@@ -325,5 +325,25 @@ document.addEventListener('DOMContentLoaded', function() {
          }
      }
  
+
+     document.addEventListener('DOMContentLoaded', function() {
+        // Select all checkboxes with the name "wich-calc"
+        const checkboxes = document.querySelectorAll('input[name="wich-calc"]');
+    
+        // Add event listener to each checkbox
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', function() {
+                // If this checkbox is checked, uncheck all others
+                if (this.checked) {
+                    checkboxes.forEach(box => {
+                        if (box !== this) {
+                            box.checked = false;
+                        }
+                    });
+                }
+            });
+        });
+    });
+    
  
 
