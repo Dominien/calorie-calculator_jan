@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Restrict input to only numeric values
     numericInputs.forEach(input => {
         input.addEventListener('input', () => {
-            input.value = input.value.replace(/[^0-9]/g, '');
+            input.value = input.value.replace(/[^0-9]/g, ''); // Allow only numbers
         });
 
         input.addEventListener('keydown', (event) => {
@@ -136,12 +136,10 @@ document.addEventListener('DOMContentLoaded', function() {
     addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
     addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
 
-    addInputFieldListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
-    addInputFieldListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
-
     observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
     observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
 
+    // Additional Range Sliders for Age, Height, Steps
     setInputValue('wrapper-step-range_slider', 'age-2');
     setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
     setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
@@ -152,18 +150,11 @@ document.addEventListener('DOMContentLoaded', function() {
     addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
     addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // New steps slider
 
-    addInputFieldListener('wrapper-step-range_slider', 'age-2');
-    addInputFieldListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
-    addInputFieldListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
-    addInputFieldListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // New steps slider
-
     observeChanges('wrapper-step-range_slider', 'age-2');
     observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
     observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
     observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // New steps slider
 });
-
-
 
 document.addEventListener("DOMContentLoaded", function() {
     // Function to look for elements until they are found
@@ -218,43 +209,35 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+// Radio Button Handler
+document.body.addEventListener('click', function(event) {
+    const wrapper = event.target.closest('.radio-field_wrapper');
+    if (wrapper) {
+        const block = wrapper.closest('.radios-abnehmziel');
+        if (block) {
+            const wrappers = block.querySelectorAll('.radio-field_wrapper');
+            wrappers.forEach(wrap => resetRadio(wrap));
 
+            // Add 'checked' class to the clicked wrapper and change SVG fill to white
+            setRadio(wrapper, true);
+        }
+    }
+});
 
-     // Delegation for '.radio-field_wrapper' click events
-     document.body.addEventListener('click', function(event) {
-         const wrapper = event.target.closest('.radio-field_wrapper');
-         if (wrapper) {
-             const block = wrapper.closest('.radios-abnehmziel');
-             if (block) {
-                 const wrappers = block.querySelectorAll('.radio-field_wrapper');
-                 wrappers.forEach(wrap => {
-                     resetRadio(wrap);
-                 });
- 
-                 // Add 'checked' class to the clicked wrapper and change SVG fill to white
-                 setRadio(wrapper, true);
-             }
-         }
-     });
- 
-     function resetRadio(wrapper) {
-         wrapper.classList.remove('checked');
-         const paths = wrapper.querySelectorAll('.ms-tooltip svg path');
-         paths.forEach(path => {
-             path.setAttribute('fill', '#303030'); // Reset fill to original color
-         });
-     }
- 
-     function setRadio(wrapper, isChecked) {
-         if (isChecked) {
-             wrapper.classList.add('checked');
-             const paths = wrapper.querySelectorAll('.ms-tooltip svg path');
-             paths.forEach(path => {
-                 path.setAttribute('fill', 'white'); // Set the SVG path color to white when checked
-             });
-         }
-     }
+function resetRadio(wrapper) {
+    wrapper.classList.remove('checked');
+    const paths = wrapper.querySelectorAll('.ms-tooltip svg path');
+    paths.forEach(path => {
+        path.setAttribute('fill', '#303030'); // Reset fill to original color
+    });
+}
 
-
- 
-
+function setRadio(wrapper, isChecked) {
+    if (isChecked) {
+        wrapper.classList.add('checked');
+        const paths = wrapper.querySelectorAll('.ms-tooltip svg path');
+        paths.forEach(path => {
+            path.setAttribute('fill', 'white'); // Set the SVG path color to white when checked
+        });
+    }
+}
