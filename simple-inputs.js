@@ -278,10 +278,10 @@ document.addEventListener('DOMContentLoaded', function() {
         event.preventDefault(); // Prevent default link behavior
 
         if (dropDown2.style.display === 'none') {
-            dropDown2.style.display = 'block'; // Show second dropdown
+            dropDown2.style.display = 'flex'; // Show second dropdown
             dropDown2.style.opacity = 1; // Add transition
         } else if (dropDown3.style.display === 'none') {
-            dropDown3.style.display = 'block'; // Show third dropdown
+            dropDown3.style.display = 'flex'; // Show third dropdown
             dropDown3.style.opacity = 1; // Add transition
             addMoreLink.style.display = 'none'; // Hide the link after the third dropdown is shown
         }
