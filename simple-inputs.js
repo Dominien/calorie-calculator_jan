@@ -325,35 +325,6 @@ document.addEventListener('DOMContentLoaded', function() {
          }
      }
 
-     document.addEventListener('DOMContentLoaded', function() {
-        // Select all checkboxes with the name "wich-calc"
-        const checkboxes = document.querySelectorAll('input[name="wich-calc"]');
-    
-        // Add event listener to each checkbox
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                // Uncheck all checkboxes except the one being clicked
-                checkboxes.forEach(cb => {
-                    if (cb !== this) {
-                        cb.checked = false;
-                        const cbWrapper = cb.closest('.w-checkbox');
-                        const cbInput = cbWrapper.querySelector('.w-checkbox-input');
-                        cbInput.classList.remove('w--redirected-checked'); // Remove checked class
-                    }
-                });
-    
-                // Toggle checked class for the current checkbox
-                const wrapper = this.closest('.w-checkbox');
-                const checkboxInput = wrapper.querySelector('.w-checkbox-input');
-    
-                if (this.checked) {
-                    checkboxInput.classList.add('w--redirected-checked');
-                } else {
-                    checkboxInput.classList.remove('w--redirected-checked');
-                }
-            });
-        });
-    });
-    
+
  
 
