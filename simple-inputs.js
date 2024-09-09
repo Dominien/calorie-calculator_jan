@@ -86,46 +86,41 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Update range slider position
-function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransition) {
-    const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
-    const handle = wrapper.querySelector(".range-slider_handle");
-    const fill = wrapper.querySelector(".range-slider_fill");
+    function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransition) {
+        const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
+        const handle = wrapper.querySelector(".range-slider_handle");
+        const fill = wrapper.querySelector(".range-slider_fill");
 
-    const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
-    const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
+        const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
+        const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
 
-    // Ensure the value doesn't exceed the slider's min and max
-    value = Math.max(min, Math.min(max, value));
+        // Allow any input value but restrict the handle and fill to stay within min and max
+        const clampedValue = Math.max(min, Math.min(value, max));
 
-    // Calculate percentage relative to the slider's range
-    const percentage = ((value - min) / (max - min)) * 100;
+        // Calculate percentage relative to the slider's range
+        const percentage = ((clampedValue - min) / (max - min)) * 100;
 
-    // Apply transition if needed
-    handle.style.transition = withTransition ? 'left 0.3s ease' : 'none';
-    fill.style.transition = withTransition ? 'width 0.3s ease' : 'none';
+        // Apply transition if needed
+        handle.style.transition = withTransition ? 'left 0.3s ease' : 'none';
+        fill.style.transition = withTransition ? 'width 0.3s ease' : 'none';
 
-    // Set handle and fill to a max of 100% and a min of 0%
-    handle.style.left = `${Math.min(Math.max(percentage, 0), 100)}%`;
-    fill.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
-}
-
+        // Set handle and fill to a max of 100% and a min of 0%
+        handle.style.left = `${Math.min(Math.max(percentage, 0), 100)}%`;
+        fill.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
+    }
 
     // Simplified handleInputChange function for all range sliders
     function handleInputChange() {
-        // Get the input values from the range sliders
         let age = document.getElementById("age-2").value;
         let height = document.getElementById("height-2").value;
         let weight = document.getElementById("weight-2").value;
         let steps = document.getElementById("steps-4").value;
 
-        // You can log the values for debugging purposes
         console.log("Age:", age, "Height:", height, "Weight:", weight, "Steps:", steps);
 
-        // Optionally update the visual state of sliders
         updateSliderUI();
     }
 
-    // Optionally update the visual state of the sliders
     function updateSliderUI() {
         const sliders = [
             { element: document.querySelector('.wrapper-step-range_slider'), max: 99 },
@@ -140,14 +135,13 @@ function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransitio
             const value = parseFloat(slider.element.querySelector('.inside-handle-text').textContent);
             const max = slider.max;
 
-            // Update the fill bar width based on the value
+            // Calculate percentage based on the max value
             const percentage = (value / max) * 100;
-            handle.style.left = `${percentage}%`;
-            fill.style.width = `${percentage}%`;
+            handle.style.left = `${Math.min(percentage, 100)}%`;
+            fill.style.width = `${Math.min(percentage, 100)}%`;
         });
     }
 
-    // Handle changes in input field and slider sync
     function observeChanges(rangeSliderWrapperClass, inputId) {
         const handleTextElement = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
@@ -169,7 +163,6 @@ function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransitio
         });
     }
 
-    // Add listeners for slider handle movement
     function addHandleMovementListener(rangeSliderWrapperClass, inputId) {
         const handle = document.querySelector(`.${rangeSliderWrapperClass} .range-slider_handle`);
         const slider = document.querySelector(`.${rangeSliderWrapperClass} .track-range-slider`);
@@ -204,7 +197,6 @@ function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransitio
         }
     }
 
-    // Event listener for input field changes
     function addInputFieldListener(rangeSliderWrapperClass, inputId) {
         const inputField = document.getElementById(inputId);
         inputField.addEventListener('input', function() {
@@ -219,7 +211,6 @@ function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransitio
         });
     }
 
-    // Initialize values and add listeners
     setInputValue('wrapper-step-range_slider', 'age-2');
     setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
     setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
@@ -240,6 +231,7 @@ function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransitio
     observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
     observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // New steps slider
 });
+
 
 
 document.addEventListener("DOMContentLoaded", function() {
