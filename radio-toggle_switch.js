@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Pre-select the miflin radio button on page load
+    // Pre-select the miflin radio button on page load (without handling styling)
     miflinRadio.checked = true;
 
     // Event listeners for radio buttons
