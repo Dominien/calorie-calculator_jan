@@ -23,51 +23,125 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Handle touch events for sliders on mobile
-    if (window.innerWidth <= 1024) {
-        function addSmoothTouchListeners(rangeSliderWrapperClass, inputId) {
-            const handle = document.querySelector(`.${rangeSliderWrapperClass} .range-slider_handle`);
-            const slider = document.querySelector(`.${rangeSliderWrapperClass} .track-range-slider`);
-            let isDragging = false;
+    // Function to update range slider position and value for weight and KFA
+    function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransition) {
+        const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
+        const handle = wrapper.querySelector(".range-slider_handle");
+        const fill = wrapper.querySelector(".range-slider_fill");
 
-            handle.addEventListener('touchstart', function(e) {
-                isDragging = true;
-                document.body.style.overflow = 'hidden'; // Prevent page scrolling
-                document.addEventListener('touchmove', onTouchMove, { passive: false });
-                document.addEventListener('touchend', onTouchEnd);
-            });
+        const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
+        const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
 
-            function onTouchMove(e) {
-                if (!isDragging) return;
-                e.preventDefault(); // Prevent vertical scrolling
+        // Ensure the value stays within the range
+        value = Math.max(min, Math.min(value, max));
 
-                const rect = slider.getBoundingClientRect();
-                const offsetX = e.touches[0].clientX - rect.left;
-                const percentage = (offsetX / slider.clientWidth) * 100;
+        // Calculate percentage relative to the slider's range
+        const percentage = ((value - min) / (max - min)) * 100;
 
-                const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
-                const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
-                const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
-                const value = Math.round(min + (percentage / 100) * (max - min));
+        // Apply transition if needed
+        handle.style.transition = withTransition ? 'left 0.3s ease' : 'none';
+        fill.style.transition = withTransition ? 'width 0.3s ease' : 'none';
 
-                document.getElementById(inputId).value = value;
-                requestAnimationFrame(() => setHandleText(rangeSliderWrapperClass, inputId));
+        // Set handle and fill to a max of 100% and a min of 0%
+        handle.style.left = `${Math.min(Math.max(percentage, 0), 100)}%`;
+        fill.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
+    }
+
+    // Sync input field value with slider handle text for weight and KFA
+    function setInputValue(rangeSliderWrapperClass, inputId) {
+        const handleText = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`).textContent;
+        document.getElementById(inputId).value = handleText;
+        handleInputChange();
+    }
+
+    // Update handle text based on input value for weight and KFA
+    function setHandleText(rangeSliderWrapperClass, inputId) {
+        const inputValue = document.getElementById(inputId).value;
+        const handleText = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
+        handleText.textContent = inputValue;
+        updateRangeSliderPosition(rangeSliderWrapperClass, inputValue, true);
+        handleInputChange();
+    }
+
+    // Function to handle input changes for weight and KFA
+    function handleInputChange() {
+        // Get the input values from the sliders
+        const weight = document.getElementById("weight-3-kfa").value;
+        const kfa = document.getElementById("kfa-2").value;
+
+        console.log("Weight:", weight, "KFA:", kfa);
+    }
+
+    // Function to handle input changes and slider sync for weight and KFA
+    function observeChanges(rangeSliderWrapperClass, inputId) {
+        const handleTextElement = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
+        const inputElement = document.getElementById(inputId);
+
+        const observer = new MutationObserver(() => {
+            if (inputElement.value !== handleTextElement.textContent) {
+                inputElement.value = handleTextElement.textContent;
+                handleInputChange();
             }
+        });
 
-            function onTouchEnd() {
-                isDragging = false;
-                document.body.style.overflow = ''; // Re-enable page scrolling
-                document.removeEventListener('touchmove', onTouchMove);
-                document.removeEventListener('touchend', onTouchEnd);
+        observer.observe(handleTextElement, { childList: true });
+
+        inputElement.addEventListener('input', () => {
+            if (inputElement.value !== handleTextElement.textContent) {
+                handleTextElement.textContent = inputElement.value;
+                updateRangeSliderPosition(rangeSliderWrapperClass, inputElement.value, true);
             }
+        });
+    }
+
+    // Add listeners for slider handle movement for weight and KFA
+    function addHandleMovementListener(rangeSliderWrapperClass, inputId) {
+        const handle = document.querySelector(`.${rangeSliderWrapperClass} .range-slider_handle`);
+        const slider = document.querySelector(`.${rangeSliderWrapperClass} .track-range-slider`);
+
+        handle.addEventListener('mousedown', () => {
+            updateRangeSliderPosition(rangeSliderWrapperClass, document.getElementById(inputId).value, false);
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        });
+
+        slider.addEventListener('click', (event) => {
+            const rect = slider.getBoundingClientRect();
+            const offsetX = event.clientX - rect.left;
+            const percentage = (offsetX / slider.clientWidth) * 100;
+
+            const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
+            const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
+            const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
+            const value = Math.round(min + (percentage / 100) * (max - min));
+
+            document.getElementById(inputId).value = value;
+            setHandleText(rangeSliderWrapperClass, inputId);
+        });
+
+        function onMouseMove() {
+            setInputValue(rangeSliderWrapperClass, inputId);
         }
 
-        // Add touch listeners for all sliders including steps
-        addSmoothTouchListeners('wrapper-step-range_slider', 'age-2');
-        addSmoothTouchListeners('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
-        addSmoothTouchListeners('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
-        addSmoothTouchListeners('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4');
+        function onMouseUp() {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
     }
+
+    // Initialize values and add listeners for weight and KFA
+    setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+    setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
+
+    addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+    addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
+
+    addInputFieldListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+    addInputFieldListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
+
+    observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+    observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
+});
 
     // Sync input field value with slider handle text
     function setInputValue(rangeSliderWrapperClass, inputId) {
