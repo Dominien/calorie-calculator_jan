@@ -294,7 +294,7 @@ document.addEventListener('DOMContentLoaded', function() {
      document.body.addEventListener('click', function(event) {
          const wrapper = event.target.closest('.radio-field_wrapper');
          if (wrapper) {
-             const block = wrapper.closest('.radio-buttons_wrapper');
+             const block = wrapper.closest('.radios-abnehmziel');
              if (block) {
                  const wrappers = block.querySelectorAll('.radio-field_wrapper');
                  wrappers.forEach(wrap => {
