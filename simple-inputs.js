@@ -174,7 +174,6 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
-
     
         // Function to set the input value based on the handle text
         function setInputValue(rangeSliderWrapperClass, inputId) {
@@ -326,12 +325,5 @@ document.addEventListener("DOMContentLoaded", function() {
         observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
         observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
     
-        // Add event listeners to FAQ questions with debounce
-        document.querySelectorAll('.faq2_question').forEach((questionElement) => {
-            questionElement.addEventListener('click', debounce(toggleFAQ, 300)); // 300ms debounce delay
-        });
-
-        // Add event listener to the "Mehr zum Ergebnis" link
-        document.querySelector('.more-info_on-calc').addEventListener('click', handleMoreInfoClick);
-    });
+       
 
