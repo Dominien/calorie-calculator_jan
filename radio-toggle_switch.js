@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const kfaInput = document.getElementById('input-kfa');
 
     // Initialize both divs to be hidden
-    miflinInput.style.display = 'none';
+    miflinInput.style.display = 'block';
     kfaInput.style.display = 'none';
 
     // Add transition for smoother showing/hiding
