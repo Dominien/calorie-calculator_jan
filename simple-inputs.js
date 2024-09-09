@@ -226,3 +226,30 @@ document.addEventListener('DOMContentLoaded', function() {
     observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
 });
 
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Function to look for elements until they are found
+    function waitForElement(selector, callback) {
+        const elements = document.querySelectorAll(selector);
+        if (elements.length) {
+            callback(elements); // Run the callback once the elements are found
+        } else {
+            requestAnimationFrame(() => waitForElement(selector, callback)); // Keep checking
+        }
+    }
+
+    // Use the function to wait for the buttons to be present in the DOM
+    waitForElement('.woman-button', function(buttons) {
+        // Add click event listener to each button
+        buttons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                // Remove 'active' class from all buttons
+                buttons.forEach(btn => btn.classList.remove('active'));
+                // Add 'active' class to the clicked button
+                this.classList.add('active');
+            });
+        });
+    });
+});
+
+
