@@ -289,3 +289,41 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
+
+     // Delegation for '.radio-field_wrapper' click events
+     document.body.addEventListener('click', function(event) {
+         const wrapper = event.target.closest('.radio-field_wrapper');
+         if (wrapper) {
+             const block = wrapper.closest('.radio-buttons_wrapper');
+             if (block) {
+                 const wrappers = block.querySelectorAll('.radio-field_wrapper');
+                 wrappers.forEach(wrap => {
+                     resetRadio(wrap);
+                 });
+ 
+                 // Add 'checked' class to the clicked wrapper and change SVG fill to white
+                 setRadio(wrapper, true);
+             }
+         }
+     });
+ 
+     function resetRadio(wrapper) {
+         wrapper.classList.remove('checked');
+         const paths = wrapper.querySelectorAll('.ms-tooltip svg path');
+         paths.forEach(path => {
+             path.setAttribute('fill', '#303030'); // Reset fill to original color
+         });
+     }
+ 
+     function setRadio(wrapper, isChecked) {
+         if (isChecked) {
+             wrapper.classList.add('checked');
+             const paths = wrapper.querySelectorAll('.ms-tooltip svg path');
+             paths.forEach(path => {
+                 path.setAttribute('fill', 'white'); // Set the SVG path color to white when checked
+             });
+         }
+     }
+ 
+ 
+
