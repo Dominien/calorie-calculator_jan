@@ -34,6 +34,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Pre-select the miflin radio button on page load
+    miflinRadio.checked = true;
+
     // Event listeners for radio buttons
     miflinRadio.addEventListener('change', toggleInputs);
     kfaRadio.addEventListener('change', toggleInputs);
