@@ -3,8 +3,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const kfaRadio = document.getElementById('kfa');
     const miflinInput = document.getElementById('input-miflin');
     const kfaInput = document.getElementById('input-kfa');
-    const miflinRadioWrapper = document.querySelector('label[for="miflin"] .w-radio-input');
-    const kfaRadioWrapper = document.querySelector('label[for="kfa"] .w-radio-input');
 
     // Initialize both divs to be hidden
     miflinInput.style.display = 'none';
@@ -14,17 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
     miflinInput.style.transition = 'opacity 0.5s ease';
     kfaInput.style.transition = 'opacity 0.5s ease';
 
-    // Pre-select the miflin radio button on page load (without handling styling)
-    miflinRadio.checked = true; // Make miflin selected by default
-    miflinRadioWrapper.classList.add('w--redirected-checked'); // Add the style for checked
-
     // Function to show the correct input block based on the selected radio button
     function toggleInputs() {
         if (miflinRadio.checked) {
-            // Update styles
-            miflinRadioWrapper.classList.add('w--redirected-checked');
-            kfaRadioWrapper.classList.remove('w--redirected-checked');
-
             // Show miflin input, hide kfa input
             kfaInput.style.opacity = '0';
             setTimeout(() => {
@@ -34,10 +24,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500); // Duration to match the transition
 
         } else if (kfaRadio.checked) {
-            // Update styles
-            kfaRadioWrapper.classList.add('w--redirected-checked');
-            miflinRadioWrapper.classList.remove('w--redirected-checked');
-
             // Show kfa input, hide miflin input
             miflinInput.style.opacity = '0';
             setTimeout(() => {
