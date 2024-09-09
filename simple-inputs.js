@@ -101,6 +101,41 @@ document.addEventListener('DOMContentLoaded', function() {
         fill.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
     }
 
+    // Simplified handleInputChange function for just range sliders
+    function handleInputChange() {
+        // Get the input values from the range sliders
+        let age = document.getElementById("age-2").value;
+        let height = document.getElementById("height-2").value;
+        let weight = document.getElementById("weight-2").value;
+
+        // You can log the values for debugging purposes
+        console.log("Age:", age, "Height:", height, "Weight:", weight);
+
+        // Optionally update the visual state of sliders
+        updateSliderUI();
+    }
+
+    // Optionally update the visual state of the sliders
+    function updateSliderUI() {
+        const sliders = [
+            { element: document.querySelector('.wrapper-step-range_slider'), max: 99 },
+            { element: document.querySelector('.wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]'), max: 220 },
+            { element: document.querySelector('.wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]'), max: 150 }
+        ];
+
+        sliders.forEach(slider => {
+            const handle = slider.element.querySelector('.range-slider_handle');
+            const fill = slider.element.querySelector('.range-slider_fill');
+            const value = parseFloat(slider.element.querySelector('.inside-handle-text').textContent);
+            const max = slider.max;
+
+            // Update the fill bar width based on the value
+            const percentage = (value / max) * 100;
+            handle.style.left = `${percentage}%`;
+            fill.style.width = `${percentage}%`;
+        });
+    }
+
     // Handle changes in input field and slider sync
     function observeChanges(rangeSliderWrapperClass, inputId) {
         const handleTextElement = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
@@ -190,3 +225,4 @@ document.addEventListener('DOMContentLoaded', function() {
     observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
     observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
 });
+
