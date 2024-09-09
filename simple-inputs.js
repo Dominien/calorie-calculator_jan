@@ -174,8 +174,164 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 
- 
 
+    
+        // Function to set the input value based on the handle text
+        function setInputValue(rangeSliderWrapperClass, inputId) {
+            var handleText = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`).textContent;
+            document.getElementById(inputId).value = handleText;
+            handleInputChange();
+        }
+    
+        // Function to update range slider handle text based on input value
+        function setHandleText(rangeSliderWrapperClass, inputId) {
+            var inputValue = document.getElementById(inputId).value;
+            var handleText = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
+            handleText.textContent = inputValue;
+            updateRangeSliderPosition(rangeSliderWrapperClass, inputValue, true);
+            handleInputChange();
+        }
+    
+        // Update range slider position based on input value
+        function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransition) {
+            const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
+            const handle = wrapper.querySelector(".range-slider_handle");
+            const track = wrapper.querySelector(".track-range-slider");
+            const fill = wrapper.querySelector(".range-slider_fill");
+    
+            const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
+            const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
+            const step = parseFloat(wrapper.getAttribute("fs-rangeslider-step"));
+    
+            const percentage = (value - min) / (max - min) * 100;
+    
+            if (withTransition) {
+                handle.style.transition = 'left 0.3s ease';
+                fill.style.transition = 'width 0.3s ease';
+            } else {
+                handle.style.transition = 'none';
+                fill.style.transition = 'none';
+            }
+    
+            handle.style.left = `${Math.min(Math.max(percentage, 0), 100)}%`;
+            fill.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
+        }
+    
+        // Function to observe changes to the handle text and input field value
+        function observeChanges(rangeSliderWrapperClass, inputId) {
+            const handleTextElement = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
+            const inputElement = document.getElementById(inputId);
+    
+            const observer = new MutationObserver(() => {
+                if (inputElement.value !== handleTextElement.textContent) {
+                    inputElement.value = handleTextElement.textContent;
+                    handleInputChange();
+                }
+            });
+    
+            observer.observe(handleTextElement, { childList: true, subtree: true });
+    
+            inputElement.addEventListener('input', () => {
+                if (inputElement.value !== handleTextElement.textContent) {
+                    handleTextElement.textContent = inputElement.value;
+                    updateRangeSliderPosition(rangeSliderWrapperClass, inputElement.value, true);
+                }
+            });
+        }
+    
+        // Event listener for range slider handle movement
+        function addHandleMovementListener(rangeSliderWrapperClass, inputId) {
+            var handle = document.querySelector(`.${rangeSliderWrapperClass} .range-slider_handle`);
+            var slider = document.querySelector(`.${rangeSliderWrapperClass} .track-range-slider`);
+    
+            handle.addEventListener('mousedown', function() {
+                updateRangeSliderPosition(rangeSliderWrapperClass, document.getElementById(inputId).value, false);
+                document.addEventListener('mousemove', onMouseMove);
+                document.addEventListener('mouseup', onMouseUp);
+            });
+    
+            handle.addEventListener('touchstart', function() {
+                updateRangeSliderPosition(rangeSliderWrapperClass, document.getElementById(inputId).value, false);
+                document.addEventListener('touchmove', onTouchMove);
+                document.addEventListener('touchend', onTouchEnd);
+            });
+    
+            slider.addEventListener('click', function(event) {
+                const rect = slider.getBoundingClientRect();
+                const offsetX = event.clientX - rect.left;
+                const percentage = (offsetX / slider.clientWidth) * 100;
+                const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
+                const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
+                const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
+                const value = Math.round(min + (percentage / 100) * (max - min));
+    
+                document.getElementById(inputId).value = value;
+                setHandleText(rangeSliderWrapperClass, inputId);
+            });
+    
+            function onMouseMove() {
+                setInputValue(rangeSliderWrapperClass, inputId);
+            }
+    
+            function onMouseUp() {
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+            }
+    
+            function onTouchMove() {
+                setInputValue(rangeSliderWrapperClass, inputId);
+            }
+    
+            function onTouchEnd() {
+                document.removeEventListener('touchmove', onTouchMove);
+                document.removeEventListener('touchend', onTouchEnd);
+            }
+        }
+    
+        // Event listener for input field changes
+        function addInputFieldListener(rangeSliderWrapperClass, inputId) {
+            var inputField = document.getElementById(inputId);
+            inputField.addEventListener('input', function() {
+                if (inputField.value.length > 3) {
+                    inputField.value = inputField.value.slice(0, 3);
+                }
+                setHandleText(rangeSliderWrapperClass, inputId);
+                // Remove the transition after the animation is done
+                setTimeout(() => {
+                    const handle = document.querySelector(`.${rangeSliderWrapperClass} .range-slider_handle`);
+                    const fill = document.querySelector(`.${rangeSliderWrapperClass} .range-slider_fill`);
+                    handle.style.transition = 'none';
+                    fill.style.transition = 'none';
+                }, 300);
+            });
+        }
+    
+        // Set initial values
+        setInputValue('wrapper-step-range_slider', 'age-2');
+        setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
+        setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
+    
+        // Add listeners for handle movement
+        addHandleMovementListener('wrapper-step-range_slider', 'age-2');
+        addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
+        addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
+    
+        // Add listeners for input field changes
+        addInputFieldListener('wrapper-step-range_slider', 'age-2');
+        addInputFieldListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
+        addInputFieldListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
+    
+        // Add observer to keep input and handle in sync
+        observeChanges('wrapper-step-range_slider', 'age-2');
+        observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
+        observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
+    
+        // Add event listeners to FAQ questions with debounce
+        document.querySelectorAll('.faq2_question').forEach((questionElement) => {
+            questionElement.addEventListener('click', debounce(toggleFAQ, 300)); // 300ms debounce delay
+        });
 
- 
- 
+        // Add event listener to the "Mehr zum Ergebnis" link
+        document.querySelector('.more-info_on-calc').addEventListener('click', handleMoreInfoClick);
+    });
+
