@@ -260,4 +260,32 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 
+document.addEventListener('DOMContentLoaded', function() {
+    const addMoreLink = document.querySelector('.link-more_training');
+    const dropDown2 = document.getElementById('drop-down-2');
+    const dropDown3 = document.getElementById('drop-down-3');
+    
+    // Initially hide dropdowns 2 and 3
+    dropDown2.style.display = 'none';
+    dropDown3.style.display = 'none';
+
+    // Smooth transition
+    dropDown2.style.transition = 'opacity 0.5s ease, height 0.5s ease';
+    dropDown3.style.transition = 'opacity 0.5s ease, height 0.5s ease';
+
+    // Handler for clicking "Weitere hinzufügen"
+    addMoreLink.addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent default link behavior
+
+        if (dropDown2.style.display === 'none') {
+            dropDown2.style.display = 'block'; // Show second dropdown
+            dropDown2.style.opacity = 1; // Add transition
+        } else if (dropDown3.style.display === 'none') {
+            dropDown3.style.display = 'block'; // Show third dropdown
+            dropDown3.style.opacity = 1; // Add transition
+            addMoreLink.style.display = 'none'; // Hide the link after the third dropdown is shown
+        }
+    });
+});
+
 
