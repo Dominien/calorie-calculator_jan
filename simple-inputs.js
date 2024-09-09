@@ -86,22 +86,29 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Update range slider position
-    function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransition) {
-        const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
-        const handle = wrapper.querySelector(".range-slider_handle");
-        const fill = wrapper.querySelector(".range-slider_fill");
+function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransition) {
+    const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
+    const handle = wrapper.querySelector(".range-slider_handle");
+    const fill = wrapper.querySelector(".range-slider_fill");
 
-        const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
-        const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
+    const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
+    const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
 
-        const percentage = ((value - min) / (max - min)) * 100;
+    // Ensure the value doesn't exceed the slider's min and max
+    value = Math.max(min, Math.min(max, value));
 
-        handle.style.transition = withTransition ? 'left 0.3s ease' : 'none';
-        fill.style.transition = withTransition ? 'width 0.3s ease' : 'none';
+    // Calculate percentage relative to the slider's range
+    const percentage = ((value - min) / (max - min)) * 100;
 
-        handle.style.left = `${Math.min(Math.max(percentage, 0), 100)}%`;
-        fill.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
-    }
+    // Apply transition if needed
+    handle.style.transition = withTransition ? 'left 0.3s ease' : 'none';
+    fill.style.transition = withTransition ? 'width 0.3s ease' : 'none';
+
+    // Set handle and fill to a max of 100% and a min of 0%
+    handle.style.left = `${Math.min(Math.max(percentage, 0), 100)}%`;
+    fill.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
+}
+
 
     // Simplified handleInputChange function for all range sliders
     function handleInputChange() {
