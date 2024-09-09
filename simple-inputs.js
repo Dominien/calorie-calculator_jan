@@ -325,7 +325,6 @@ document.addEventListener('DOMContentLoaded', function() {
          }
      }
  
-
      document.addEventListener('DOMContentLoaded', function() {
         // Select all checkboxes with the name "wich-calc"
         const checkboxes = document.querySelectorAll('input[name="wich-calc"]');
@@ -333,17 +332,35 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add event listener to each checkbox
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', function() {
-                // If this checkbox is checked, uncheck all others
+                // If this checkbox is checked
                 if (this.checked) {
+                    // Remove 'w--redirected-checked' class from all checkboxes
                     checkboxes.forEach(box => {
-                        if (box !== this) {
-                            box.checked = false;
+                        const wrapper = box.closest('.w-checkbox');
+                        const checkboxInput = wrapper.querySelector('.w-checkbox-input');
+                        if (checkboxInput) {
+                            checkboxInput.classList.remove('w--redirected-checked');
                         }
                     });
+    
+                    // Add 'w--redirected-checked' class to the clicked checkbox
+                    const wrapper = this.closest('.w-checkbox');
+                    const checkboxInput = wrapper.querySelector('.w-checkbox-input');
+                    if (checkboxInput) {
+                        checkboxInput.classList.add('w--redirected-checked');
+                    }
+                } else {
+                    // Remove 'w--redirected-checked' class when unchecked
+                    const wrapper = this.closest('.w-checkbox');
+                    const checkboxInput = wrapper.querySelector('.w-checkbox-input');
+                    if (checkboxInput) {
+                        checkboxInput.classList.remove('w--redirected-checked');
+                    }
                 }
             });
         });
     });
+    
     
  
 
