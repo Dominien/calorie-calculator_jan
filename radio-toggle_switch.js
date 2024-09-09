@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
             kfaInput.style.opacity = '0';
             setTimeout(() => {
                 kfaInput.style.display = 'none';
-                miflinInput.style.display = 'flex';
+                miflinInput.style.display = 'block';
                 setTimeout(() => miflinInput.style.opacity = '1', 10); // Small delay to trigger opacity transition
             }, 500); // Duration to match the transition
 
@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', function() {
             miflinInput.style.opacity = '0';
             setTimeout(() => {
                 miflinInput.style.display = 'none';
-                kfaInput.style.display = 'flex';
+                kfaInput.style.display = 'block';
                 setTimeout(() => kfaInput.style.opacity = '1', 10); // Small delay to trigger opacity transition
             }, 500); // Duration to match the transition
         }
