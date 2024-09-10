@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'cardio (HIIT)': 9
     };
 
-    let weight = 0;  // This will be dynamically fetched from the Grundumsatz section.
+    let weight = 0;
 
     // Function to fetch weight from the Grundumsatz section
     function getWeightFromGrundumsatz() {
@@ -283,17 +283,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to calculate calories for each training session
     function calculateTrainingCalories(dropdownId, minutesInputId, sessionsInputId) {
-        const activityDropdown = document.querySelector(`#${dropdownId} .current`);
+        const activityDropdown = $(`#${dropdownId}`).find('.current');
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsInput = document.getElementById(sessionsInputId);
 
-        let activityType = activityDropdown ? activityDropdown.textContent.trim() : '';
-        console.log(`Activity Type Selected: ${activityType}`);  // Log the selected activity type
+        let activityType = activityDropdown ? activityDropdown.text().trim() : '';
+        console.log(`Activity Type Selected: ${activityType}`);
 
         let minutes = parseInt(minutesInput.value, 10) || 0;
         let sessions = parseInt(sessionsInput.value, 10) || 0;
 
-        // Get MET value based on the selected activity
         let MET = MET_VALUES[activityType] || 0;
         if (!activityType || minutes === 0 || sessions === 0 || weight === 0 || MET === 0) {
             return 0;
@@ -315,30 +314,24 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (totalCalories > 0) {
             totalCaloriesElement.textContent = `${totalCalories} kcal`;
-            totalCaloriesElement.style.display = 'flex';  // Show the element when calories > 0
+            totalCaloriesElement.style.display = 'flex';
         } else {
-            totalCaloriesElement.style.display = 'none';  // Hide the element when calories are 0
+            totalCaloriesElement.style.display = 'none';
         }
     }
 
-    // Add event listeners for each training session
+    // Function to set up training sessions
     function setupTrainingSession(dropdownId, minutesInputId, sessionsInputId) {
-        const activityDropdown = document.querySelector(`#${dropdownId}`);
+        const activityDropdown = $(`#${dropdownId}`);
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsInput = document.getElementById(sessionsInputId);
 
-        // Listen for dropdown changes by observing changes in the 'current' element of the dropdown
-        activityDropdown.addEventListener('click', function () {
-            const optionsList = activityDropdown.querySelector('.list');
-            optionsList.addEventListener('click', function () {
-                setTimeout(function() {
-                    console.log(`Dropdown clicked: ${dropdownId}`);
-                    updateTotalCalories();
-                }, 100);
-            });
+        // Bind to the 'change' event using jQuery after nice-select initializes
+        $(`#${dropdownId}`).on('change', function () {
+            console.log(`Dropdown changed: ${$(this).val()}`);
+            updateTotalCalories();
         });
 
-        // Add event listeners for input fields
         minutesInput.addEventListener('input', function () {
             updateTotalCalories();
         });
@@ -348,13 +341,15 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Initialize training sessions
-    getWeightFromGrundumsatz();
-    setupTrainingSession('drop-down-1', 'training-minuten', 'training-woche');
-    setupTrainingSession('drop-down-2', 'training-minuten-2', 'training-woche-2');
-    setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
+    // Initialize nice-select and training sessions
+    $(document).ready(function () {
+        $('select').niceSelect();  // Initialize nice-select for all select elements
+        getWeightFromGrundumsatz();
+        setupTrainingSession('drop-down-1', 'training-minuten', 'training-woche');
+        setupTrainingSession('drop-down-2', 'training-minuten-2', 'training-woche-2');
+        setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
+    });
 });
-
 
 
 
