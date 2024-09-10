@@ -264,21 +264,21 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to handle each training session input
     function handleTrainingSession(dropdownId, minutesInputId, sessionsPerWeekInputId, resultWrapperClass) {
         const activitySelectWrapper = document.querySelector(`#${dropdownId} .nice-select`);
-        const minutesInput = document.getElementById(minutesInputId);
-        const sessionsPerWeekInput = document.getElementById(sessionsPerWeekInputId);
-        const trainingResultElement = document.querySelector(`.${resultWrapperClass} .steps_result-text`);
-        const trainingWrapperResult = document.querySelector(`.${resultWrapperClass}`); // Training kcal wrapper
+        const minutesInput = document.getElementById(minutesInputId); // Input for minutes
+        const sessionsPerWeekInput = document.getElementById(sessionsPerWeekInputId); // Input for sessions per week
+        const trainingResultElement = document.querySelector(`.${resultWrapperClass} .steps_result-text`); // Where the calories will be displayed
+        const trainingWrapperResult = document.querySelector(`.${resultWrapperClass}`); // Wrapper for result (used for showing/hiding result)
 
-        let weight = 0; // Get dynamically from Grundumsatz
-        let activityType = ''; // Initialize empty, updated in event listener
+        let weight = 0; // Placeholder for weight, will be fetched from the Grundumsatz section
+        let activityType = ''; // Placeholder for activity type (dropdown)
         let minutesPerSession = 0;
         let sessionsPerWeek = 0;
 
         // MET values for different activities
         const MET_VALUES = {
-            'Krafttraining': 6, // Strength training
-            'cardio (LISS)': 7,  // Cardio LISS (Jogging, cycling, light sports)
-            'cardio (HIIT)': 9   // HIIT (Competitive sports, interval training)
+            'Krafttraining': 6,  // Strength training
+            'cardio-liss': 7,     // Cardio LISS
+            'cardio-hiit': 9      // HIIT
         };
 
         // Function to fetch weight from the Grundumsatz section
@@ -292,20 +292,20 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(`Weight used for training calculation: ${weight}`);
         }
 
-        // Event listener for activity type selection (custom dropdown)
+        // Event listener for activity type selection (dropdown click)
         if (activitySelectWrapper) {
             activitySelectWrapper.addEventListener('click', function () {
                 setTimeout(() => {
-                    const activitySelect = document.querySelector(`#${dropdownId} .nice-select span.current`);
-                    if (activitySelect) {
-                        activityType = activitySelect.textContent.trim();
+                    const selectedActivity = document.querySelector(`#${dropdownId} .nice-select .option.selected`);
+                    if (selectedActivity) {
+                        activityType = selectedActivity.getAttribute('data-value');
                         console.log(`Selected activity type: ${activityType}`);
                         getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
                         calculateTrainingCalories();
                     } else {
                         console.error(`Activity select element not found inside ${dropdownId}`);
                     }
-                }, 100); // Add slight delay to allow selection
+                }, 100); // Slight delay to ensure correct selection
             });
         } else {
             console.error(`Dropdown wrapper ${dropdownId} not found.`);
@@ -364,4 +364,3 @@ document.addEventListener('DOMContentLoaded', function () {
     handleTrainingSession('drop-down-2', 'training-minuten-3', 'training-woche-3', 'wrapper-training_result-2');
     handleTrainingSession('drop-down-3', 'training-minuten-4', 'training-woche-4', 'wrapper-training_result-3');
 });
-
