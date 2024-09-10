@@ -260,7 +260,6 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('Initial setup complete.');
 });
 
-
 document.addEventListener('DOMContentLoaded', function () {
     const MET_VALUES = {
         'Krafttraining': 6,
@@ -326,9 +325,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsInput = document.getElementById(sessionsInputId);
 
-        // Bind to the 'change' event using jQuery after nice-select initializes
+        // Event for detecting dropdown changes (jQuery Nice Select specific)
         $(`#${dropdownId}`).on('change', function () {
-            console.log(`Dropdown changed: ${$(this).find('.current').text()}`);
+            console.log(`Dropdown changed: ${$(this).val()}`);
             updateTotalCalories(); // Update total calories for all sessions
         });
 
@@ -350,7 +349,3 @@ document.addEventListener('DOMContentLoaded', function () {
         setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
     });
 });
-
-
-
-
