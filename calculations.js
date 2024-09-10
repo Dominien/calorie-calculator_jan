@@ -262,8 +262,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     // Function to handle each training session input
-    function handleTrainingSession(dropdownId, minutesInputId, sessionsPerWeekInputId, resultWrapperClass) {
-        const activitySelectWrapper = document.querySelector(`#${dropdownId} .nice-select`);
+    function handleTrainingSession(selectWrapperClass, minutesInputId, sessionsPerWeekInputId, resultWrapperClass) {
+        const activitySelectWrapper = document.querySelector(`.${selectWrapperClass} .nice-select`);
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsPerWeekInput = document.getElementById(sessionsPerWeekInputId);
         const trainingResultElement = document.querySelector(`.${resultWrapperClass} .steps_result-text`);
@@ -296,19 +296,19 @@ document.addEventListener('DOMContentLoaded', function () {
         if (activitySelectWrapper) {
             activitySelectWrapper.addEventListener('click', function () {
                 setTimeout(() => {
-                    const activitySelect = document.querySelector(`#${dropdownId} .nice-select span.current`);
+                    const activitySelect = document.querySelector(`.${selectWrapperClass} .nice-select span.current`);
                     if (activitySelect) {
                         activityType = activitySelect.textContent.trim();
                         console.log(`Selected activity type: ${activityType}`);
                         getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
                         calculateTrainingCalories();
                     } else {
-                        console.error(`Activity select element not found inside ${dropdownId}`);
+                        console.error(`Activity select element not found inside ${selectWrapperClass}`);
                     }
                 }, 100); // Add slight delay to allow selection
             });
         } else {
-            console.error(`Dropdown wrapper ${dropdownId} not found.`);
+            console.error(`Dropdown wrapper ${selectWrapperClass} not found.`);
         }
 
         // Event listener for input of minutes per session
@@ -364,7 +364,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Call the function for each training session dropdown
-    handleTrainingSession('drop-down-1', 'training-minuten', 'training-woche', 'wrapper-training_result');
-    handleTrainingSession('drop-down-2', 'training-minuten-2', 'training-woche-2', 'wrapper-training_result-2');
-    handleTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3', 'wrapper-training_result-3');
+    handleTrainingSession('drop-wrapper_training', 'training-minuten', 'training-woche', 'wrapper-training_result');
+    handleTrainingSession('drop-wrapper_training._2', 'training-minuten-2', 'training-woche-2', 'wrapper-training_result-2');
+    handleTrainingSession('drop-wrapper_training._3', 'training-minuten-3', 'training-woche-3', 'wrapper-training_result-3');
 });
