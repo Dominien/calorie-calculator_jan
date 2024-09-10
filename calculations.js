@@ -7,9 +7,12 @@ document.addEventListener('DOMContentLoaded', function () {
     const weightInput = document.getElementById('weight-2');
     const weightKfaInput = document.getElementById('weight-3-kfa'); // KFA weight input
     const kfaInput = document.getElementById('kfa-2');
+    const stepsInput = document.getElementById('steps-4'); // Steps input
+    const stepsResultElement = document.querySelector('.wrapper-steps_kcals .steps_result-text');
+    const dailyMovementResultElement = document.querySelector('.wrapper-ziel_aufgespalten .wrapper-right_text-result > div');
+
     const resultElement = document.querySelector('.steps_result-text');
     const wrapperResult = document.querySelector('.wrapper-result_grundumsatz');
-    const grundumsatzResultElement = document.querySelector('.wrapper-ziel_aufgespalten .wrapper-right_text-result div'); // Target this element to update
 
     let gender = '';
     let calcType = 'miflin'; // Default to Miflin
@@ -17,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     let height = 0;
     let weight = 0;
     let kfa = 0; // Body Fat Percentage for KFA calculation
+    let dailySteps = 0;
 
     // Gender selection
     genderInputs.forEach(input => {
@@ -69,6 +73,13 @@ document.addEventListener('DOMContentLoaded', function () {
         calculateResult();
     });
 
+    // Input change listener for Steps input
+    stepsInput.addEventListener('input', () => {
+        dailySteps = parseInt(stepsInput.value.replace(/\./g, ''), 10) || 0; // Removing periods and converting to integer
+        console.log(`Steps input: ${dailySteps}`);
+        calculateStepsCalories();
+    });
+
     // Function to toggle between Miflin and KFA input fields
     function toggleCalcType() {
         const miflinInputs = document.getElementById('input-miflin');
@@ -84,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Calculation function
+    // Calculation function for BMR
     function calculateResult() {
         // Fetch values from sliders' handle text if available
         age = getSliderValue('wrapper-step-range_slider', 'age-2');
@@ -113,12 +124,22 @@ document.addEventListener('DOMContentLoaded', function () {
         if ((calcType === 'miflin' && weight && height && age && gender) || (calcType === 'kfa' && weight && kfa && gender)) {
             wrapperResult.style.display = 'flex';
             resultElement.textContent = `${Math.round(result)} kcal`;
-            grundumsatzResultElement.textContent = `${Math.round(result)} kcal`; // Update the Grundumsatz display
             console.log(`Result displayed: ${Math.round(result)} kcal`);
         } else {
             wrapperResult.style.display = 'none'; // Hide result if inputs are incomplete
             console.log('Incomplete inputs, hiding result');
         }
+    }
+
+    // New function to calculate calories burned from daily steps
+    function calculateStepsCalories() {
+        const stepsCalories = dailySteps * 0.04; // On average, walking burns 0.04 kcal per step
+
+        // Update both locations with the steps calories result
+        stepsResultElement.textContent = `${Math.round(stepsCalories)} kcal`;
+        dailyMovementResultElement.textContent = `${Math.round(stepsCalories)} kcal`;
+
+        console.log(`Steps calories calculated: ${Math.round(stepsCalories)} kcal`);
     }
 
     // Get the value from the slider handle or the input field
