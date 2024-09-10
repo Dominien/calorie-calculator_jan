@@ -263,29 +263,22 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     // Function to handle each training session input
     function handleTrainingSession(dropdownId, minutesInputId, sessionsPerWeekInputId, resultWrapperClass) {
-        // Ensure that the dropdown and input elements exist before proceeding
-        const activitySelect = document.querySelector(`#${dropdownId} .nice-select`);
+        const activitySelect = document.querySelector(`#${dropdownId} .nice-select span.current`);
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsPerWeekInput = document.getElementById(sessionsPerWeekInputId);
         const trainingResultElement = document.querySelector(`.${resultWrapperClass} .steps_result-text`);
         const trainingWrapperResult = document.querySelector(`.${resultWrapperClass}`); // Training kcal wrapper
 
-        // Check if all required elements exist
-        if (!activitySelect || !minutesInput || !sessionsPerWeekInput || !trainingResultElement || !trainingWrapperResult) {
-            console.error(`Elements for ${dropdownId} not found.`);
-            return;
-        }
-
         let weight = 0; // Get dynamically from Grundumsatz
-        let activityType = '';
+        let activityType = activitySelect.textContent.trim(); // Get initial activity type from span
         let minutesPerSession = 0;
         let sessionsPerWeek = 0;
 
         // MET values for different activities
         const MET_VALUES = {
             'Krafttraining': 6, // Strength training
-            'cardio-liss': 7,    // Cardio LISS (Jogging, cycling, light sports)
-            'cardio-hiit': 9     // HIIT (Competitive sports, interval training)
+            'cardio (LISS)': 7,  // Cardio LISS (Jogging, cycling, light sports)
+            'cardio (HIIT)': 9   // HIIT (Competitive sports, interval training)
         };
 
         // Function to fetch weight from the Grundumsatz section
@@ -300,15 +293,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Event listener for activity type selection (custom dropdown)
-        activitySelect.addEventListener('click', function () {
+        document.querySelector(`#${dropdownId} .nice-select`).addEventListener('click', function () {
             setTimeout(() => {
-                const selectedOption = document.querySelector(`#${dropdownId} .nice-select .option.selected`);
-                if (selectedOption) {
-                    activityType = selectedOption.getAttribute('data-value');
-                    console.log(`Selected activity type: ${activityType}`);
-                    getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
-                    calculateTrainingCalories();
-                }
+                activityType = document.querySelector(`#${dropdownId} .nice-select span.current`).textContent.trim();
+                console.log(`Selected activity type: ${activityType}`);
+                getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
+                calculateTrainingCalories();
             }, 100); // Add slight delay to allow selection
         });
 
