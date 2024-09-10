@@ -329,8 +329,12 @@ document.addEventListener('DOMContentLoaded', function () {
         // Event for detecting dropdown changes
         activityDropdown.on('change', function () {
             const selectedActivity = $(this).val();  // Capture the value on change
-            console.log(`Dropdown changed: ${selectedActivity}`);
-            updateTotalCalories();  // Update total calories for all sessions
+            if (selectedActivity) {  // Check if the selected activity is valid
+                console.log(`Dropdown changed: ${selectedActivity}`);
+                updateTotalCalories();  // Update total calories for all sessions
+            } else {
+                console.log('No valid activity selected.');
+            }
         });
 
         // Input events
@@ -352,5 +356,3 @@ document.addEventListener('DOMContentLoaded', function () {
         setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
     });
 });
-
-
