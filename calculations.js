@@ -281,11 +281,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Function to calculate calories for each training session
-    function calculateTrainingCalories(dropdownId, minutesInputId, sessionsInputId, resultElementId) {
+    function calculateTrainingCalories(dropdownId, minutesInputId, sessionsInputId) {
         const activityDropdown = document.querySelector(`#${dropdownId} .current`);
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsInput = document.getElementById(sessionsInputId);
-        const resultElement = document.getElementById(resultElementId);
 
         let activityType = activityDropdown ? activityDropdown.textContent.trim() : '';
         let minutes = parseInt(minutesInput.value, 10) || 0;
@@ -294,37 +293,46 @@ document.addEventListener('DOMContentLoaded', function () {
         // Get MET value based on the selected activity
         let MET = MET_VALUES[activityType] || 0;
         if (!activityType || minutes === 0 || sessions === 0 || weight === 0 || MET === 0) {
-            resultElement.textContent = '0 kcal';
-            return;
+            return 0;
         }
 
         const caloriesPerMinute = (MET * 3.5 * weight) / 200;
         const totalCalories = caloriesPerMinute * minutes * sessions;
-        resultElement.textContent = `${Math.round(totalCalories)} kcal`;
+        return Math.round(totalCalories);
+    }
+
+    // Function to update the total calories for all sessions
+    function updateTotalCalories() {
+        const totalCalories = 
+            calculateTrainingCalories('drop-down-1', 'training-minuten', 'training-woche') +
+            calculateTrainingCalories('drop-down-2', 'training-minuten-2', 'training-woche-2') +
+            calculateTrainingCalories('drop-down-3', 'training-minuten-3', 'training-woche-3');
+
+        document.getElementById('total-calories').textContent = `${totalCalories} kcal`;
     }
 
     // Add event listeners for each training session
-    function setupTrainingSession(dropdownId, minutesInputId, sessionsInputId, resultElementId) {
+    function setupTrainingSession(dropdownId, minutesInputId, sessionsInputId) {
         const activityDropdown = document.querySelector(`#${dropdownId}`);
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsInput = document.getElementById(sessionsInputId);
 
         activityDropdown.addEventListener('click', function () {
-            setTimeout(() => calculateTrainingCalories(dropdownId, minutesInputId, sessionsInputId, resultElementId), 100);
+            setTimeout(updateTotalCalories, 100);
         });
 
         minutesInput.addEventListener('input', function () {
-            calculateTrainingCalories(dropdownId, minutesInputId, sessionsInputId, resultElementId);
+            updateTotalCalories();
         });
 
         sessionsInput.addEventListener('input', function () {
-            calculateTrainingCalories(dropdownId, minutesInputId, sessionsInputId, resultElementId);
+            updateTotalCalories();
         });
     }
 
     // Initialize training sessions
     getWeightFromGrundumsatz();
-    setupTrainingSession('drop-down-1', 'training-minuten', 'training-woche', 'result-training-1');
-    setupTrainingSession('drop-down-2', 'training-minuten-2', 'training-woche-2', 'result-training-2');
-    setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3', 'result-training-3');
+    setupTrainingSession('drop-down-1', 'training-minuten', 'training-woche');
+    setupTrainingSession('drop-down-2', 'training-minuten-2', 'training-woche-2');
+    setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
 });
