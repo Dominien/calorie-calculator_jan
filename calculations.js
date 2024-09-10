@@ -20,6 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
     genderInputs.forEach(input => {
         input.addEventListener('change', () => {
             gender = input.value;
+            console.log(`Gender selected: ${gender}`);
             calculateResult();
         });
     });
@@ -28,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     calcTypeInputs.forEach(input => {
         input.addEventListener('change', () => {
             calcType = input.value;
+            console.log(`Calculation type selected: ${calcType}`);
             toggleCalcType();
             calculateResult();
         });
@@ -36,21 +38,25 @@ document.addEventListener('DOMContentLoaded', function () {
     // Input change listeners
     ageInput.addEventListener('input', () => {
         age = parseInt(ageInput.value, 10) || 0;
+        console.log(`Age input: ${age}`);
         calculateResult();
     });
 
     heightInput.addEventListener('input', () => {
         height = parseInt(heightInput.value, 10) || 0;
+        console.log(`Height input: ${height}`);
         calculateResult();
     });
 
     weightInput.addEventListener('input', () => {
         weight = parseInt(weightInput.value, 10) || 0;
+        console.log(`Weight input: ${weight}`);
         calculateResult();
     });
 
     kfaInput.addEventListener('input', () => {
         kfa = parseInt(kfaInput.value, 10) || 0;
+        console.log(`KFA input: ${kfa}`);
         calculateResult();
     });
 
@@ -61,15 +67,18 @@ document.addEventListener('DOMContentLoaded', function () {
         if (calcType === 'miflin') {
             miflinInputs.style.display = 'block';
             kfaInputs.style.display = 'none';
+            console.log('Switched to Miflin inputs');
         } else {
             miflinInputs.style.display = 'none';
             kfaInputs.style.display = 'block';
+            console.log('Switched to KFA inputs');
         }
     }
 
     // Calculation function
     function calculateResult() {
         let result = 0;
+        console.log(`Calculating result with gender: ${gender}, type: ${calcType}, weight: ${weight}, height: ${height}, age: ${age}, kfa: ${kfa}`);
 
         if (calcType === 'miflin') {
             // Miflin St. Jeor formula
@@ -89,8 +98,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if ((calcType === 'miflin' && weight && height && age && gender) || (calcType === 'kfa' && weight && kfa && gender)) {
             wrapperResult.style.display = 'flex';
             resultElement.textContent = `${Math.round(result)} kcal`;
+            console.log(`Result displayed: ${Math.round(result)} kcal`);
         } else {
             wrapperResult.style.display = 'none'; // Hide result if inputs are incomplete
+            console.log('Incomplete inputs, hiding result');
         }
     }
 
