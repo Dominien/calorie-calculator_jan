@@ -260,6 +260,8 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('Initial setup complete.');
 });
 
+
+
 document.addEventListener('DOMContentLoaded', function () {
     const MET_VALUES = {
         'Krafttraining': 6,

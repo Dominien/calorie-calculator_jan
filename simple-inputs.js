@@ -182,8 +182,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
 document.addEventListener('DOMContentLoaded', function() {
     const addMoreLink = document.querySelector('.link-more_training');
-    const dropDown2 = document.getElementById('drop-down-2');
-    const dropDown3 = document.getElementById('drop-down-3');
+    const dropDown2 = document.getElementById('drop-down-2-wrapper');
+    const dropDown3 = document.getElementById('drop-down-3-wrapper');
     
     // Initially hide dropdowns 2 and 3
     dropDown2.style.display = 'none';
