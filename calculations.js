@@ -17,11 +17,6 @@ document.addEventListener('DOMContentLoaded', function () {
     let weight = 0;
     let kfa = 0; // Body Fat Percentage for KFA calculation
 
-    // Function to extract value from the slider handle
-    function getSliderValue(sliderElement) {
-        return parseInt(sliderElement.querySelector('.inside-handle-text').textContent, 10) || 0;
-    }
-
     // Gender selection
     genderInputs.forEach(input => {
         input.addEventListener('change', () => {
@@ -41,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Input change listeners for manual inputs
+    // Input change listeners for Miflin inputs
     ageInput.addEventListener('input', () => {
         age = parseInt(ageInput.value, 10) || 0;
         console.log(`Age input: ${age}`);
@@ -60,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
         calculateResult();
     });
 
-    // Input change listeners for manual KFA inputs
+    // Input change listeners for KFA inputs
     weightKfaInput.addEventListener('input', () => {
         weight = parseInt(weightKfaInput.value, 10) || 0;
         console.log(`Weight (KFA) input: ${weight}`);
@@ -71,60 +66,6 @@ document.addEventListener('DOMContentLoaded', function () {
         kfa = parseInt(kfaInput.value, 10) || 0;
         console.log(`KFA input: ${kfa}`);
         calculateResult();
-    });
-
-    // Handle range slider updates
-    const sliders = document.querySelectorAll('.range-slider_handle');
-
-    sliders.forEach(slider => {
-        slider.addEventListener('fsChange', () => {
-            const value = getSliderValue(slider);
-            const sliderId = slider.closest('[fs-rangeslider-element="wrapper"]').id;
-            
-            if (sliderId === 'wrapper') { // Age slider
-                age = value;
-                console.log(`Age (slider) input: ${age}`);
-            } else if (sliderId === 'wrapper-2') { // Height slider
-                height = value;
-                console.log(`Height (slider) input: ${height}`);
-            } else if (sliderId === 'wrapper-3') { // Weight slider for Miflin
-                weight = value;
-                console.log(`Weight (slider) input: ${weight}`);
-            } else if (sliderId === 'wrapper-5') { // Weight slider for KFA
-                weight = value;
-                console.log(`Weight (slider, KFA) input: ${weight}`);
-            } else if (sliderId === 'wrapper-6') { // KFA slider
-                kfa = value;
-                console.log(`KFA (slider) input: ${kfa}`);
-            }
-
-            calculateResult();
-        });
-
-        // Also listen for a standard input or change event just in case
-        slider.addEventListener('input', () => {
-            const value = getSliderValue(slider);
-            const sliderId = slider.closest('[fs-rangeslider-element="wrapper"]').id;
-
-            if (sliderId === 'wrapper') {
-                age = value;
-                console.log(`Age (slider input) input: ${age}`);
-            } else if (sliderId === 'wrapper-2') {
-                height = value;
-                console.log(`Height (slider input) input: ${height}`);
-            } else if (sliderId === 'wrapper-3') {
-                weight = value;
-                console.log(`Weight (slider input) input: ${weight}`);
-            } else if (sliderId === 'wrapper-5') {
-                weight = value;
-                console.log(`Weight (slider input, KFA) input: ${weight}`);
-            } else if (sliderId === 'wrapper-6') {
-                kfa = value;
-                console.log(`KFA (slider input) input: ${kfa}`);
-            }
-
-            calculateResult();
-        });
     });
 
     // Function to toggle between Miflin and KFA input fields
@@ -172,6 +113,16 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Sync custom range slider changes
+    function syncCustomSliders() {
+        observeChanges('wrapper-step-range_slider', 'age-2');
+        observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
+        observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
+        observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+        observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
+    }
+
     // Initial setup
     toggleCalcType();
+    syncCustomSliders(); // Attach slider listeners
 });
