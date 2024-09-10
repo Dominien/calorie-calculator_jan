@@ -261,15 +261,15 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-
 document.addEventListener('DOMContentLoaded', function () {
     // Select necessary DOM elements for training calculations
     const activitySelect = document.querySelector('#day');
     const minutesInput = document.querySelector('#training-minuten');
     const sessionsPerWeekInput = document.querySelector('#training-woche');
     const trainingResultElement = document.querySelector('.wrapper-training_result .steps_result-text');
-    
-    let weight = 70; // Assume weight for now, could be dynamically set
+    const trainingWrapperResult = document.querySelector('.wrapper-training_result'); // Training kcal wrapper
+
+    let weight = 70; // Assume weight for now, this can be dynamically set
     let activityType = '';
     let minutesPerSession = 0;
     let sessionsPerWeek = 0;
@@ -303,6 +303,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function calculateTrainingCalories() {
         if (!activityType || minutesPerSession === 0 || sessionsPerWeek === 0) {
             trainingResultElement.textContent = '0 kcal';
+            trainingWrapperResult.style.display = 'none'; // Hide wrapper if no valid input
             return;
         }
 
@@ -312,6 +313,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Update the result in the training result element
         trainingResultElement.textContent = `${Math.round(totalCaloriesBurned)} kcal`;
+
+        // Show the result wrapper if calories are greater than 0
+        if (totalCaloriesBurned > 0) {
+            trainingWrapperResult.style.display = 'flex'; // Set wrapper to flex
+        } else {
+            trainingWrapperResult.style.display = 'none'; // Hide wrapper if no calories burned
+        }
     }
 });
+
 
