@@ -314,6 +314,7 @@ document.addEventListener('DOMContentLoaded', function () {
             totalCaloriesElement.style.display = 'flex';
         } else {
             totalCaloriesElement.style.display = 'none';
+            console.log(`${totalCalories} kcal`);
         }
     }
 
