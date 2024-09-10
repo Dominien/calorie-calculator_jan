@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const ageInput = document.getElementById('age-2');
     const heightInput = document.getElementById('height-2');
     const weightInput = document.getElementById('weight-2');
+    const weightKfaInput = document.getElementById('weight-3-kfa'); // KFA weight input
     const kfaInput = document.getElementById('kfa-2');
     const resultElement = document.querySelector('.steps_result-text');
     const wrapperResult = document.querySelector('.wrapper-result_grundumsatz');
@@ -51,6 +52,12 @@ document.addEventListener('DOMContentLoaded', function () {
     weightInput.addEventListener('input', () => {
         weight = parseInt(weightInput.value, 10) || 0;
         console.log(`Weight input: ${weight}`);
+        calculateResult();
+    });
+
+    weightKfaInput.addEventListener('input', () => {
+        weight = parseInt(weightKfaInput.value, 10) || 0;
+        console.log(`Weight (KFA) input: ${weight}`);
         calculateResult();
     });
 
