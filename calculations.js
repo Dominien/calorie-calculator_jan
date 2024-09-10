@@ -85,6 +85,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Calculation function
     function calculateResult() {
+        // Fetch values from sliders' handle text if available
+        age = getSliderValue('wrapper-step-range_slider', 'age-2');
+        height = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
+        weight = calcType === 'miflin' ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2') : getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+        kfa = calcType === 'kfa' ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2') : 0;
+
         let result = 0;
         console.log(`Starting calculation with gender: ${gender}, type: ${calcType}, weight: ${weight}, height: ${height}, age: ${age}, kfa: ${kfa}`);
 
@@ -111,6 +117,18 @@ document.addEventListener('DOMContentLoaded', function () {
             wrapperResult.style.display = 'none'; // Hide result if inputs are incomplete
             console.log('Incomplete inputs, hiding result');
         }
+    }
+
+    // Get the value from the slider handle or the input field
+    function getSliderValue(wrapperClass, inputId) {
+        const handleText = document.querySelector(`.${wrapperClass} .inside-handle-text`);
+        const inputElement = document.getElementById(inputId);
+        
+        // Use the handle text value if available, else fall back to the input value
+        const valueFromHandle = handleText ? parseInt(handleText.textContent, 10) || 0 : 0;
+        const valueFromInput = parseInt(inputElement.value, 10) || 0;
+
+        return valueFromHandle || valueFromInput;
     }
 
     // Add listeners for custom sliders
