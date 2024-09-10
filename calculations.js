@@ -113,38 +113,38 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Sync custom range slider changes
-    function syncCustomSliders() {
-        observeChanges('wrapper-step-range_slider', 'age-2');
-        observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
-        observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
-        observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
-        observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
+    // Add listeners for custom sliders
+    function addSliderListeners() {
+        // Observe age, height, weight, weight-KFA, and KFA sliders
+        observeSliderChange('wrapper-step-range_slider', 'age-2');
+        observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
+        observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
+        observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+        observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
     }
 
-    // Function to handle input changes and slider sync for weight and KFA
-    function observeChanges(rangeSliderWrapperClass, inputId) {
-        const handleTextElement = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
+    // Function to observe slider changes
+    function observeSliderChange(wrapperClass, inputId) {
+        const handleTextElement = document.querySelector(`.${wrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
 
+        // Observe changes in slider handle text
         const observer = new MutationObserver(() => {
-            if (inputElement.value !== handleTextElement.textContent) {
-                inputElement.value = handleTextElement.textContent;
-                calculateResult(); // Trigger the result calculation when slider value changes
-            }
+            const value = handleTextElement.textContent;
+            inputElement.value = value;
+            calculateResult(); // Trigger result calculation when the slider handle moves
         });
 
         observer.observe(handleTextElement, { childList: true });
 
+        // Also listen to direct input changes
         inputElement.addEventListener('input', () => {
-            if (inputElement.value !== handleTextElement.textContent) {
-                handleTextElement.textContent = inputElement.value;
-                calculateResult();
-            }
+            handleTextElement.textContent = inputElement.value;
+            calculateResult();
         });
     }
 
     // Initial setup
     toggleCalcType();
-    syncCustomSliders(); // Attach slider listeners
+    addSliderListeners(); // Attach slider listeners
 });
