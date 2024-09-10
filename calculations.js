@@ -288,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let minutes = parseInt(minutesInput.value, 10) || 0;
         let sessions = parseInt(sessionsInput.value, 10) || 0;
 
-        console.log(`Activity Type Selected: ${activityType}`);  // Should now display correct activity
+        console.log(`Activity Type Selected: ${activityType}`);  // Correct activity displayed
 
         let MET = MET_VALUES[activityType] || 0;
         if (!activityType || minutes === 0 || sessions === 0 || weight === 0 || MET === 0) {
