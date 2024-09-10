@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const trainingResultElement = document.querySelector('.wrapper-training_result .steps_result-text');
     const trainingWrapperResult = document.querySelector('.wrapper-training_result'); // Training kcal wrapper
 
-    let weight = 70; // Assume weight for now, this can be dynamically set
+    let weight = 0; // Set weight to 0 initially, it will be updated by Grundumsatz calculation
     let activityType = '';
     let minutesPerSession = 0;
     let sessionsPerWeek = 0;
@@ -280,24 +280,33 @@ document.addEventListener('DOMContentLoaded', function () {
         'cardio-hiit': 9     // HIIT (Competitive sports, interval training)
     };
 
+    // Function to fetch weight from the Grundumsatz section
+    function getWeightFromGrundumsatz() {
+        const calcType = document.querySelector('input[name="kfa-or-miflin"]:checked').value;
+        if (calcType === 'miflin') {
+            weight = parseInt(document.getElementById('weight-2').value, 10) || 0;
+        } else {
+            weight = parseInt(document.getElementById('weight-3-kfa').value, 10) || 0;
+        }
+        console.log(`Weight used for training calculation: ${weight}`);
+    }
+
     // Event listener for activity type selection
     activitySelect.addEventListener('change', function() {
         activityType = activitySelect.value;
-        console.log(`Selected activity type: ${activityType}`);
+        getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
         calculateTrainingCalories();
     });
 
     // Event listener for input of minutes per session
     minutesInput.addEventListener('input', function() {
         minutesPerSession = parseInt(minutesInput.value, 10) || 0;
-        console.log(`Minutes per session: ${minutesPerSession}`);
         calculateTrainingCalories();
     });
 
     // Event listener for input of sessions per week
     sessionsPerWeekInput.addEventListener('input', function() {
         sessionsPerWeek = parseInt(sessionsPerWeekInput.value, 10) || 0;
-        console.log(`Sessions per week: ${sessionsPerWeek}`);
         calculateTrainingCalories();
     });
 
@@ -305,7 +314,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function calculateTrainingCalories() {
         console.log('Calculating training calories...');
         
-        if (!activityType || minutesPerSession === 0 || sessionsPerWeek === 0) {
+        if (!activityType || minutesPerSession === 0 || sessionsPerWeek === 0 || weight === 0) {
             trainingResultElement.textContent = '0 kcal';
             trainingWrapperResult.style.display = 'none'; // Hide wrapper if no valid input
             console.log('No valid input, setting result to 0 kcal.');
