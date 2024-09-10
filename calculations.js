@@ -259,3 +259,59 @@ document.addEventListener('DOMContentLoaded', function () {
     addSliderListeners(); // Attach slider listeners
     console.log('Initial setup complete.');
 });
+
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Select necessary DOM elements for training calculations
+    const activitySelect = document.querySelector('#day');
+    const minutesInput = document.querySelector('#training-minuten');
+    const sessionsPerWeekInput = document.querySelector('#training-woche');
+    const trainingResultElement = document.querySelector('.wrapper-training_result .steps_result-text');
+    
+    let weight = 70; // Assume weight for now, could be dynamically set
+    let activityType = '';
+    let minutesPerSession = 0;
+    let sessionsPerWeek = 0;
+
+    // MET values for different activities
+    const MET_VALUES = {
+        'Krafttraining': 6, // Strength training
+        'cardio-liss': 7,    // Cardio LISS (Jogging, cycling, light sports)
+        'cardio-hiit': 9     // HIIT (Competitive sports, interval training)
+    };
+
+    // Event listener for activity type selection
+    activitySelect.addEventListener('change', function() {
+        activityType = activitySelect.value;
+        calculateTrainingCalories();
+    });
+
+    // Event listener for input of minutes per session
+    minutesInput.addEventListener('input', function() {
+        minutesPerSession = parseInt(minutesInput.value, 10) || 0;
+        calculateTrainingCalories();
+    });
+
+    // Event listener for input of sessions per week
+    sessionsPerWeekInput.addEventListener('input', function() {
+        sessionsPerWeek = parseInt(sessionsPerWeekInput.value, 10) || 0;
+        calculateTrainingCalories();
+    });
+
+    // Function to calculate calories burned during training
+    function calculateTrainingCalories() {
+        if (!activityType || minutesPerSession === 0 || sessionsPerWeek === 0) {
+            trainingResultElement.textContent = '0 kcal';
+            return;
+        }
+
+        const MET = MET_VALUES[activityType];
+        const caloriesPerMinute = (MET * 3.5 * weight) / 200;
+        const totalCaloriesBurned = caloriesPerMinute * minutesPerSession * sessionsPerWeek;
+
+        // Update the result in the training result element
+        trainingResultElement.textContent = `${Math.round(totalCaloriesBurned)} kcal`;
+    }
+});
+
