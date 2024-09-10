@@ -1,5 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Select necessary DOM elements
+    console.log('DOM fully loaded and parsed.');
+
     const genderInputs = document.querySelectorAll('input[name="geschlecht"]');
     const calcTypeInputs = document.querySelectorAll('input[name="kfa-or-miflin"]');
     const ageInput = document.getElementById('age-2');
@@ -24,10 +26,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Hide steps result by default if value is 0
     stepsWrapperResult.style.display = 'none';
 
+    console.log('Elements selected, initial setup complete.');
+
     // Gender selection
     genderInputs.forEach(input => {
         input.addEventListener('change', () => {
             gender = input.value;
+            console.log(`Gender selected: ${gender}`);
             calculateResult();
         });
     });
@@ -36,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
     calcTypeInputs.forEach(input => {
         input.addEventListener('change', () => {
             calcType = input.value;
+            console.log(`Calculation type selected: ${calcType}`);
             toggleCalcType();
             calculateResult();
         });
@@ -44,33 +50,39 @@ document.addEventListener('DOMContentLoaded', function () {
     // Input change listeners for Miflin inputs
     ageInput.addEventListener('input', () => {
         age = parseInt(ageInput.value, 10) || 0;
+        console.log(`Age input: ${age}`);
         calculateResult();
     });
 
     heightInput.addEventListener('input', () => {
         height = parseInt(heightInput.value, 10) || 0;
+        console.log(`Height input: ${height}`);
         calculateResult();
     });
 
     weightInput.addEventListener('input', () => {
         weight = parseInt(weightInput.value, 10) || 0;
+        console.log(`Weight input: ${weight}`);
         calculateResult();
     });
 
     // Input change listeners for KFA inputs
     weightKfaInput.addEventListener('input', () => {
         weight = parseInt(weightKfaInput.value, 10) || 0;
+        console.log(`Weight (KFA) input: ${weight}`);
         calculateResult();
     });
 
     kfaInput.addEventListener('input', () => {
         kfa = parseInt(kfaInput.value, 10) || 0;
+        console.log(`KFA input: ${kfa}`);
         calculateResult();
     });
 
     // Input change listener for Steps input
     stepsInput.addEventListener('input', () => {
         dailySteps = parseInt(stepsInput.value.replace(/\./g, ''), 10) || 0; // Removing periods and converting to integer
+        console.log(`Daily steps input: ${dailySteps}`);
         calculateStepsCalories();
     });
 
@@ -81,19 +93,24 @@ document.addEventListener('DOMContentLoaded', function () {
         if (calcType === 'miflin') {
             miflinInputs.style.display = 'block';
             kfaInputs.style.display = 'none';
+            console.log('Switched to Miflin inputs.');
         } else {
             miflinInputs.style.display = 'none';
             kfaInputs.style.display = 'block';
+            console.log('Switched to KFA inputs.');
         }
     }
 
     // Calculation function for BMR
     function calculateResult() {
+        console.log('Calculating BMR...');
         // Fetch values from sliders' handle text if available
         age = getSliderValue('wrapper-step-range_slider', 'age-2');
         height = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
         weight = calcType === 'miflin' ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2') : getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
         kfa = calcType === 'kfa' ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2') : 0;
+
+        console.log(`Values: Age = ${age}, Height = ${height}, Weight = ${weight}, KFA = ${kfa}`);
 
         let result = 0;
 
@@ -111,26 +128,35 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
+        console.log(`BMR Result: ${result}`);
+
         // Display the result in the appropriate element
         if ((calcType === 'miflin' && weight && height && age && gender) || (calcType === 'kfa' && weight && kfa && gender)) {
             grundumsatzElement.textContent = `${Math.round(result)} kcal`; // Update Grundumsatz
+            console.log(`Displayed Grundumsatz: ${Math.round(result)} kcal`);
         } else {
             grundumsatzElement.textContent = '0 kcal'; // Reset Grundumsatz if incomplete inputs
+            console.log('Incomplete inputs, Grundumsatz set to 0 kcal');
         }
     }
 
     // New function to calculate calories burned from daily steps
     function calculateStepsCalories() {
+        console.log('Calculating calories from daily steps...');
         const stepsCalories = dailySteps * 0.04; // On average, walking burns 0.04 kcal per step
+
+        console.log(`Steps Calories: ${stepsCalories}`);
 
         // Only show the result if the value is greater than 0
         if (dailySteps > 0) {
             stepsWrapperResult.style.display = 'flex';
             stepsResultElement.textContent = `${Math.round(stepsCalories)} kcal`;
             altagElement.textContent = `${Math.round(stepsCalories)} kcal`; // Update Alltagsbewegung
+            console.log(`Displayed Steps Calories: ${Math.round(stepsCalories)} kcal`);
         } else {
             stepsWrapperResult.style.display = 'none'; // Hide if steps are 0
             altagElement.textContent = '0 kcal'; // Reset Alltagsbewegung if steps are 0
+            console.log('No steps input, Steps result set to 0 kcal');
         }
     }
 
@@ -138,16 +164,19 @@ document.addEventListener('DOMContentLoaded', function () {
     function getSliderValue(wrapperClass, inputId) {
         const handleText = document.querySelector(`.${wrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
-        
+
         // Use the handle text value if available, else fall back to the input value
         const valueFromHandle = handleText ? parseInt(handleText.textContent, 10) || 0 : 0;
         const valueFromInput = parseInt(inputElement.value, 10) || 0;
+
+        console.log(`Slider Value: ${valueFromHandle || valueFromInput} for ${inputId}`);
 
         return valueFromHandle || valueFromInput;
     }
 
     // Add listeners for custom sliders
     function addSliderListeners() {
+        console.log('Adding slider listeners...');
         // Observe age, height, weight, weight-KFA, and KFA sliders
         observeSliderChange('wrapper-step-range_slider', 'age-2');
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
@@ -162,10 +191,14 @@ document.addEventListener('DOMContentLoaded', function () {
         const handleTextElement = document.querySelector(`.${wrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
 
+        console.log(`Observing changes for: ${inputId}`);
+
         // Observe changes in slider handle text
         const observer = new MutationObserver(() => {
             const value = handleTextElement.textContent;
             inputElement.value = value;
+            console.log(`Observed slider change: ${value} for ${inputId}`);
+
             if (inputId === 'steps-4') {
                 dailySteps = parseInt(value, 10);
                 calculateStepsCalories();
@@ -179,6 +212,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Also listen to direct input changes
         inputElement.addEventListener('input', () => {
             handleTextElement.textContent = inputElement.value;
+            console.log(`Direct input change: ${inputElement.value} for ${inputId}`);
             if (inputId === 'steps-4') {
                 dailySteps = parseInt(inputElement.value, 10);
                 calculateStepsCalories();
@@ -191,4 +225,5 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initial setup
     toggleCalcType();
     addSliderListeners(); // Attach slider listeners
+    console.log('Initial setup complete.');
 });
