@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let weight = 0;
 
-    // Function to fetch weight from the Grundumsatz section
+    // Fetch weight from the Grundumsatz section
     function getWeightFromGrundumsatz() {
         const calcType = document.querySelector('input[name="kfa-or-miflin"]:checked').value;
         if (calcType === 'miflin') {
@@ -281,16 +281,14 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Function to calculate calories for each training session
-    function calculateTrainingCalories(dropdownId, minutesInputId, sessionsInputId) {
-        const activityDropdown = $(`#${dropdownId}`).find('.current');
+    function calculateTrainingCalories(activityType, minutesInputId, sessionsInputId) {
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsInput = document.getElementById(sessionsInputId);
 
-        let activityType = activityDropdown ? activityDropdown.text().trim() : '';
-        console.log(`Activity Type Selected: ${activityType}`);
-
         let minutes = parseInt(minutesInput.value, 10) || 0;
         let sessions = parseInt(sessionsInput.value, 10) || 0;
+
+        console.log(`Activity Type Selected: ${activityType}`);  // Should now display correct activity
 
         let MET = MET_VALUES[activityType] || 0;
         if (!activityType || minutes === 0 || sessions === 0 || weight === 0 || MET === 0) {
@@ -304,9 +302,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to update the total calories for all sessions
     function updateTotalCalories() {
-        const totalCaloriesSession1 = calculateTrainingCalories('drop-down-1', 'training-minuten', 'training-woche');
-        const totalCaloriesSession2 = calculateTrainingCalories('drop-down-2', 'training-minuten-2', 'training-woche-2');
-        const totalCaloriesSession3 = calculateTrainingCalories('drop-down-3', 'training-minuten-3', 'training-woche-3');
+        const totalCaloriesSession1 = calculateTrainingCalories($('#drop-down-1').val(), 'training-minuten', 'training-woche');
+        const totalCaloriesSession2 = calculateTrainingCalories($('#drop-down-2').val(), 'training-minuten-2', 'training-woche-2');
+        const totalCaloriesSession3 = calculateTrainingCalories($('#drop-down-3').val(), 'training-minuten-3', 'training-woche-3');
 
         const totalCalories = totalCaloriesSession1 + totalCaloriesSession2 + totalCaloriesSession3;
 
@@ -325,18 +323,19 @@ document.addEventListener('DOMContentLoaded', function () {
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsInput = document.getElementById(sessionsInputId);
 
-        // Event for detecting dropdown changes (jQuery Nice Select specific)
-        $(`#${dropdownId}`).on('change', function () {
-            console.log(`Dropdown changed: ${$(this).val()}`);
-            updateTotalCalories(); // Update total calories for all sessions
+        // Event for detecting dropdown changes
+        activityDropdown.on('change', function () {
+            const selectedActivity = $(this).val();  // Capture the value on change
+            console.log(`Dropdown changed: ${selectedActivity}`);
+            updateTotalCalories();  // Update total calories for all sessions
         });
 
         minutesInput.addEventListener('input', function () {
-            updateTotalCalories(); // Update total calories for all sessions
+            updateTotalCalories();  // Update total calories for all sessions
         });
 
         sessionsInput.addEventListener('input', function () {
-            updateTotalCalories(); // Update total calories for all sessions
+            updateTotalCalories();  // Update total calories for all sessions
         });
     }
 
@@ -349,3 +348,4 @@ document.addEventListener('DOMContentLoaded', function () {
         setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
     });
 });
+
