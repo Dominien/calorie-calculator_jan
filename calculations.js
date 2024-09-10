@@ -122,6 +122,28 @@ document.addEventListener('DOMContentLoaded', function () {
         observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
     }
 
+    // Function to handle input changes and slider sync for weight and KFA
+    function observeChanges(rangeSliderWrapperClass, inputId) {
+        const handleTextElement = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
+        const inputElement = document.getElementById(inputId);
+
+        const observer = new MutationObserver(() => {
+            if (inputElement.value !== handleTextElement.textContent) {
+                inputElement.value = handleTextElement.textContent;
+                calculateResult(); // Trigger the result calculation when slider value changes
+            }
+        });
+
+        observer.observe(handleTextElement, { childList: true });
+
+        inputElement.addEventListener('input', () => {
+            if (inputElement.value !== handleTextElement.textContent) {
+                handleTextElement.textContent = inputElement.value;
+                calculateResult();
+            }
+        });
+    }
+
     // Initial setup
     toggleCalcType();
     syncCustomSliders(); // Attach slider listeners
