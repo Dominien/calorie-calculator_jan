@@ -261,6 +261,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Function to handle each training session input
     function handleTrainingSession(dropdownId, minutesInputId, sessionsPerWeekInputId, resultWrapperClass) {
         const activitySelectWrapper = document.querySelector(`#${dropdownId} .nice-select`);
         const minutesInput = document.getElementById(minutesInputId);
@@ -268,17 +269,19 @@ document.addEventListener('DOMContentLoaded', function () {
         const trainingResultElement = document.querySelector(`.${resultWrapperClass} .steps_result-text`);
         const trainingWrapperResult = document.querySelector(`.${resultWrapperClass}`);
 
-        let weight = 0;
-        let activityType = '';
+        let weight = 0; // Get dynamically from Grundumsatz
+        let activityType = ''; // Initialize empty, updated in event listener
         let minutesPerSession = 0;
         let sessionsPerWeek = 0;
 
+        // MET values for different activities
         const MET_VALUES = {
-            'Krafttraining': 6,
-            'cardio-liss': 7,
-            'cardio-hiit': 9
+            'Krafttraining': 6, // Strength training
+            'cardio (LISS)': 7,  // Cardio LISS
+            'cardio (HIIT)': 9   // HIIT
         };
 
+        // Function to fetch weight from the Grundumsatz section
         function getWeightFromGrundumsatz() {
             const calcType = document.querySelector('input[name="kfa-or-miflin"]:checked').value;
             if (calcType === 'miflin') {
@@ -289,67 +292,79 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(`Weight used for training calculation: ${weight}`);
         }
 
+        // Event listener for activity type selection (custom dropdown)
         if (activitySelectWrapper) {
             activitySelectWrapper.addEventListener('click', function () {
                 setTimeout(() => {
-                    const selectedActivity = document.querySelector(`#${dropdownId} .nice-select .option.selected`);
-                    if (selectedActivity) {
-                        activityType = selectedActivity.getAttribute('data-value');
+                    const activitySelect = document.querySelector(`#${dropdownId} .nice-select span.current`);
+                    if (activitySelect) {
+                        activityType = activitySelect.textContent.trim();
                         console.log(`Selected activity type: ${activityType}`);
-                        getWeightFromGrundumsatz();
+                        getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
                         calculateTrainingCalories();
                     } else {
                         console.error(`Activity select element not found inside ${dropdownId}`);
                     }
-                }, 100);
+                }, 100); // Add slight delay to allow selection
             });
         } else {
             console.error(`Dropdown wrapper ${dropdownId} not found.`);
         }
 
+        // Event listener for input of minutes per session
         if (minutesInput) {
             minutesInput.addEventListener('input', function () {
                 minutesPerSession = parseInt(minutesInput.value, 10) || 0;
                 console.log(`Minutes per session: ${minutesPerSession}`);
                 calculateTrainingCalories();
             });
-        } else {
-            console.error(`Element with ID ${minutesInputId} not found.`);
         }
 
+        // Event listener for input of sessions per week
         if (sessionsPerWeekInput) {
             sessionsPerWeekInput.addEventListener('input', function () {
                 sessionsPerWeek = parseInt(sessionsPerWeekInput.value, 10) || 0;
                 console.log(`Sessions per week: ${sessionsPerWeek}`);
                 calculateTrainingCalories();
             });
-        } else {
-            console.error(`Element with ID ${sessionsPerWeekInputId} not found.`);
         }
 
+        // Function to calculate calories burned during training
         function calculateTrainingCalories() {
+            console.log('Calculating training calories...');
+
             if (!activityType || minutesPerSession === 0 || sessionsPerWeek === 0 || weight === 0) {
                 trainingResultElement.textContent = '0 kcal';
-                trainingWrapperResult.style.display = 'none';
+                trainingWrapperResult.style.display = 'none'; // Hide wrapper if no valid input
                 console.log('No valid input, setting result to 0 kcal.');
                 return;
             }
 
             const MET = MET_VALUES[activityType];
-            const caloriesPerMinute = (MET * 3.5 * weight) / 200;
-            const totalCaloriesBurned = caloriesPerMinute * minutesPerSession * sessionsPerWeek;
+            console.log(`MET value for activity: ${MET}`);
 
+            const caloriesPerMinute = (MET * 3.5 * weight) / 200;
+            console.log(`Calories per minute: ${caloriesPerMinute}`);
+
+            const totalCaloriesBurned = caloriesPerMinute * minutesPerSession * sessionsPerWeek;
+            console.log(`Total calories burned: ${totalCaloriesBurned}`);
+
+            // Update the result in the training result element
             trainingResultElement.textContent = `${Math.round(totalCaloriesBurned)} kcal`;
 
+            // Show the result wrapper if calories are greater than 0
             if (totalCaloriesBurned > 0) {
-                trainingWrapperResult.style.display = 'flex';
+                trainingWrapperResult.style.display = 'flex'; // Set wrapper to flex
+                console.log(`Displayed calories burned: ${Math.round(totalCaloriesBurned)} kcal`);
             } else {
-                trainingWrapperResult.style.display = 'none';
+                trainingWrapperResult.style.display = 'none'; // Hide wrapper if no calories burned
+                console.log('Calories burned is 0, hiding result wrapper.');
             }
         }
     }
 
+    // Call the function for each training session dropdown
     handleTrainingSession('drop-down-1', 'training-minuten', 'training-woche', 'wrapper-training_result');
-    handleTrainingSession('drop-down-2', 'training-minuten-3', 'training-woche-3', 'wrapper-training_result-2');
-    handleTrainingSession('drop-down-3', 'training-minuten-4', 'training-woche-4', 'wrapper-training_result-3');
+    handleTrainingSession('drop-down-2', 'training-minuten-2', 'training-woche-2', 'wrapper-training_result-2');
+    handleTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3', 'wrapper-training_result-3');
 });
