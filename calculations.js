@@ -8,8 +8,9 @@ document.addEventListener('DOMContentLoaded', function () {
     const weightKfaInput = document.getElementById('weight-3-kfa'); // KFA weight input
     const kfaInput = document.getElementById('kfa-2');
     const stepsInput = document.getElementById('steps-4'); // Steps input
+    const grundumsatzElement = document.getElementById('grund-right'); // Grundumsatz result element
+    const altagElement = document.getElementById('altag-right'); // Alltagsbewegung result element
     const stepsResultElement = document.querySelector('.wrapper-steps_kcals .steps_result-text');
-    const dailyMovementResultElement = document.querySelector('.wrapper-ziel_aufgespalten .wrapper-right_text-result > div');
     const stepsWrapperResult = document.querySelector('.wrapper-steps_kcals'); // Steps kcal wrapper
 
     let gender = '';
@@ -110,12 +111,11 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Display the result if all required fields are filled
+        // Display the result in the appropriate element
         if ((calcType === 'miflin' && weight && height && age && gender) || (calcType === 'kfa' && weight && kfa && gender)) {
-            wrapperResult.style.display = 'flex';
-            resultElement.textContent = `${Math.round(result)} kcal`;
+            grundumsatzElement.textContent = `${Math.round(result)} kcal`; // Update Grundumsatz
         } else {
-            wrapperResult.style.display = 'none'; // Hide result if inputs are incomplete
+            grundumsatzElement.textContent = '0 kcal'; // Reset Grundumsatz if incomplete inputs
         }
     }
 
@@ -127,9 +127,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (dailySteps > 0) {
             stepsWrapperResult.style.display = 'flex';
             stepsResultElement.textContent = `${Math.round(stepsCalories)} kcal`;
-            dailyMovementResultElement.textContent = `${Math.round(stepsCalories)} kcal`;
+            altagElement.textContent = `${Math.round(stepsCalories)} kcal`; // Update Alltagsbewegung
         } else {
             stepsWrapperResult.style.display = 'none'; // Hide if steps are 0
+            altagElement.textContent = '0 kcal'; // Reset Alltagsbewegung if steps are 0
         }
     }
 
