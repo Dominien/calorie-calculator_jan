@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const resultElement = document.querySelector('.steps_result-text');
     const wrapperResult = document.querySelector('.wrapper-result_grundumsatz');
+    const stepsWrapperResult = document.querySelector('.wrapper-steps_kcals');
 
     let gender = '';
     let calcType = 'miflin'; // Default to Miflin
@@ -21,6 +22,9 @@ document.addEventListener('DOMContentLoaded', function () {
     let weight = 0;
     let kfa = 0; // Body Fat Percentage for KFA calculation
     let dailySteps = 0;
+
+    // Set steps result container to flex
+    stepsWrapperResult.style.display = 'flex';
 
     // Gender selection
     genderInputs.forEach(input => {
@@ -162,6 +166,7 @@ document.addEventListener('DOMContentLoaded', function () {
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
+        observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // Steps slider
     }
 
     // Function to observe slider changes
@@ -173,7 +178,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const observer = new MutationObserver(() => {
             const value = handleTextElement.textContent;
             inputElement.value = value;
-            calculateResult(); // Trigger result calculation when the slider handle moves
+            if (inputId === 'steps-4') {
+                dailySteps = parseInt(value, 10);
+                calculateStepsCalories();
+            } else {
+                calculateResult(); // Trigger result calculation when the slider handle moves
+            }
         });
 
         observer.observe(handleTextElement, { childList: true });
@@ -181,7 +191,12 @@ document.addEventListener('DOMContentLoaded', function () {
         // Also listen to direct input changes
         inputElement.addEventListener('input', () => {
             handleTextElement.textContent = inputElement.value;
-            calculateResult();
+            if (inputId === 'steps-4') {
+                dailySteps = parseInt(inputElement.value, 10);
+                calculateStepsCalories();
+            } else {
+                calculateResult();
+            }
         });
     }
 
