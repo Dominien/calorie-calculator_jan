@@ -260,7 +260,6 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('Initial setup complete.');
 });
 
-
 document.addEventListener('DOMContentLoaded', function () {
     // Select necessary DOM elements for training calculations
     const activitySelect = document.querySelector('#day');
@@ -284,32 +283,43 @@ document.addEventListener('DOMContentLoaded', function () {
     // Event listener for activity type selection
     activitySelect.addEventListener('change', function() {
         activityType = activitySelect.value;
+        console.log(`Selected activity type: ${activityType}`);
         calculateTrainingCalories();
     });
 
     // Event listener for input of minutes per session
     minutesInput.addEventListener('input', function() {
         minutesPerSession = parseInt(minutesInput.value, 10) || 0;
+        console.log(`Minutes per session: ${minutesPerSession}`);
         calculateTrainingCalories();
     });
 
     // Event listener for input of sessions per week
     sessionsPerWeekInput.addEventListener('input', function() {
         sessionsPerWeek = parseInt(sessionsPerWeekInput.value, 10) || 0;
+        console.log(`Sessions per week: ${sessionsPerWeek}`);
         calculateTrainingCalories();
     });
 
     // Function to calculate calories burned during training
     function calculateTrainingCalories() {
+        console.log('Calculating training calories...');
+        
         if (!activityType || minutesPerSession === 0 || sessionsPerWeek === 0) {
             trainingResultElement.textContent = '0 kcal';
             trainingWrapperResult.style.display = 'none'; // Hide wrapper if no valid input
+            console.log('No valid input, setting result to 0 kcal.');
             return;
         }
 
         const MET = MET_VALUES[activityType];
+        console.log(`MET value for activity: ${MET}`);
+        
         const caloriesPerMinute = (MET * 3.5 * weight) / 200;
+        console.log(`Calories per minute: ${caloriesPerMinute}`);
+        
         const totalCaloriesBurned = caloriesPerMinute * minutesPerSession * sessionsPerWeek;
+        console.log(`Total calories burned: ${totalCaloriesBurned}`);
 
         // Update the result in the training result element
         trainingResultElement.textContent = `${Math.round(totalCaloriesBurned)} kcal`;
@@ -317,10 +327,10 @@ document.addEventListener('DOMContentLoaded', function () {
         // Show the result wrapper if calories are greater than 0
         if (totalCaloriesBurned > 0) {
             trainingWrapperResult.style.display = 'flex'; // Set wrapper to flex
+            console.log(`Displayed calories burned: ${Math.round(totalCaloriesBurned)} kcal`);
         } else {
             trainingWrapperResult.style.display = 'none'; // Hide wrapper if no calories burned
+            console.log('Calories burned is 0, hiding result wrapper.');
         }
     }
 });
-
-
