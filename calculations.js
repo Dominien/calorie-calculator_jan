@@ -262,7 +262,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     // Select necessary DOM elements for training calculations
-    const activitySelect = document.querySelector('#day');
+    const activitySelect = document.querySelector('#day'); // Native select element
+    const niceSelectWrapper = document.querySelector('.nice-select.form-field'); // Nice select wrapper
     const minutesInput = document.querySelector('#training-minuten');
     const sessionsPerWeekInput = document.querySelector('#training-woche');
     const trainingResultElement = document.querySelector('.wrapper-training_result .steps_result-text');
@@ -291,22 +292,27 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log(`Weight used for training calculation: ${weight}`);
     }
 
-    // Event listener for activity type selection
-    activitySelect.addEventListener('change', function() {
-        activityType = activitySelect.value;
-        getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
-        calculateTrainingCalories();
+    // Event listener for activity type selection (custom dropdown)
+    niceSelectWrapper.addEventListener('click', function () {
+        setTimeout(() => {
+            activityType = document.querySelector('.nice-select .option.selected').getAttribute('data-value');
+            console.log(`Selected activity type: ${activityType}`);
+            getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
+            calculateTrainingCalories();
+        }, 100); // Add slight delay to allow selection
     });
 
     // Event listener for input of minutes per session
     minutesInput.addEventListener('input', function() {
         minutesPerSession = parseInt(minutesInput.value, 10) || 0;
+        console.log(`Minutes per session: ${minutesPerSession}`);
         calculateTrainingCalories();
     });
 
     // Event listener for input of sessions per week
     sessionsPerWeekInput.addEventListener('input', function() {
         sessionsPerWeek = parseInt(sessionsPerWeekInput.value, 10) || 0;
+        console.log(`Sessions per week: ${sessionsPerWeek}`);
         calculateTrainingCalories();
     });
 
