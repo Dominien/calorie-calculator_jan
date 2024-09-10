@@ -326,10 +326,15 @@ document.addEventListener('DOMContentLoaded', function () {
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsInput = document.getElementById(sessionsInputId);
 
+        // Listen for dropdown changes by observing changes in the 'current' element of the dropdown
         activityDropdown.addEventListener('click', function () {
-            setTimeout(updateTotalCalories, 100);
+            const optionsList = activityDropdown.querySelector('.list');
+            optionsList.addEventListener('click', function () {
+                setTimeout(updateTotalCalories, 100);
+            });
         });
 
+        // Add event listeners for input fields
         minutesInput.addEventListener('input', function () {
             updateTotalCalories();
         });
@@ -345,4 +350,5 @@ document.addEventListener('DOMContentLoaded', function () {
     setupTrainingSession('drop-down-2', 'training-minuten-2', 'training-woche-2');
     setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
 });
+
 
