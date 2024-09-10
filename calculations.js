@@ -289,6 +289,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const sessionsInput = document.getElementById(sessionsInputId);
 
         let activityType = activityDropdown ? activityDropdown.textContent.trim() : '';
+        console.log(`Activity Type Selected: ${activityType}`);  // Log the selected activity type
+
         let minutes = parseInt(minutesInput.value, 10) || 0;
         let sessions = parseInt(sessionsInput.value, 10) || 0;
 
@@ -330,7 +332,10 @@ document.addEventListener('DOMContentLoaded', function () {
         activityDropdown.addEventListener('click', function () {
             const optionsList = activityDropdown.querySelector('.list');
             optionsList.addEventListener('click', function () {
-                setTimeout(updateTotalCalories, 100);
+                setTimeout(function() {
+                    console.log(`Dropdown clicked: ${dropdownId}`);
+                    updateTotalCalories();
+                }, 100);
             });
         });
 
@@ -350,5 +355,6 @@ document.addEventListener('DOMContentLoaded', function () {
     setupTrainingSession('drop-down-2', 'training-minuten-2', 'training-woche-2');
     setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
 });
+
 
 
