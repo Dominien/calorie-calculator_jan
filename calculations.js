@@ -36,7 +36,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Input change listeners
+    // Input change listeners for Miflin inputs
     ageInput.addEventListener('input', () => {
         age = parseInt(ageInput.value, 10) || 0;
         console.log(`Age input: ${age}`);
@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
         calculateResult();
     });
 
+    // Input change listeners for KFA inputs
     weightKfaInput.addEventListener('input', () => {
         weight = parseInt(weightKfaInput.value, 10) || 0;
         console.log(`Weight (KFA) input: ${weight}`);
@@ -88,14 +89,14 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log(`Starting calculation with gender: ${gender}, type: ${calcType}, weight: ${weight}, height: ${height}, age: ${age}, kfa: ${kfa}`);
 
         if (calcType === 'miflin') {
-            // Miflin St. Jeor formula
+            // Miflin St. Jeor formula (using height, weight, age)
             if (gender === 'Mann') {
                 result = 10 * weight + 6.25 * height - 5 * age + 5; // For males
             } else if (gender === 'frau') {
                 result = 10 * weight + 6.25 * height - 5 * age - 161; // For females
             }
         } else if (calcType === 'kfa') {
-            // Calculate BMR with KFA (Body Fat Percentage)
+            // Calculate BMR with KFA (only using weight and body fat percentage)
             if (weight > 0 && kfa > 0) {
                 result = 370 + 21.6 * (weight * (1 - kfa / 100)); // KFA formula
             }
