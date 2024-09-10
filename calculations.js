@@ -261,7 +261,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-
 document.addEventListener('DOMContentLoaded', function () {
     const MET_VALUES = {
         'Krafttraining': 6,
@@ -355,6 +354,7 @@ document.addEventListener('DOMContentLoaded', function () {
     setupTrainingSession('drop-down-2', 'training-minuten-2', 'training-woche-2');
     setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
 });
+
 
 
 
