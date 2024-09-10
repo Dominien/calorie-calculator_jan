@@ -261,91 +261,97 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Select necessary DOM elements for training calculations
-    const activitySelect = document.querySelector('#day'); // Native select element
-    const niceSelectWrapper = document.querySelector('.nice-select.form-field'); // Nice select wrapper
-    const minutesInput = document.querySelector('#training-minuten');
-    const sessionsPerWeekInput = document.querySelector('#training-woche');
-    const trainingResultElement = document.querySelector('.wrapper-training_result .steps_result-text');
-    const trainingWrapperResult = document.querySelector('.wrapper-training_result'); // Training kcal wrapper
+    // Function to handle each training session input
+    function handleTrainingSession(dropdownId, minutesInputId, sessionsPerWeekInputId, resultWrapperClass) {
+        const activitySelect = document.querySelector(`#${dropdownId} .nice-select`);
+        const minutesInput = document.getElementById(minutesInputId);
+        const sessionsPerWeekInput = document.getElementById(sessionsPerWeekInputId);
+        const trainingResultElement = document.querySelector(`.${resultWrapperClass} .steps_result-text`);
+        const trainingWrapperResult = document.querySelector(`.${resultWrapperClass}`); // Training kcal wrapper
 
-    let weight = 0; // Set weight to 0 initially, it will be updated by Grundumsatz calculation
-    let activityType = '';
-    let minutesPerSession = 0;
-    let sessionsPerWeek = 0;
+        let weight = 0; // Get dynamically from Grundumsatz
+        let activityType = '';
+        let minutesPerSession = 0;
+        let sessionsPerWeek = 0;
 
-    // MET values for different activities
-    const MET_VALUES = {
-        'Krafttraining': 6, // Strength training
-        'cardio-liss': 7,    // Cardio LISS (Jogging, cycling, light sports)
-        'cardio-hiit': 9     // HIIT (Competitive sports, interval training)
-    };
+        // MET values for different activities
+        const MET_VALUES = {
+            'Krafttraining': 6, // Strength training
+            'cardio-liss': 7,    // Cardio LISS (Jogging, cycling, light sports)
+            'cardio-hiit': 9     // HIIT (Competitive sports, interval training)
+        };
 
-    // Function to fetch weight from the Grundumsatz section
-    function getWeightFromGrundumsatz() {
-        const calcType = document.querySelector('input[name="kfa-or-miflin"]:checked').value;
-        if (calcType === 'miflin') {
-            weight = parseInt(document.getElementById('weight-2').value, 10) || 0;
-        } else {
-            weight = parseInt(document.getElementById('weight-3-kfa').value, 10) || 0;
+        // Function to fetch weight from the Grundumsatz section
+        function getWeightFromGrundumsatz() {
+            const calcType = document.querySelector('input[name="kfa-or-miflin"]:checked').value;
+            if (calcType === 'miflin') {
+                weight = parseInt(document.getElementById('weight-2').value, 10) || 0;
+            } else {
+                weight = parseInt(document.getElementById('weight-3-kfa').value, 10) || 0;
+            }
+            console.log(`Weight used for training calculation: ${weight}`);
         }
-        console.log(`Weight used for training calculation: ${weight}`);
-    }
 
-    // Event listener for activity type selection (custom dropdown)
-    niceSelectWrapper.addEventListener('click', function () {
-        setTimeout(() => {
-            activityType = document.querySelector('.nice-select .option.selected').getAttribute('data-value');
-            console.log(`Selected activity type: ${activityType}`);
-            getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
+        // Event listener for activity type selection (custom dropdown)
+        activitySelect.addEventListener('click', function () {
+            setTimeout(() => {
+                activityType = document.querySelector(`#${dropdownId} .nice-select .option.selected`).getAttribute('data-value');
+                console.log(`Selected activity type: ${activityType}`);
+                getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
+                calculateTrainingCalories();
+            }, 100); // Add slight delay to allow selection
+        });
+
+        // Event listener for input of minutes per session
+        minutesInput.addEventListener('input', function () {
+            minutesPerSession = parseInt(minutesInput.value, 10) || 0;
+            console.log(`Minutes per session: ${minutesPerSession}`);
             calculateTrainingCalories();
-        }, 100); // Add slight delay to allow selection
-    });
+        });
 
-    // Event listener for input of minutes per session
-    minutesInput.addEventListener('input', function() {
-        minutesPerSession = parseInt(minutesInput.value, 10) || 0;
-        console.log(`Minutes per session: ${minutesPerSession}`);
-        calculateTrainingCalories();
-    });
+        // Event listener for input of sessions per week
+        sessionsPerWeekInput.addEventListener('input', function () {
+            sessionsPerWeek = parseInt(sessionsPerWeekInput.value, 10) || 0;
+            console.log(`Sessions per week: ${sessionsPerWeek}`);
+            calculateTrainingCalories();
+        });
 
-    // Event listener for input of sessions per week
-    sessionsPerWeekInput.addEventListener('input', function() {
-        sessionsPerWeek = parseInt(sessionsPerWeekInput.value, 10) || 0;
-        console.log(`Sessions per week: ${sessionsPerWeek}`);
-        calculateTrainingCalories();
-    });
+        // Function to calculate calories burned during training
+        function calculateTrainingCalories() {
+            console.log('Calculating training calories...');
 
-    // Function to calculate calories burned during training
-    function calculateTrainingCalories() {
-        console.log('Calculating training calories...');
-        
-        if (!activityType || minutesPerSession === 0 || sessionsPerWeek === 0 || weight === 0) {
-            trainingResultElement.textContent = '0 kcal';
-            trainingWrapperResult.style.display = 'none'; // Hide wrapper if no valid input
-            console.log('No valid input, setting result to 0 kcal.');
-            return;
-        }
+            if (!activityType || minutesPerSession === 0 || sessionsPerWeek === 0 || weight === 0) {
+                trainingResultElement.textContent = '0 kcal';
+                trainingWrapperResult.style.display = 'none'; // Hide wrapper if no valid input
+                console.log('No valid input, setting result to 0 kcal.');
+                return;
+            }
 
-        const MET = MET_VALUES[activityType];
-        console.log(`MET value for activity: ${MET}`);
-        
-        const caloriesPerMinute = (MET * 3.5 * weight) / 200;
-        console.log(`Calories per minute: ${caloriesPerMinute}`);
-        
-        const totalCaloriesBurned = caloriesPerMinute * minutesPerSession * sessionsPerWeek;
-        console.log(`Total calories burned: ${totalCaloriesBurned}`);
+            const MET = MET_VALUES[activityType];
+            console.log(`MET value for activity: ${MET}`);
 
-        // Update the result in the training result element
-        trainingResultElement.textContent = `${Math.round(totalCaloriesBurned)} kcal`;
+            const caloriesPerMinute = (MET * 3.5 * weight) / 200;
+            console.log(`Calories per minute: ${caloriesPerMinute}`);
 
-        // Show the result wrapper if calories are greater than 0
-        if (totalCaloriesBurned > 0) {
-            trainingWrapperResult.style.display = 'flex'; // Set wrapper to flex
-            console.log(`Displayed calories burned: ${Math.round(totalCaloriesBurned)} kcal`);
-        } else {
-            trainingWrapperResult.style.display = 'none'; // Hide wrapper if no calories burned
-            console.log('Calories burned is 0, hiding result wrapper.');
+            const totalCaloriesBurned = caloriesPerMinute * minutesPerSession * sessionsPerWeek;
+            console.log(`Total calories burned: ${totalCaloriesBurned}`);
+
+            // Update the result in the training result element
+            trainingResultElement.textContent = `${Math.round(totalCaloriesBurned)} kcal`;
+
+            // Show the result wrapper if calories are greater than 0
+            if (totalCaloriesBurned > 0) {
+                trainingWrapperResult.style.display = 'flex'; // Set wrapper to flex
+                console.log(`Displayed calories burned: ${Math.round(totalCaloriesBurned)} kcal`);
+            } else {
+                trainingWrapperResult.style.display = 'none'; // Hide wrapper if no calories burned
+                console.log('Calories burned is 0, hiding result wrapper.');
+            }
         }
     }
+
+    // Call the function for each training session dropdown
+    handleTrainingSession('drop-down-1', 'training-minuten', 'training-woche', 'wrapper-training_result');
+    handleTrainingSession('drop-down-2', 'training-minuten-3', 'training-woche-3', 'wrapper-training_result-2');
+    handleTrainingSession('drop-down-3', 'training-minuten-4', 'training-woche-4', 'wrapper-training_result-3');
 });
