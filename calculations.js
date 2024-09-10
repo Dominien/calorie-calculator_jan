@@ -323,6 +323,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsInput = document.getElementById(sessionsInputId);
 
+        // Remove any previous event listeners to avoid multiple triggers
+        activityDropdown.off('change');
+
         // Event for detecting dropdown changes
         activityDropdown.on('change', function () {
             const selectedActivity = $(this).val();  // Capture the value on change
@@ -330,6 +333,7 @@ document.addEventListener('DOMContentLoaded', function () {
             updateTotalCalories();  // Update total calories for all sessions
         });
 
+        // Input events
         minutesInput.addEventListener('input', function () {
             updateTotalCalories();  // Update total calories for all sessions
         });
@@ -348,4 +352,5 @@ document.addEventListener('DOMContentLoaded', function () {
         setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
     });
 });
+
 
