@@ -305,13 +305,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to update the total calories for all sessions
     function updateTotalCalories() {
-        const totalCalories = 
-            calculateTrainingCalories('drop-down-1', 'training-minuten', 'training-woche') +
-            calculateTrainingCalories('drop-down-2', 'training-minuten-2', 'training-woche-2') +
-            calculateTrainingCalories('drop-down-3', 'training-minuten-3', 'training-woche-3');
+        const totalCaloriesSession1 = calculateTrainingCalories('drop-down-1', 'training-minuten', 'training-woche');
+        const totalCaloriesSession2 = calculateTrainingCalories('drop-down-2', 'training-minuten-2', 'training-woche-2');
+        const totalCaloriesSession3 = calculateTrainingCalories('drop-down-3', 'training-minuten-3', 'training-woche-3');
+
+        const totalCalories = totalCaloriesSession1 + totalCaloriesSession2 + totalCaloriesSession3;
 
         const totalCaloriesElement = document.getElementById('total-calories');
-
         if (totalCalories > 0) {
             totalCaloriesElement.textContent = `${totalCalories} kcal`;
             totalCaloriesElement.style.display = 'flex';
@@ -328,16 +328,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Bind to the 'change' event using jQuery after nice-select initializes
         $(`#${dropdownId}`).on('change', function () {
-            console.log(`Dropdown changed: ${$(this).val()}`);
-            updateTotalCalories();
+            console.log(`Dropdown changed: ${$(this).find('.current').text()}`);
+            updateTotalCalories(); // Update total calories for all sessions
         });
 
         minutesInput.addEventListener('input', function () {
-            updateTotalCalories();
+            updateTotalCalories(); // Update total calories for all sessions
         });
 
         sessionsInput.addEventListener('input', function () {
-            updateTotalCalories();
+            updateTotalCalories(); // Update total calories for all sessions
         });
     }
 
@@ -350,6 +350,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
     });
 });
+
 
 
 
