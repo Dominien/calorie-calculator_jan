@@ -309,6 +309,7 @@ document.addEventListener('DOMContentLoaded', function () {
             calculateTrainingCalories('drop-down-3', 'training-minuten-3', 'training-woche-3');
 
         document.getElementById('total-calories').textContent = `${totalCalories} kcal`;
+        document.getElementById('total-calories').style.display = 'flex'; 
     }
 
     // Add event listeners for each training session
