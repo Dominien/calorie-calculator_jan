@@ -263,14 +263,14 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     // Function to handle each training session input
     function handleTrainingSession(dropdownId, minutesInputId, sessionsPerWeekInputId, resultWrapperClass) {
-        const activitySelect = document.querySelector(`#${dropdownId} .nice-select span.current`);
+        const activitySelectWrapper = document.querySelector(`#${dropdownId} .nice-select`);
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsPerWeekInput = document.getElementById(sessionsPerWeekInputId);
         const trainingResultElement = document.querySelector(`.${resultWrapperClass} .steps_result-text`);
         const trainingWrapperResult = document.querySelector(`.${resultWrapperClass}`); // Training kcal wrapper
 
         let weight = 0; // Get dynamically from Grundumsatz
-        let activityType = activitySelect.textContent.trim(); // Get initial activity type from span
+        let activityType = ''; // Initialize empty, updated in event listener
         let minutesPerSession = 0;
         let sessionsPerWeek = 0;
 
@@ -293,14 +293,23 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Event listener for activity type selection (custom dropdown)
-        document.querySelector(`#${dropdownId} .nice-select`).addEventListener('click', function () {
-            setTimeout(() => {
-                activityType = document.querySelector(`#${dropdownId} .nice-select span.current`).textContent.trim();
-                console.log(`Selected activity type: ${activityType}`);
-                getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
-                calculateTrainingCalories();
-            }, 100); // Add slight delay to allow selection
-        });
+        if (activitySelectWrapper) {
+            activitySelectWrapper.addEventListener('click', function () {
+                setTimeout(() => {
+                    const activitySelect = document.querySelector(`#${dropdownId} .nice-select span.current`);
+                    if (activitySelect) {
+                        activityType = activitySelect.textContent.trim();
+                        console.log(`Selected activity type: ${activityType}`);
+                        getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
+                        calculateTrainingCalories();
+                    } else {
+                        console.error(`Activity select element not found inside ${dropdownId}`);
+                    }
+                }, 100); // Add slight delay to allow selection
+            });
+        } else {
+            console.error(`Dropdown wrapper ${dropdownId} not found.`);
+        }
 
         // Event listener for input of minutes per session
         minutesInput.addEventListener('input', function () {
