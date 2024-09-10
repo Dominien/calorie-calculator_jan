@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Calculation function
     function calculateResult() {
         let result = 0;
-        console.log(`Calculating result with gender: ${gender}, type: ${calcType}, weight: ${weight}, height: ${height}, age: ${age}, kfa: ${kfa}`);
+        console.log(`Starting calculation with gender: ${gender}, type: ${calcType}, weight: ${weight}, height: ${height}, age: ${age}, kfa: ${kfa}`);
 
         if (calcType === 'miflin') {
             // Miflin St. Jeor formula
