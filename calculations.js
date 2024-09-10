@@ -130,18 +130,28 @@ document.addEventListener('DOMContentLoaded', function () {
     
         console.log(`BMR Result: ${result}`);
     
+        // Select the wrapper for Grundumsatz result
+        const grundumsatzWrapper = document.querySelector('.wrapper-result_grundumsatz');
+    
         // Update both elements with the calculated Grundumsatz
         if ((calcType === 'miflin' && weight && height && age && gender) || (calcType === 'kfa' && weight && kfa && gender)) {
+            const roundedResult = Math.round(result);
+    
             // Update the Grundumsatz element in the first section
-            grundumsatzElement.textContent = `${Math.round(result)} kcal`;
+            grundumsatzElement.textContent = `${roundedResult} kcal`;
     
             // Update the other element with the Grundumsatz result
             const grundumsatzResultElement = document.querySelector('.wrapper-result_grundumsatz .steps_result-text');
             if (grundumsatzResultElement) {
-                grundumsatzResultElement.textContent = `${Math.round(result)} kcal`;
+                grundumsatzResultElement.textContent = `${roundedResult} kcal`;
             }
     
-            console.log(`Displayed Grundumsatz: ${Math.round(result)} kcal`);
+            // Set wrapper display to flex if result is greater than 0
+            if (roundedResult > 0 && grundumsatzWrapper) {
+                grundumsatzWrapper.style.display = 'flex';
+            }
+    
+            console.log(`Displayed Grundumsatz: ${roundedResult} kcal`);
         } else {
             // Reset both elements to 0 kcal if inputs are incomplete
             grundumsatzElement.textContent = '0 kcal';
@@ -151,9 +161,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 grundumsatzResultElement.textContent = '0 kcal';
             }
     
+            // Set wrapper display to none if result is 0
+            if (grundumsatzWrapper) {
+                grundumsatzWrapper.style.display = 'none';
+            }
+    
             console.log('Incomplete inputs, Grundumsatz set to 0 kcal');
         }
     }
+    
     
 
     // New function to calculate calories burned from daily steps
