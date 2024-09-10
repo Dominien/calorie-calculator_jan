@@ -109,11 +109,11 @@ document.addEventListener('DOMContentLoaded', function () {
         height = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
         weight = calcType === 'miflin' ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2') : getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
         kfa = calcType === 'kfa' ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2') : 0;
-
+    
         console.log(`Values: Age = ${age}, Height = ${height}, Weight = ${weight}, KFA = ${kfa}`);
-
+    
         let result = 0;
-
+    
         if (calcType === 'miflin') {
             // Miflin St. Jeor formula (using height, weight, age)
             if (gender === 'Mann') {
@@ -127,18 +127,34 @@ document.addEventListener('DOMContentLoaded', function () {
                 result = 370 + 21.6 * (weight * (1 - kfa / 100)); // KFA formula
             }
         }
-
+    
         console.log(`BMR Result: ${result}`);
-
-        // Display the result in the appropriate element
+    
+        // Update both elements with the calculated Grundumsatz
         if ((calcType === 'miflin' && weight && height && age && gender) || (calcType === 'kfa' && weight && kfa && gender)) {
-            grundumsatzElement.textContent = `${Math.round(result)} kcal`; // Update Grundumsatz
+            // Update the Grundumsatz element in the first section
+            grundumsatzElement.textContent = `${Math.round(result)} kcal`;
+    
+            // Update the other element with the Grundumsatz result
+            const grundumsatzResultElement = document.querySelector('.wrapper-result_grundumsatz .steps_result-text');
+            if (grundumsatzResultElement) {
+                grundumsatzResultElement.textContent = `${Math.round(result)} kcal`;
+            }
+    
             console.log(`Displayed Grundumsatz: ${Math.round(result)} kcal`);
         } else {
-            grundumsatzElement.textContent = '0 kcal'; // Reset Grundumsatz if incomplete inputs
+            // Reset both elements to 0 kcal if inputs are incomplete
+            grundumsatzElement.textContent = '0 kcal';
+    
+            const grundumsatzResultElement = document.querySelector('.wrapper-result_grundumsatz .steps_result-text');
+            if (grundumsatzResultElement) {
+                grundumsatzResultElement.textContent = '0 kcal';
+            }
+    
             console.log('Incomplete inputs, Grundumsatz set to 0 kcal');
         }
     }
+    
 
     // New function to calculate calories burned from daily steps
     function calculateStepsCalories() {
