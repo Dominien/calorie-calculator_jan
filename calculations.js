@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', function () {
     let weight = 0;
     let kfa = 0; // Body Fat Percentage for KFA calculation
 
+    // Function to extract value from the range slider's displayed value
+    function getSliderValue(sliderElement) {
+        return parseInt(sliderElement.querySelector('.inside-handle-text').textContent, 10) || 0;
+    }
+
     // Gender selection
     genderInputs.forEach(input => {
         input.addEventListener('change', () => {
@@ -36,7 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Input change listeners for Miflin inputs
+    // Input change listeners for manual Miflin inputs
     ageInput.addEventListener('input', () => {
         age = parseInt(ageInput.value, 10) || 0;
         console.log(`Age input: ${age}`);
@@ -55,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
         calculateResult();
     });
 
-    // Input change listeners for KFA inputs
+    // Input change listeners for manual KFA inputs
     weightKfaInput.addEventListener('input', () => {
         weight = parseInt(weightKfaInput.value, 10) || 0;
         console.log(`Weight (KFA) input: ${weight}`);
@@ -67,6 +72,27 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log(`KFA input: ${kfa}`);
         calculateResult();
     });
+
+    // Listening to the slider changes (assuming sliders update an element with `inside-handle-text`)
+    const weightSlider = document.querySelector('#wrapper-3');
+    const kfaSlider = document.querySelector('#wrapper-6');
+    
+    // Triggering calculation on range slider changes
+    if (weightSlider) {
+        weightSlider.addEventListener('input', () => {
+            weight = getSliderValue(weightSlider);
+            console.log(`Weight (slider) input: ${weight}`);
+            calculateResult();
+        });
+    }
+
+    if (kfaSlider) {
+        kfaSlider.addEventListener('input', () => {
+            kfa = getSliderValue(kfaSlider);
+            console.log(`KFA (slider) input: ${kfa}`);
+            calculateResult();
+        });
+    }
 
     // Function to toggle between Miflin and KFA input fields
     function toggleCalcType() {
