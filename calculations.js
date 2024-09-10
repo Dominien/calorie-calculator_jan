@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const kfaInput = document.getElementById('kfa-2');
     const resultElement = document.querySelector('.steps_result-text');
     const wrapperResult = document.querySelector('.wrapper-result_grundumsatz');
+    const grundumsatzResultElement = document.querySelector('.wrapper-ziel_aufgespalten .wrapper-right_text-result div'); // Target this element to update
 
     let gender = '';
     let calcType = 'miflin'; // Default to Miflin
@@ -112,6 +113,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if ((calcType === 'miflin' && weight && height && age && gender) || (calcType === 'kfa' && weight && kfa && gender)) {
             wrapperResult.style.display = 'flex';
             resultElement.textContent = `${Math.round(result)} kcal`;
+            grundumsatzResultElement.textContent = `${Math.round(result)} kcal`; // Update the Grundumsatz display
             console.log(`Result displayed: ${Math.round(result)} kcal`);
         } else {
             wrapperResult.style.display = 'none'; // Hide result if inputs are incomplete
