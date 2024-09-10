@@ -310,8 +310,14 @@ document.addEventListener('DOMContentLoaded', function () {
             calculateTrainingCalories('drop-down-2', 'training-minuten-2', 'training-woche-2') +
             calculateTrainingCalories('drop-down-3', 'training-minuten-3', 'training-woche-3');
 
-        document.getElementById('total-calories').textContent = `${totalCalories} kcal`;
-        document.getElementById('total-calories').style.display = 'flex'; 
+        const totalCaloriesElement = document.getElementById('total-calories');
+
+        if (totalCalories > 0) {
+            totalCaloriesElement.textContent = `${totalCalories} kcal`;
+            totalCaloriesElement.style.display = 'flex';  // Show the element when calories > 0
+        } else {
+            totalCaloriesElement.style.display = 'none';  // Hide the element when calories are 0
+        }
     }
 
     // Add event listeners for each training session
@@ -339,3 +345,4 @@ document.addEventListener('DOMContentLoaded', function () {
     setupTrainingSession('drop-down-2', 'training-minuten-2', 'training-woche-2');
     setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
 });
+
