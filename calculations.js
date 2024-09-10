@@ -263,11 +263,18 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     // Function to handle each training session input
     function handleTrainingSession(dropdownId, minutesInputId, sessionsPerWeekInputId, resultWrapperClass) {
+        // Ensure that the dropdown and input elements exist before proceeding
         const activitySelect = document.querySelector(`#${dropdownId} .nice-select`);
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsPerWeekInput = document.getElementById(sessionsPerWeekInputId);
         const trainingResultElement = document.querySelector(`.${resultWrapperClass} .steps_result-text`);
         const trainingWrapperResult = document.querySelector(`.${resultWrapperClass}`); // Training kcal wrapper
+
+        // Check if all required elements exist
+        if (!activitySelect || !minutesInput || !sessionsPerWeekInput || !trainingResultElement || !trainingWrapperResult) {
+            console.error(`Elements for ${dropdownId} not found.`);
+            return;
+        }
 
         let weight = 0; // Get dynamically from Grundumsatz
         let activityType = '';
@@ -295,10 +302,13 @@ document.addEventListener('DOMContentLoaded', function () {
         // Event listener for activity type selection (custom dropdown)
         activitySelect.addEventListener('click', function () {
             setTimeout(() => {
-                activityType = document.querySelector(`#${dropdownId} .nice-select .option.selected`).getAttribute('data-value');
-                console.log(`Selected activity type: ${activityType}`);
-                getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
-                calculateTrainingCalories();
+                const selectedOption = document.querySelector(`#${dropdownId} .nice-select .option.selected`);
+                if (selectedOption) {
+                    activityType = selectedOption.getAttribute('data-value');
+                    console.log(`Selected activity type: ${activityType}`);
+                    getWeightFromGrundumsatz(); // Fetch the weight when activity type is selected
+                    calculateTrainingCalories();
+                }
             }, 100); // Add slight delay to allow selection
         });
 
@@ -355,3 +365,4 @@ document.addEventListener('DOMContentLoaded', function () {
     handleTrainingSession('drop-down-2', 'training-minuten-3', 'training-woche-3', 'wrapper-training_result-2');
     handleTrainingSession('drop-down-3', 'training-minuten-4', 'training-woche-4', 'wrapper-training_result-3');
 });
+
