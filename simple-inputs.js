@@ -69,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const weight = document.getElementById("weight-3-kfa").value;
         const kfa = document.getElementById("kfa-2").value;
 
-        console.log("Weight:", weight, "KFA:", kfa);
     }
 
     // Function to handle input changes and slider sync for weight and KFA
