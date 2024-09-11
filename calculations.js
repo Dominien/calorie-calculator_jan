@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalCaloriesElement = document.querySelector('.result-tats-chlich');
     const nahrungsverbrennungElement = document.getElementById('nahrungsburn');
 
-    const baseCalories = 1200; // Default calories a body needs daily
+    const baseCalories = 1280; // Default starting calories
 
     // Function to update the total actual calorie burn
     function updateActualCalories() {
@@ -433,7 +433,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const alltagsbewegung = parseInt(alltagsbewegungElement.textContent, 10) || 0;
         const aktivesTraining = parseInt(aktivesTrainingElement.textContent, 10) || 0;
 
-        // Add base calories (1200 kcal) to the total calculation
+        // Add base calories (1280 kcal) to the total calculation
         const totalCalories = baseCalories + grundumsatz + alltagsbewegung + aktivesTraining;
         totalCaloriesElement.textContent = `${totalCalories} kcal`;
 
@@ -447,11 +447,15 @@ document.addEventListener('DOMContentLoaded', function () {
         nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)} kcal`;
     }
 
+    // Set initial value of totalCaloriesElement to 1280 kcal on page load
+    totalCaloriesElement.textContent = `${baseCalories} kcal`;
+
     // Add listeners to the text fields for changes
     [grundumsatzElement, alltagsbewegungElement, aktivesTrainingElement].forEach(element => {
         const observer = new MutationObserver(updateActualCalories);
-        observer.observe(element, { childList: true }); // Observe changes to the text content
+        observer.observe(element, { childList: true, subtree: true }); // Observe changes to the text content
     });
 
     console.log('Listeners for Grundumsatz, Alltagsbewegung, and Aktives Training added successfully.');
 });
+
