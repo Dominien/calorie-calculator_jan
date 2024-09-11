@@ -554,3 +554,197 @@ for (const radio of radios) {
 
 // Initial check when the page loads
 updateResults();
+
+
+// Biggest Part HERE ALL SCRIPTS MADE by Marco.P :D
+document.addEventListener('DOMContentLoaded', function () {
+    // Select necessary DOM elements
+    const totalCaloriesElement = document.querySelector('.result-tats-chlich'); // Declared once at the top
+    const weightInputElement = document.getElementById('weight-2'); // Assuming weight comes from here
+    const targetWeightElement = document.getElementById('wunschgewicht'); // Wunschgewicht input
+    const grundUmsatzElement = document.getElementById('grund-right'); // BMR element
+    const warningMessageElement = document.querySelector('.warning-message_wrapper');
+    const zielKalorienElement = document.querySelector('.result_zielkalorien'); // Zielkalorien element
+    const weeksElement = document.querySelector('.span-result.weeks'); // Weeks to reach goal
+    const monthsElement = document.querySelector('.span-result.months'); // Months to reach goal
+    const targetWeightResultElement = document.querySelector('.span-result.target-weight'); // Target weight
+
+    // Function to validate inputs and show warnings if any are missing
+    function validateInputs() {
+        let isValid = true; // Track if all inputs are valid
+
+        // Wunschgewicht Validation
+        const wunschgewichtInput = document.getElementById('wunschgewicht');
+        const wunschgewichtWarning = wunschgewichtInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+        if (wunschgewichtInput.value.trim() === '') {
+            wunschgewichtWarning.style.display = 'block'; // Show warning
+            isValid = false;
+        } else {
+            wunschgewichtWarning.style.display = 'none'; // Hide warning if valid
+        }
+
+        // Weight Loss Option Validation
+        const abnehmzielRadios = document.getElementsByName('Gewichtverlust');
+        const abnehmzielWarning = document.querySelector('.text-warning.here');
+        let abnehmzielSelected = false;
+        for (const radio of abnehmzielRadios) {
+            if (radio.checked) {
+                abnehmzielSelected = true;
+                break;
+            }
+        }
+        if (!abnehmzielSelected) {
+            abnehmzielWarning.style.display = 'block'; // Show warning
+            isValid = false;
+        } else {
+            abnehmzielWarning.style.display = 'none'; // Hide warning if valid
+        }
+
+        // Age Validation
+        const ageInput = document.getElementById('age-2');
+        const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+        if (ageInput.value.trim() === '') {
+            ageWarning.style.display = 'block'; // Show warning
+            isValid = false;
+        } else {
+            ageWarning.style.display = 'none'; // Hide warning if valid
+        }
+
+        // Height Validation
+        const heightInput = document.getElementById('height-2');
+        const heightWarning = heightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+        if (heightInput.value.trim() === '') {
+            heightWarning.style.display = 'block'; // Show warning
+            isValid = false;
+        } else {
+            heightWarning.style.display = 'none'; // Hide warning if valid
+        }
+
+        // Weight Validation
+        const weightInput = document.getElementById('weight-2');
+        const weightWarning = weightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+        if (weightInput.value.trim() === '') {
+            weightWarning.style.display = 'block'; // Show warning
+            isValid = false;
+        } else {
+            weightWarning.style.display = 'none'; // Hide warning if valid
+        }
+
+        return isValid;
+    }
+
+    // Function to handle the calculation and validation when the "Berechnen" button is clicked
+    function handleCalculation(event) {
+        event.preventDefault(); // Prevent default form submission behavior
+
+        // Check if all inputs are valid
+        if (validateInputs()) {
+            // Proceed with calculations if inputs are valid
+            updateResults();
+        }
+    }
+
+    // Function to handle the display logic (results calculation)
+    function updateResults() {
+        // Get the 'Tatsächlicher Kalorienverbrauch' value and extract the number
+        const totalCalories = totalCaloriesElement.textContent;
+        const totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')); // Extract only the numeric part
+
+        // Get the user's current weight from input
+        const currentWeight = parseInt(weightInputElement.value);
+
+        // Get the user's target weight (Wunschgewicht)
+        const targetWeight = parseInt(targetWeightElement.value);
+
+        // Get BMR (Grundumsatz) value
+        const grundUmsatzText = grundUmsatzElement.textContent;
+        const grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')); // Extract only the numeric part
+
+        // Get the selected radio button value for weight loss speed
+        const radios = document.getElementsByName('Gewichtverlust');
+        let selectedValue = null;
+        for (const radio of radios) {
+            if (radio.checked) {
+                selectedValue = radio.value;
+                break;
+            }
+        }
+
+        // Only proceed if a weight loss option is selected
+        if (!selectedValue) {
+            console.log("No weight loss option selected.");
+            return;
+        }
+
+        // Calculate weekly weight loss percentage based on selection
+        let weeklyWeightLossPercentage = 0;
+        if (selectedValue === 'Langsames Abnehmen') {
+            weeklyWeightLossPercentage = 0.005;
+        } else if (selectedValue === 'Moderates Abnehmen') {
+            weeklyWeightLossPercentage = 0.0075;
+        } else if (selectedValue === 'Schnelles Abnehmen') {
+            weeklyWeightLossPercentage = 0.01;
+        }
+
+        // Only display the results if 'Tatsächlicher Kalorienverbrauch' is greater than 0
+        if (totalCaloriesValue > 0 && targetWeight > 0 && currentWeight > 0) {
+            const weeklyWeightLossKg = currentWeight * weeklyWeightLossPercentage;
+            const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
+            const targetCalories = totalCaloriesValue - calorieDeficitPerDay;
+
+            // Check if target calories fall below BMR
+            if (targetCalories < grundUmsatzValue) {
+                // Show the warning message if target calories are less than BMR
+                warningMessageElement.style.display = 'block'; // Show warning box
+                warningMessageElement.querySelector('.warning-message').textContent = `Warnhinweis: Das angestrebte Gewichtsverlustziel könnte möglicherweise nicht erreichbar sein, ohne deine Gesundheit zu riskieren. Wir empfehlen dir, nicht weniger als ${grundUmsatzValue} kcal zu essen, da dies dein Grundumsatz ist.`;
+            } else {
+                warningMessageElement.style.display = 'none'; // Hide warning box if safe
+            }
+
+            // Update Zielkalorien element
+            zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : 0; // Show 0 if targetCalories is negative
+
+            // Calculate the weight loss timeline
+            const totalWeightToLose = currentWeight - targetWeight; // Weight to lose
+            const totalCaloricDeficitNeeded = totalWeightToLose * 7700; // Total caloric deficit to lose the weight
+
+            // Days, weeks, and months to reach the goal
+            const daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
+            const weeksToReachGoal = Math.round(daysToReachGoal / 7);
+            const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1); // Convert weeks to months
+
+            // Update the HTML content for weeks, months, and target weight
+            weeksElement.textContent = weeksToReachGoal;
+            monthsElement.textContent = monthsToReachGoal;
+            targetWeightResultElement.textContent = targetWeight;
+        } else {
+            // Reset or hide results if any values are missing or invalid
+            document.querySelector('.result-defizit').textContent = 0;
+            document.querySelector('.result-fettabhnahme').textContent = 0;
+            warningMessageElement.style.display = 'none'; // Hide warning box if no valid data
+            zielKalorienElement.textContent = 0; // Set Zielkalorien to 0 if no valid data
+            weeksElement.textContent = 0;
+            monthsElement.textContent = 0;
+            targetWeightResultElement.textContent = 0;
+        }
+    }
+
+    // Event listener for changes in 'Tatsächlicher Kalorienverbrauch' (result-tats-chlich)
+    const observer = new MutationObserver(updateResults);
+
+    // Observe changes in the total calories burned element
+    observer.observe(totalCaloriesElement, { childList: true, subtree: true });
+
+    // Add event listeners to radio buttons to trigger recalculation when a weight loss option is selected
+    const radios = document.getElementsByName('Gewichtverlust');
+    for (const radio of radios) {
+        radio.addEventListener('change', updateResults);
+    }
+
+    // Add event listener to the "Berechnen" button
+    const berechnenButton = document.getElementById('check-inputs');
+    berechnenButton.addEventListener('click', handleCalculation);
+
+    // Initial check when the page loads
+    updateResults();
+});
