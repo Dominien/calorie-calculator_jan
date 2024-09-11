@@ -291,6 +291,38 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Function to observe changes in sliders and input fields
+    function observeWeightInputChange(wrapperClass, inputId) {
+        const handleTextElement = document.querySelector(`.${wrapperClass} .inside-handle-text`);
+        const inputElement = document.getElementById(inputId);
+
+        // Observe changes in slider handle text
+        if (handleTextElement) {
+            const observer = new MutationObserver(() => {
+                const value = parseInt(handleTextElement.textContent, 10) || 0;
+                inputElement.value = value;
+                console.log(`Observed slider change: ${value} for ${inputId}`);
+                getWeightFromGrundumsatz(); // Trigger weight fetch
+                updateTotalCalories(); // Update total calories after weight change
+            });
+
+            observer.observe(handleTextElement, { childList: true });
+        }
+
+        // Add input event listener to handle manual input changes
+        inputElement.addEventListener('input', () => {
+            const value = parseInt(inputElement.value, 10) || 0;
+            handleTextElement.textContent = value;
+            console.log(`Manual input change: ${value} for ${inputId}`);
+            getWeightFromGrundumsatz();
+            updateTotalCalories();
+        });
+    }
+
+    // Attach the observer to weight sliders and inputs
+    observeWeightInputChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');  // Miflin weight slider
+    observeWeightInputChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');  // KFA weight slider
+
     // Function to calculate calories for each training session
     function calculateTrainingCalories(activityType, minutesInputId, sessionsInputId) {
         const minutesInput = document.getElementById(minutesInputId);
@@ -374,4 +406,3 @@ document.addEventListener('DOMContentLoaded', function () {
         setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
     });
 });
-
