@@ -470,6 +470,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const grundUmsatzElement = document.getElementById('grund-right'); // BMR element
     const warningMessageElement = document.querySelector('.warning-message_wrapper'); // Warning message element
     const zielKalorienElement = document.querySelector('.result_zielkalorien'); // Zielkalorien element (target calories)
+    const zielKcalElement = document.querySelector('.span-result.ziel-kcal'); // Span for Zielkalorien display in the text
     const radios = document.getElementsByName('Gewichtverlust'); // Radio buttons for weight loss speed
     const targetWeightElement = document.getElementById('wunschgewicht'); // Wunschgewicht input
     const weeksElement = document.querySelector('.span-result.weeks'); // Weeks to reach goal
@@ -583,6 +584,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Update Zielkalorien element
             zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : 0;
+            zielKcalElement.textContent = targetCalories > 0 ? targetCalories : 0; // Update ziel-kcal span in text
 
             // Show warning if target calories fall below Grundumsatz
             if (targetCalories < grundUmsatzValue) {
@@ -614,6 +616,7 @@ document.addEventListener('DOMContentLoaded', function () {
             weeksElement.textContent = 0;
             monthsElement.textContent = 0;
             targetWeightResultElement.textContent = 0;
+            zielKcalElement.textContent = 0; // Reset ziel-kcal span if invalid
             warningMessageElement.style.display = 'none';
         }
     }
@@ -648,4 +651,5 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize all listeners
     initializeListeners();
 });
+
 
