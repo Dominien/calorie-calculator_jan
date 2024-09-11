@@ -263,22 +263,22 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     const MET_VALUES = {
         'Krafttraining': 6,
-        'cardio-liss': 7,
-        'cardio-hiit': 9
+        'cardio (LISS)': 7,
+        'cardio (HIIT)': 9
     };
 
-    let weight = 0;
+    let weight = 0; // Holds the current weight value
 
-    // Function to dynamically fetch the correct weight based on the selected calculation type (miflin or kfa)
-    function getWeightFromGrundumsatz() {
+    // Fetch weight based on the selected calculation type
+    function getWeightFromInputs() {
         const calcType = document.querySelector('input[name="kfa-or-miflin"]:checked').value;
         if (calcType === 'miflin') {
             weight = parseInt(document.getElementById('weight-2').value, 10) || 0;
-            console.log(`Weight (Miflin) used for calculation: ${weight}`);
         } else {
             weight = parseInt(document.getElementById('weight-3-kfa').value, 10) || 0;
-            console.log(`Weight (KFA) used for calculation: ${weight}`);
         }
+        console.log(`Updated Weight: ${weight}`);
+        updateTotalCalories(); // Recalculate calories with the updated weight
     }
 
     // Function to calculate calories for each training session
@@ -289,24 +289,19 @@ document.addEventListener('DOMContentLoaded', function () {
         let minutes = parseInt(minutesInput.value, 10) || 0;
         let sessions = parseInt(sessionsInput.value, 10) || 0;
 
-        console.log(`Activity Type Selected: ${activityType}`);  // Correct activity displayed
-
         let MET = MET_VALUES[activityType] || 0;
+
         if (!activityType || minutes === 0 || sessions === 0 || weight === 0 || MET === 0) {
-            console.log(`Missing input for calculation - Activity: ${activityType}, Minutes: ${minutes}, Sessions: ${sessions}, Weight: ${weight}, MET: ${MET}`);
             return 0;
         }
 
         const caloriesPerMinute = (MET * 3.5 * weight) / 200;
         const totalCalories = caloriesPerMinute * minutes * sessions;
-        console.log(`Calories for ${activityType}: ${totalCalories}`);
         return Math.round(totalCalories);
     }
 
     // Function to update the total calories for all sessions
     function updateTotalCalories() {
-        getWeightFromGrundumsatz(); // Ensure weight is fetched each time a change is made
-
         const totalCaloriesSession1 = calculateTrainingCalories($('#drop-down-1').val(), 'training-minuten', 'training-woche');
         const totalCaloriesSession2 = calculateTrainingCalories($('#drop-down-2').val(), 'training-minuten-2', 'training-woche-2');
         const totalCaloriesSession3 = calculateTrainingCalories($('#drop-down-3').val(), 'training-minuten-3', 'training-woche-3');
@@ -317,48 +312,24 @@ document.addEventListener('DOMContentLoaded', function () {
         if (totalCalories > 0) {
             totalCaloriesElement.textContent = `${totalCalories} kcal`;
             totalCaloriesElement.style.display = 'flex';
-            console.log(`Total calories: ${totalCalories} kcal`);
         } else {
             totalCaloriesElement.style.display = 'none';
-            console.log(`Total calories: ${totalCalories} kcal (hidden)`);
         }
     }
 
-    // Function to set up training sessions
-    function setupTrainingSession(dropdownId, minutesInputId, sessionsInputId) {
-        const activityDropdown = $(`#${dropdownId}`);
-        const minutesInput = document.getElementById(minutesInputId);
-        const sessionsInput = document.getElementById(sessionsInputId);
-
-        // Remove any previous event listeners to avoid multiple triggers
-        activityDropdown.off('change');
-
-        // Event for detecting dropdown changes
-        activityDropdown.on('change', function () {
-            const selectedActivity = $(this).val();  // Capture the value on change
-            if (selectedActivity) {  // Check if the selected activity is valid
-                console.log(`Dropdown changed: ${selectedActivity}`);
-                updateTotalCalories();  // Update total calories for all sessions
-            } else {
-                console.log('No valid activity selected.');
-            }
+    // Setup event listeners for Miflin and KFA toggle
+    const calcTypeInputs = document.querySelectorAll('input[name="kfa-or-miflin"]');
+    calcTypeInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            console.log(`Calculation type changed to: ${input.value}`);
+            getWeightFromInputs(); // Fetch the correct weight based on the selected type
         });
-
-        // Input events
-        minutesInput.addEventListener('input', function () {
-            console.log(`Minutes input for ${minutesInputId}: ${minutesInput.value}`);
-            updateTotalCalories();  // Update total calories for all sessions
-        });
-
-        sessionsInput.addEventListener('input', function () {
-            console.log(`Sessions input for ${sessionsInputId}: ${sessionsInput.value}`);
-            updateTotalCalories();  // Update total calories for all sessions
-        });
-    }
+    });
 
     // Initialize nice-select and training sessions
     $(document).ready(function () {
         $('select').niceSelect();  // Initialize nice-select for all select elements
+        getWeightFromInputs(); // Initial fetch of the weight value based on the default type
         setupTrainingSession('drop-down-1', 'training-minuten', 'training-woche');
         setupTrainingSession('drop-down-2', 'training-minuten-2', 'training-woche-2');
         setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
