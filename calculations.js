@@ -281,6 +281,14 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Function to update the "Aktives Training" result display
+    function updateTrainingResultDisplay(totalCalories) {
+        const resultElement = document.querySelector('.wrapper-ziel_aufgespalten .wrapper-right_text-result div');
+        if (resultElement) {
+            resultElement.textContent = `${totalCalories} kcal`;
+        }
+    }
+
     // Add event listener to toggle between Miflin and KFA
     const calcTypeInputs = document.querySelectorAll('input[name="kfa-or-miflin"]');
     calcTypeInputs.forEach(input => {
@@ -290,38 +298,6 @@ document.addEventListener('DOMContentLoaded', function () {
             updateTotalCalories(); // Recalculate after changing the weight source
         });
     });
-
-    // Function to observe changes in sliders and input fields
-    function observeWeightInputChange(wrapperClass, inputId) {
-        const handleTextElement = document.querySelector(`.${wrapperClass} .inside-handle-text`);
-        const inputElement = document.getElementById(inputId);
-
-        // Observe changes in slider handle text
-        if (handleTextElement) {
-            const observer = new MutationObserver(() => {
-                const value = parseInt(handleTextElement.textContent, 10) || 0;
-                inputElement.value = value;
-                console.log(`Observed slider change: ${value} for ${inputId}`);
-                getWeightFromGrundumsatz(); // Trigger weight fetch
-                updateTotalCalories(); // Update total calories after weight change
-            });
-
-            observer.observe(handleTextElement, { childList: true });
-        }
-
-        // Add input event listener to handle manual input changes
-        inputElement.addEventListener('input', () => {
-            const value = parseInt(inputElement.value, 10) || 0;
-            handleTextElement.textContent = value;
-            console.log(`Manual input change: ${value} for ${inputId}`);
-            getWeightFromGrundumsatz();
-            updateTotalCalories();
-        });
-    }
-
-    // Attach the observer to weight sliders and inputs
-    observeWeightInputChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');  // Miflin weight slider
-    observeWeightInputChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');  // KFA weight slider
 
     // Function to calculate calories for each training session
     function calculateTrainingCalories(activityType, minutesInputId, sessionsInputId) {
@@ -345,7 +321,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return Math.round(totalCalories);
     }
 
-    // Function to update the total calories for all sessions
+    // Function to update the total calories for all sessions and display the result
     function updateTotalCalories() {
         getWeightFromGrundumsatz(); // Ensure weight is fetched each time a change is made
 
@@ -354,6 +330,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const totalCaloriesSession3 = calculateTrainingCalories($('#drop-down-3').val(), 'training-minuten-3', 'training-woche-3');
 
         const totalCalories = totalCaloriesSession1 + totalCaloriesSession2 + totalCaloriesSession3;
+
+        updateTrainingResultDisplay(totalCalories);
 
         const totalCaloriesElement = document.getElementById('total-calories');
         if (totalCalories > 0) {
@@ -406,3 +384,4 @@ document.addEventListener('DOMContentLoaded', function () {
         setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
     });
 });
+
