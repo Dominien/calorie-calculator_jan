@@ -445,7 +445,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to calculate Nahrungsverbrennung
     function calculateNahrungsverbrennung(totalCalories) {
         const nahrungsverbrennung = totalCalories * 0.08; // 8% of total calories
-        nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)}`;
+        nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)} kcal`;
     }
 
     // Set initial value of totalCaloriesElement to the fallback value (1280 kcal) on page load
