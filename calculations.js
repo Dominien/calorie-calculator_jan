@@ -269,15 +269,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let weight = 0;
 
-    // Fetch weight from the Grundumsatz section
+    // Function to dynamically fetch the correct weight based on the selected calculation type (miflin or kfa)
     function getWeightFromGrundumsatz() {
         const calcType = document.querySelector('input[name="kfa-or-miflin"]:checked').value;
         if (calcType === 'miflin') {
             weight = parseInt(document.getElementById('weight-2').value, 10) || 0;
+            console.log(`Weight (Miflin) used for calculation: ${weight}`);
         } else {
             weight = parseInt(document.getElementById('weight-3-kfa').value, 10) || 0;
+            console.log(`Weight (KFA) used for calculation: ${weight}`);
         }
-        console.log(`Weight used for calculation: ${weight}`);
     }
 
     // Function to calculate calories for each training session
@@ -292,6 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         let MET = MET_VALUES[activityType] || 0;
         if (!activityType || minutes === 0 || sessions === 0 || weight === 0 || MET === 0) {
+            console.log(`Missing input for calculation - Activity: ${activityType}, Minutes: ${minutes}, Sessions: ${sessions}, Weight: ${weight}, MET: ${MET}`);
             return 0;
         }
 
@@ -303,6 +305,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to update the total calories for all sessions
     function updateTotalCalories() {
+        getWeightFromGrundumsatz(); // Ensure weight is fetched each time a change is made
+
         const totalCaloriesSession1 = calculateTrainingCalories($('#drop-down-1').val(), 'training-minuten', 'training-woche');
         const totalCaloriesSession2 = calculateTrainingCalories($('#drop-down-2').val(), 'training-minuten-2', 'training-woche-2');
         const totalCaloriesSession3 = calculateTrainingCalories($('#drop-down-3').val(), 'training-minuten-3', 'training-woche-3');
@@ -355,7 +359,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize nice-select and training sessions
     $(document).ready(function () {
         $('select').niceSelect();  // Initialize nice-select for all select elements
-        getWeightFromGrundumsatz();
         setupTrainingSession('drop-down-1', 'training-minuten', 'training-woche');
         setupTrainingSession('drop-down-2', 'training-minuten-2', 'training-woche-2');
         setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
