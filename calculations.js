@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const baseCalories = grundumsatz || fallbackCalories;
 
         const totalCalories = baseCalories + alltagsbewegung + aktivesTraining;
-        totalCaloriesElement.textContent = `${totalCalories} kcal`;
+        totalCaloriesElement.textContent = `${totalCalories}`;
 
         calculateNahrungsverbrennung(totalCalories);
     }
@@ -445,11 +445,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to calculate Nahrungsverbrennung
     function calculateNahrungsverbrennung(totalCalories) {
         const nahrungsverbrennung = totalCalories * 0.08; // 8% of total calories
-        nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)} kcal`;
+        nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)}`;
     }
 
     // Set initial value of totalCaloriesElement to the fallback value (1280 kcal) on page load
-    totalCaloriesElement.textContent = `${fallbackCalories} kcal`;
+    totalCaloriesElement.textContent = `${fallbackCalories}`;
 
     // Add listeners to the text fields for changes
     [grundumsatzElement, alltagsbewegungElement, aktivesTrainingElement].forEach(element => {
