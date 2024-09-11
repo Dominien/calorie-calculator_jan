@@ -461,7 +461,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-// Function to handle the display logic
 // Select necessary DOM elements
 const totalCaloriesElement = document.querySelector('.result-tats-chlich');
 
