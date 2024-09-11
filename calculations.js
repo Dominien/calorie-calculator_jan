@@ -444,11 +444,11 @@ document.addEventListener('DOMContentLoaded', function () {
     function calculateNahrungsverbrennung(totalCalories) {
         // You can customize the formula here if needed
         const nahrungsverbrennung = totalCalories * 0.08; // Example: 8% of total calories
-        nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)} kcal`;
+        nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)}`;
     }
 
     // Set initial value of totalCaloriesElement to 1280 kcal on page load
-    totalCaloriesElement.textContent = `${baseCalories} kcal`;
+    totalCaloriesElement.textContent = `${baseCalories}`;
 
     // Add listeners to the text fields for changes
     [grundumsatzElement, alltagsbewegungElement, aktivesTrainingElement].forEach(element => {
