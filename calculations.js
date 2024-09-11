@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     const MET_VALUES = {
-        'Krafttraining': 6,
+        'Krafttraining': 10.21,  // Updated MET value for Krafttraining
         'cardio-liss': 7,
         'cardio-hiit': 9
     };
@@ -339,6 +339,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return 0;
         }
 
+        // Calculate calories per minute based on the activity's MET, weight, and time
         const caloriesPerMinute = (MET * 3.5 * weight) / 200;
         const totalCalories = caloriesPerMinute * minutes * sessions;
         console.log(`Calories for ${activityType}: ${totalCalories}`);
