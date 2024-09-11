@@ -464,12 +464,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 // Weight loss Options HERE ALL SCRIPTS MADE by Marco.P :D
-
 // Select necessary DOM elements
 const totalCaloriesElement = document.querySelector('.result-tats-chlich');
 const weightInputElement = document.getElementById('weight-2'); // Assuming weight comes from here
 const grundUmsatzElement = document.getElementById('grund-right'); // BMR element
 const warningMessageElement = document.querySelector('.warning-message_wrapper');
+const zielKalorienElement = document.querySelector('.result_zielkalorien'); // Zielkalorien element
 
 // Function to handle the display logic
 function updateResults() {
@@ -516,6 +516,9 @@ function updateResults() {
         const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
         const targetCalories = totalCaloriesValue - calorieDeficitPerDay;
 
+        // Update Zielkalorien element
+        zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : 0; // Show 0 if targetCalories is negative
+
         // Check if target calories fall below BMR
         if (targetCalories < grundUmsatzValue) {
             // Show the warning message if target calories are less than BMR
@@ -533,6 +536,7 @@ function updateResults() {
         document.querySelector('.result-defizit').textContent = 0;
         document.querySelector('.result-fettabhnahme').textContent = 0;
         warningMessageElement.style.display = 'none'; // Hide warning box if no valid data
+        zielKalorienElement.textContent = 0; // Set Zielkalorien to 0 if no valid data
     }
 }
 
@@ -550,4 +554,3 @@ for (const radio of radios) {
 
 // Initial check when the page loads
 updateResults();
-
