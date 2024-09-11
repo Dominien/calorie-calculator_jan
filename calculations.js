@@ -269,7 +269,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let weight = 0;
 
-    // Function to dynamically fetch the correct weight based on the selected calculation type (miflin or kfa)
+    // Function to dynamically fetch the correct weight based on the selected calculation type (Miflin or KFA)
     function getWeightFromGrundumsatz() {
         const calcType = document.querySelector('input[name="kfa-or-miflin"]:checked').value;
         if (calcType === 'miflin') {
@@ -280,6 +280,16 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log(`Weight (KFA) used for calculation: ${weight}`);
         }
     }
+
+    // Add event listener to toggle between Miflin and KFA
+    const calcTypeInputs = document.querySelectorAll('input[name="kfa-or-miflin"]');
+    calcTypeInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            console.log(`Calculation type changed to: ${input.value}`);
+            getWeightFromGrundumsatz();
+            updateTotalCalories(); // Recalculate after changing the weight source
+        });
+    });
 
     // Function to calculate calories for each training session
     function calculateTrainingCalories(activityType, minutesInputId, sessionsInputId) {
@@ -364,3 +374,4 @@ document.addEventListener('DOMContentLoaded', function () {
         setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
     });
 });
+
