@@ -465,206 +465,193 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     // Select necessary DOM elements
-    const totalCaloriesElement = document.querySelector('.result-tats-chlich'); // Total actual calories element
-    const weightInputElement = document.getElementById('weight-2'); // Weight input element
-    const grundUmsatzElement = document.getElementById('grund-right'); // BMR element
-    const warningMessageElement = document.querySelector('.warning-message_wrapper'); // Warning message element
-    const zielKalorienElement = document.querySelector('.result_zielkalorien'); // Zielkalorien element (target calories)
-    const zielKcalElement = document.querySelector('.span-result.ziel-kcal'); // Span for Zielkalorien display in the text
-    const radios = document.getElementsByName('Gewichtverlust'); // Radio buttons for weight loss speed
-    const targetWeightElement = document.getElementById('wunschgewicht'); // Wunschgewicht input
-    const weeksElement = document.querySelector('.span-result.weeks'); // Weeks to reach goal
-    const monthsElement = document.querySelector('.span-result.months'); // Months to reach goal
-    const targetWeightResultElement = document.querySelector('.span-result.target-weight'); // Target weight
-    const defizitElement = document.querySelector('.result-defizit'); // Deficit per day
-    const fettAbnahmeElement = document.querySelector('.result-fettabhnahme'); // Fat loss per week
+    console.log('DOM fully loaded and parsed.');
 
-    // Function to handle live validation on input fields
-    function hideWarningOnInput(inputElement, warningElement) {
-        inputElement.addEventListener('input', () => {
-            if (inputElement.value.trim() !== '' && parseInt(inputElement.value) > 0) {
-                warningElement.style.display = 'none'; // Hide the warning if the input is valid
-            }
-        });
-    }
-
-    // Add live validation for Wunschgewicht
-    const wunschgewichtInput = document.getElementById('wunschgewicht');
-    const wunschgewichtWarning = wunschgewichtInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-    hideWarningOnInput(wunschgewichtInput, wunschgewichtWarning);
-
-    // Add live validation for Age
+    const genderInputs = document.querySelectorAll('input[name="geschlecht"]');
+    const calcTypeInputs = document.querySelectorAll('input[name="kfa-or-miflin"]');
     const ageInput = document.getElementById('age-2');
-    const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-    hideWarningOnInput(ageInput, ageWarning);
-
-    // Add live validation for Height
     const heightInput = document.getElementById('height-2');
-    const heightWarning = heightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-    hideWarningOnInput(heightInput, heightWarning);
+    const weightInput = document.getElementById('weight-2');
+    const weightKfaInput = document.getElementById('weight-3-kfa'); // KFA weight input
+    const kfaInput = document.getElementById('kfa-2');
+    const stepsInput = document.getElementById('steps-4'); // Steps input
+    const grundumsatzElement = document.getElementById('grund-right'); // Grundumsatz result element
+    const altagElement = document.getElementById('altag-right'); // Alltagsbewegung result element
+    const stepsResultElement = document.querySelector('.wrapper-steps_kcals .steps_result-text');
+    const stepsWrapperResult = document.querySelector('.wrapper-steps_kcals'); // Steps kcal wrapper
+    const warningMessageElement = document.querySelector('.warning-message_wrapper'); // Warning message element
 
-    // Add live validation for Weight
-    const weightWarning = weightInputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
-    hideWarningOnInput(weightInputElement, weightWarning);
+    let gender = '';
+    let calcType = 'miflin'; // Default to Miflin
+    let age = 0;
+    let height = 0;
+    let weight = 0;
+    let kfa = 0; // Body Fat Percentage for KFA calculation
+    let dailySteps = 0;
 
-    // Function to validate inputs and show warnings if any are missing or invalid
-    function validateInputs() {
-        let isValid = true;
+    // Hide steps result by default if value is 0
+    stepsWrapperResult.style.display = 'none';
 
-        // Validate Wunschgewicht
-        if (wunschgewichtInput.value.trim() === '' || parseInt(wunschgewichtInput.value) <= 0) {
-            wunschgewichtWarning.style.display = 'block'; // Show warning if empty or invalid
-            isValid = false;
-        } else {
-            wunschgewichtWarning.style.display = 'none';
-        }
+    console.log('Elements selected, initial setup complete.');
 
-        // Validate Age, Height, and Weight similarly
-        if (ageInput.value.trim() === '' || parseInt(ageInput.value) <= 0) {
-            ageWarning.style.display = 'block';
-            isValid = false;
-        } else {
-            ageWarning.style.display = 'none';
-        }
-
-        if (heightInput.value.trim() === '' || parseInt(heightInput.value) <= 0) {
-            heightWarning.style.display = 'block';
-            isValid = false;
-        } else {
-            heightWarning.style.display = 'none';
-        }
-
-        if (weightInputElement.value.trim() === '' || parseInt(weightInputElement.value) <= 0) {
-            weightWarning.style.display = 'block';
-            isValid = false;
-        } else {
-            weightWarning.style.display = 'none';
-        }
-
-        return isValid;
-    }
-
-    // Unified function to handle total calorie updates and weight loss results
-    function updateResults() {
-        const totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
-        const totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0; // Extract numeric part
-        const currentWeight = parseInt(weightInputElement.value) || 0;
-        const grundUmsatzText = grundUmsatzElement ? grundUmsatzElement.textContent : '';
-        const grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0; // Extract numeric part from Grundumsatz
-
-        // Only proceed with the calculations if Grundumsatz is greater than 0
-        if (grundUmsatzValue > 0) {
-            const targetWeight = parseInt(targetWeightElement.value);
-
-            // Get the selected radio button value for weight loss speed
-            let selectedValue = null;
-            for (const radio of radios) {
-                if (radio.checked) {
-                    selectedValue = radio.value;
-                    break;
-                }
-            }
-
-            if (!selectedValue) {
-                console.log("No weight loss option selected.");
-                return;
-            }
-
-            // Determine weekly weight loss percentage
-            let weeklyWeightLossPercentage = 0;
-            if (selectedValue === 'Langsames Abnehmen') {
-                weeklyWeightLossPercentage = 0.005;
-            } else if (selectedValue === 'Moderates Abnehmen') {
-                weeklyWeightLossPercentage = 0.0075;
-            } else if (selectedValue === 'Schnelles Abnehmen') {
-                weeklyWeightLossPercentage = 0.01;
-            }
-
-            if (totalCaloriesValue > 0 && currentWeight > 0 && targetWeight > 0) {
-                const weeklyWeightLossKg = currentWeight * weeklyWeightLossPercentage;
-                const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
-                const targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay); // No negative target calories
-
-                // Update Zielkalorien element
-                zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : 0;
-                zielKcalElement.textContent = targetCalories > 0 ? targetCalories : 0; // Update ziel-kcal span in text
-
-                // Show warning if target calories fall below Grundumsatz
-                if (targetCalories < grundUmsatzValue) {
-                    warningMessageElement.style.display = 'flex';
-                    warningMessageElement.querySelector('.warning-message').textContent = `Warnhinweis: Nicht weniger als ${grundUmsatzValue} kcal essen, da dies dein Grundumsatz ist.`;
-                } else {
-                    warningMessageElement.style.display = 'none';
-                }
-
-                // Update fat loss and calorie deficit
-                fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2); // Fat loss per week
-                defizitElement.textContent = calorieDeficitPerDay; // Calorie deficit per day
-
-                // Calculate timeline to reach goal
-                const totalWeightToLose = currentWeight - targetWeight;
-                const totalCaloricDeficitNeeded = totalWeightToLose * 7700;
-                const daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
-                const weeksToReachGoal = Math.round(daysToReachGoal / 7);
-                const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
-
-                // Update the timeline
-                weeksElement.textContent = weeksToReachGoal;
-                monthsElement.textContent = monthsToReachGoal;
-                targetWeightResultElement.textContent = targetWeight;
-            } else {
-                // Reset results if inputs are invalid
-                defizitElement.textContent = 0;
-                fettAbnahmeElement.textContent = 0;
-                weeksElement.textContent = 0;
-                monthsElement.textContent = 0;
-                targetWeightResultElement.textContent = 0;
-                zielKcalElement.textContent = 0; // Reset ziel-kcal span if invalid
-                warningMessageElement.style.display = 'none';
-            }
-        } else {
-            // Reset all results if Grundumsatz is not valid
-            defizitElement.textContent = 0;
-            fettAbnahmeElement.textContent = 0;
-            weeksElement.textContent = 0;
-            monthsElement.textContent = 0;
-            targetWeightResultElement.textContent = 0;
-            zielKcalElement.textContent = 0;
-            zielKalorienElement.textContent = 0;
-            warningMessageElement.style.display = 'none';
-        }
-    }
-
-    // Function to initialize event listeners
-    function initializeListeners() {
-        if (totalCaloriesElement) {
-            const observer = new MutationObserver(updateResults);
-            observer.observe(totalCaloriesElement, { childList: true, subtree: true });
-        }
-
-        // Add event listeners to radio buttons for weight loss
-        radios.forEach(radio => {
-            radio.addEventListener('change', updateResults);
+    // Gender selection
+    genderInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            gender = input.value;
+            console.log(`Gender selected: ${gender}`);
+            calculateResult();
         });
+    });
 
-        // Add event listener for "Berechnen" button
-        const berechnenButton = document.getElementById('check-inputs');
-        if (berechnenButton) {
-            berechnenButton.addEventListener('click', function (event) {
-                event.preventDefault();
-                if (validateInputs()) {
-                    updateResults();
-                }
-            });
+    // Calculation type selection
+    calcTypeInputs.forEach(input => {
+        input.addEventListener('change', () => {
+            calcType = input.value;
+            console.log(`Calculation type selected: ${calcType}`);
+            toggleCalcType();
+            calculateResult();
+        });
+    });
+
+    // Input change listeners for Miflin inputs
+    ageInput.addEventListener('input', () => {
+        age = parseInt(ageInput.value, 10) || 0;
+        console.log(`Age input: ${age}`);
+        calculateResult();
+    });
+
+    heightInput.addEventListener('input', () => {
+        height = parseInt(heightInput.value, 10) || 0;
+        console.log(`Height input: ${height}`);
+        calculateResult();
+    });
+
+    weightInput.addEventListener('input', () => {
+        weight = parseInt(weightInput.value, 10) || 0;
+        console.log(`Weight input: ${weight}`);
+        calculateResult();
+    });
+
+    // Input change listeners for KFA inputs
+    weightKfaInput.addEventListener('input', () => {
+        weight = parseInt(weightKfaInput.value, 10) || 0;
+        console.log(`Weight (KFA) input: ${weight}`);
+        calculateResult();
+    });
+
+    kfaInput.addEventListener('input', () => {
+        kfa = parseInt(kfaInput.value, 10) || 0;
+        console.log(`KFA input: ${kfa}`);
+        calculateResult();
+    });
+
+    // Input change listener for Steps input
+    stepsInput.addEventListener('input', () => {
+        dailySteps = parseInt(stepsInput.value.replace(/\./g, ''), 10) || 0; // Removing periods and converting to integer
+        console.log(`Daily steps input: ${dailySteps}`);
+        calculateStepsCalories();
+    });
+
+    // Function to toggle between Miflin and KFA input fields
+    function toggleCalcType() {
+        const miflinInputs = document.getElementById('input-miflin');
+        const kfaInputs = document.getElementById('input-kfa');
+        if (calcType === 'miflin') {
+            miflinInputs.style.display = 'block';
+            kfaInputs.style.display = 'none';
+            console.log('Switched to Miflin inputs.');
+        } else {
+            miflinInputs.style.display = 'none';
+            kfaInputs.style.display = 'block';
+            console.log('Switched to KFA inputs.');
         }
-
-        // Run initial calculation
-        updateResults();
     }
 
-    // Initialize all listeners
-    initializeListeners();
+    // Calculation function for BMR
+    function calculateResult() {
+        console.log('Calculating BMR...');
+        // Fetch values from sliders' handle text if available
+        age = getSliderValue('wrapper-step-range_slider', 'age-2');
+        height = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
+        weight = calcType === 'miflin' ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2') : getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+        kfa = calcType === 'kfa' ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2') : 0;
+    
+        console.log(`Values: Age = ${age}, Height = ${height}, Weight = ${weight}, KFA = ${kfa}`);
+    
+        let result = 0;
+    
+        if (calcType === 'miflin') {
+            // Miflin St. Jeor formula (using height, weight, age)
+            if (gender === 'Mann') {
+                result = 10 * weight + 6.25 * height - 5 * age + 5; // For males
+            } else if (gender === 'frau') {
+                result = 10 * weight + 6.25 * height - 5 * age - 161; // For females
+            }
+        } else if (calcType === 'kfa') {
+            // Calculate BMR with KFA (only using weight and body fat percentage)
+            if (weight > 0 && kfa > 0) {
+                result = 370 + 21.6 * (weight * (1 - kfa / 100)); // KFA formula
+            }
+        }
+    
+        console.log(`BMR Result: ${result}`);
+    
+        // Select the wrapper for Grundumsatz result
+        const grundumsatzWrapper = document.querySelector('.wrapper-result_grundumsatz');
+    
+        // Update both elements with the calculated Grundumsatz
+        if ((calcType === 'miflin' && weight && height && age && gender) || (calcType === 'kfa' && weight && kfa && gender)) {
+            const roundedResult = Math.round(result);
+    
+            // Update the Grundumsatz element in the first section
+            grundumsatzElement.textContent = `${roundedResult} kcal`;
+    
+            // Update the other element with the Grundumsatz result
+            const grundumsatzResultElement = document.querySelector('.wrapper-result_grundumsatz .steps_result-text');
+            if (grundumsatzResultElement) {
+                grundumsatzResultElement.textContent = `${roundedResult} kcal`;
+            }
+    
+            // Set wrapper display to flex if result is greater than 0
+            if (roundedResult > 0 && grundumsatzWrapper) {
+                grundumsatzWrapper.style.display = 'flex';
+                warningMessageElement.style.display = 'none'; // Hide the warning message when valid data is provided
+            }
+    
+            console.log(`Displayed Grundumsatz: ${roundedResult} kcal`);
+        } else {
+            // Reset both elements to 0 kcal if inputs are incomplete
+            grundumsatzElement.textContent = '0 kcal';
+    
+            const grundumsatzResultElement = document.querySelector('.wrapper-result_grundumsatz .steps_result-text');
+            if (grundumsatzResultElement) {
+                grundumsatzResultElement.textContent = '0 kcal';
+            }
+    
+            // Set wrapper display to none if result is 0
+            if (grundumsatzWrapper) {
+                grundumsatzWrapper.style.display = 'none';
+            }
+
+            // Show warning message if KFA or other necessary inputs are missing
+            if (calcType === 'kfa' && (!weight || !kfa)) {
+                warningMessageElement.style.display = 'flex';
+                warningMessageElement.querySelector('.warning-message').textContent = 'Bitte fülle alle Felder aus, um das Ergebnis zu berechnen.';
+            }
+    
+            console.log('Incomplete inputs, Grundumsatz set to 0 kcal');
+        }
+    }
+
+    // Function to handle steps calorie calculation
+    function calculateStepsCalories() {
+        if (dailySteps > 0) {
+            const stepsCalories = dailySteps * 0.04; // Example calculation for steps to kcal
+            stepsResultElement.textContent = `${Math.round(stepsCalories)} kcal`;
+            stepsWrapperResult.style.display = 'flex';
+        } else {
+            stepsResultElement.textContent = '0 kcal';
+            stepsWrapperResult.style.display = 'none';
+        }
+    }
 });
-
-
-
