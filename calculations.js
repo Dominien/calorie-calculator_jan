@@ -461,18 +461,15 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+// Function to handle the display logic
 // Select necessary DOM elements
-const grundumsatzElement = document.getElementById('grund-right');
-const alltagsbewegungElement = document.getElementById('altag-right');
-const aktivesTrainingElement = document.getElementById('active-right');
 const totalCaloriesElement = document.querySelector('.result-tats-chlich');
-const nahrungsverbrennungElement = document.getElementById('nahrungsburn');
 
 // Function to handle the display logic
 function updateResults() {
-    // Get the 'Grundumsatz' value and extract the number
-    const grundUmsatz = grundumsatzElement.textContent;
-    const grundUmsatzValue = parseInt(grundUmsatz.replace(/\D/g, '')); // Extract only the numeric part
+    // Get the 'Tatsächlicher Kalorienverbrauch' value and extract the number
+    const totalCalories = totalCaloriesElement.textContent;
+    const totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')); // Extract only the numeric part
 
     // Get the selected radio button value for weight loss speed
     const radios = document.getElementsByName('Gewichtverlust');
@@ -494,8 +491,8 @@ function updateResults() {
         weeklyWeightLossPercentage = 0.01;
     }
 
-    // Only display the results if 'Grundumsatz' is greater than 0
-    if (grundUmsatzValue > 0) {
+    // Only display the results if 'Tatsächlicher Kalorienverbrauch' is greater than 0
+    if (totalCaloriesValue > 0) {
         const weight = 70; // Example weight, you should fetch this dynamically
         const weeklyWeightLossKg = weight * weeklyWeightLossPercentage;
         const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
@@ -504,29 +501,15 @@ function updateResults() {
         document.querySelector('.result-defizit').textContent = calorieDeficitPerDay;
         document.querySelector('.result-fettabhnahme').textContent = weeklyWeightLossKg.toFixed(2);
     } else {
-        // Hide results if 'Grundumsatz' is not greater than 0
+        // Hide results if 'Tatsächlicher Kalorienverbrauch' is not greater than 0
         document.querySelector('.result-defizit').textContent = 0;
         document.querySelector('.result-fettabhnahme').textContent = 0;
     }
 }
 
-// Add event listeners to radio buttons
-const radios = document.getElementsByName('Gewichtverlust');
-for (const radio of radios) {
-    radio.addEventListener('change', updateResults);
-}
-
-// Function to monitor and trigger recalculation when text changes
-function addContentChangeListener(element) {
-    element.addEventListener('DOMSubtreeModified', updateResults);
-}
-
-// Add event listeners for content changes
-addContentChangeListener(grundumsatzElement);
-addContentChangeListener(alltagsbewegungElement);
-addContentChangeListener(aktivesTrainingElement);
-addContentChangeListener(totalCaloriesElement);
-addContentChangeListener(nahrungsverbrennungElement);
+// Add event listener to 'Tatsächlicher Kalorienverbrauch'
+totalCaloriesElement.addEventListener('DOMSubtreeModified', updateResults);
 
 // Call the function once to initialize
 updateResults();
+
