@@ -644,22 +644,21 @@ function validateInputs() {
         }
     }
 
-    // Function to handle the display logic (results calculation)
     function updateResults() {
         // Get the 'Tatsächlicher Kalorienverbrauch' value and extract the number
         const totalCalories = totalCaloriesElement.textContent;
         const totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')); // Extract only the numeric part
-
+    
         // Get the user's current weight from input
         const currentWeight = parseInt(weightInputElement.value);
-
+    
         // Get the user's target weight (Wunschgewicht)
         const targetWeight = parseInt(targetWeightElement.value);
-
+    
         // Get BMR (Grundumsatz) value
         const grundUmsatzText = grundUmsatzElement.textContent;
         const grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')); // Extract only the numeric part
-
+    
         // Get the selected radio button value for weight loss speed
         const radios = document.getElementsByName('Gewichtverlust');
         let selectedValue = null;
@@ -669,13 +668,13 @@ function validateInputs() {
                 break;
             }
         }
-
+    
         // Only proceed if a weight loss option is selected
         if (!selectedValue) {
             console.log("No weight loss option selected.");
             return;
         }
-
+    
         // Calculate weekly weight loss percentage based on selection
         let weeklyWeightLossPercentage = 0;
         if (selectedValue === 'Langsames Abnehmen') {
@@ -685,13 +684,13 @@ function validateInputs() {
         } else if (selectedValue === 'Schnelles Abnehmen') {
             weeklyWeightLossPercentage = 0.01;
         }
-
+    
         // Only display the results if 'Tatsächlicher Kalorienverbrauch' is greater than 0
         if (totalCaloriesValue > 0 && targetWeight > 0 && currentWeight > 0) {
             const weeklyWeightLossKg = currentWeight * weeklyWeightLossPercentage;
             const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
             const targetCalories = totalCaloriesValue - calorieDeficitPerDay;
-
+    
             // Check if target calories fall below BMR
             if (targetCalories < grundUmsatzValue) {
                 // Show the warning message if target calories are less than BMR
@@ -700,20 +699,21 @@ function validateInputs() {
             } else {
                 warningMessageElement.style.display = 'none'; // Hide warning box if safe
             }
-
+    
             // Update Zielkalorien element
             zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : 0; // Show 0 if targetCalories is negative
-
+    
             // Calculate the weight loss timeline
             const totalWeightToLose = currentWeight - targetWeight; // Weight to lose
             const totalCaloricDeficitNeeded = totalWeightToLose * 7700; // Total caloric deficit to lose the weight
-
+    
             // Days, weeks, and months to reach the goal
             const daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
             const weeksToReachGoal = Math.round(daysToReachGoal / 7);
             const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1); // Convert weeks to months
-
+    
             // Update the HTML content for weeks, months, and target weight
+            document.querySelector('.ziel-kcal').textContent = targetCalories > 0 ? targetCalories : 0; // Update Zielkalorien in the result text
             weeksElement.textContent = weeksToReachGoal;
             monthsElement.textContent = monthsToReachGoal;
             targetWeightResultElement.textContent = targetWeight;
