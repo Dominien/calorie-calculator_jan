@@ -349,27 +349,31 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to update the total calories for all sessions
     function updateTotalCalories() {
         getWeightFromGrundumsatz(); // Ensure weight is fetched each time a change is made
-
+    
         const totalCaloriesSession1 = calculateTrainingCalories($('#drop-down-1').val(), 'training-minuten', 'training-woche');
         const totalCaloriesSession2 = calculateTrainingCalories($('#drop-down-2').val(), 'training-minuten-2', 'training-woche-2');
         const totalCaloriesSession3 = calculateTrainingCalories($('#drop-down-3').val(), 'training-minuten-3', 'training-woche-3');
-
+    
         const totalCalories = totalCaloriesSession1 + totalCaloriesSession2 + totalCaloriesSession3;
-
+    
         const totalCaloriesElement = document.getElementById('total-calories');
-        const activeCaloriesElement = document.getElementById('active-right'); // Add reference to #active-right
-
+        const activeCaloriesElement = document.getElementById('active-right'); 
+    
         if (totalCalories > 0) {
-            totalCaloriesElement.textContent = `${totalCalories} kcal`;
-            activeCaloriesElement.textContent = `${totalCalories} kcal`; // Update the active calories display
+            const dailyCalories = Math.round(totalCalories / 7); // Divide by 7 to get daily calories
+    
+            totalCaloriesElement.textContent = `${dailyCalories} kcal`; // Update with daily calories
+            activeCaloriesElement.textContent = `${dailyCalories} kcal`; // Update with daily calories in active-right
+    
             totalCaloriesElement.style.display = 'flex';
-            console.log(`Total calories: ${totalCalories} kcal`);
+            console.log(`Daily calories: ${dailyCalories} kcal`);
         } else {
             totalCaloriesElement.style.display = 'none';
             activeCaloriesElement.textContent = '0 kcal'; // Reset active calories if total is 0
             console.log(`Total calories: ${totalCalories} kcal (hidden)`);
         }
     }
+    
 
     // Function to set up training sessions
     function setupTrainingSession(dropdownId, minutesInputId, sessionsInputId) {
