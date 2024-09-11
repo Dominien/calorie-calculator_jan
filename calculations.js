@@ -461,6 +461,8 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+// We ADD Always here PLS :D
+
 document.addEventListener('DOMContentLoaded', function () {
     // Select necessary DOM elements
     const totalCaloriesElement = document.querySelector('.result-tats-chlich'); // Total actual calories element
@@ -473,6 +475,8 @@ document.addEventListener('DOMContentLoaded', function () {
     const weeksElement = document.querySelector('.span-result.weeks'); // Weeks to reach goal
     const monthsElement = document.querySelector('.span-result.months'); // Months to reach goal
     const targetWeightResultElement = document.querySelector('.span-result.target-weight'); // Target weight
+    const defizitElement = document.querySelector('.result-defizit'); // Deficit per day
+    const fettAbnahmeElement = document.querySelector('.result-fettabhnahme'); // Fat loss per week
 
     // Function to handle live validation on input fields
     function hideWarningOnInput(inputElement, warningElement) {
@@ -504,7 +508,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to validate inputs and show warnings if any are missing or invalid
     function validateInputs() {
-        let isValid = true; // Track if all inputs are valid
+        let isValid = true;
 
         // Validate Wunschgewicht
         if (wunschgewichtInput.value.trim() === '' || parseInt(wunschgewichtInput.value) <= 0) {
@@ -539,20 +543,13 @@ document.addEventListener('DOMContentLoaded', function () {
         return isValid;
     }
 
-    // Unified function to handle both total calorie updates and weight loss results
+    // Unified function to handle total calorie updates and weight loss results
     function updateResults() {
-        // Get the total calories burned value
         const totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
-        const totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0; // Extract only the numeric part
-
-        // Get the user's weight input
+        const totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0; // Extract numeric part
         const currentWeight = parseInt(weightInputElement.value) || 0;
-
-        // Get BMR (Grundumsatz) value
         const grundUmsatzText = grundUmsatzElement ? grundUmsatzElement.textContent : '';
-        const grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0; // Extract only the numeric part
-
-        // Get the user's target weight (Wunschgewicht)
+        const grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0;
         const targetWeight = parseInt(targetWeightElement.value);
 
         // Get the selected radio button value for weight loss speed
@@ -569,7 +566,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Determine the weekly weight loss percentage based on the selected option
+        // Determine weekly weight loss percentage
         let weeklyWeightLossPercentage = 0;
         if (selectedValue === 'Langsames Abnehmen') {
             weeklyWeightLossPercentage = 0.005;
@@ -579,11 +576,10 @@ document.addEventListener('DOMContentLoaded', function () {
             weeklyWeightLossPercentage = 0.01;
         }
 
-        // Calculate if totalCaloriesValue is greater than 0
         if (totalCaloriesValue > 0 && currentWeight > 0 && targetWeight > 0) {
             const weeklyWeightLossKg = currentWeight * weeklyWeightLossPercentage;
-            const calorieDeficitPerDay = Math.max(0, Math.round((weeklyWeightLossKg * 7700) / 7)); // Ensure no negative deficit
-            const targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay); // Ensure no negative calories
+            const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
+            const targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay); // No negative target calories
 
             // Update Zielkalorien element
             zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : 0;
@@ -596,28 +592,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 warningMessageElement.style.display = 'none';
             }
 
-            // Calculate timeline to reach goal
-            const totalWeightToLose = Math.max(0, currentWeight - targetWeight); // Ensure no negative weight to lose
-            if (totalWeightToLose > 0 && calorieDeficitPerDay > 0) {
-                const totalCaloricDeficitNeeded = totalWeightToLose * 7700;
-                const daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
-                const weeksToReachGoal = Math.round(daysToReachGoal / 7);
-                const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
+            // Update fat loss and calorie deficit
+            fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2); // Fat loss per week
+            defizitElement.textContent = calorieDeficitPerDay; // Calorie deficit per day
 
-                // Update the HTML content
-                weeksElement.textContent = weeksToReachGoal;
-                monthsElement.textContent = monthsToReachGoal;
-                targetWeightResultElement.textContent = targetWeight;
-            } else {
-                // Reset results if weight loss is not possible
-                weeksElement.textContent = '0';
-                monthsElement.textContent = '0';
-                targetWeightResultElement.textContent = '0';
-            }
+            // Calculate timeline to reach goal
+            const totalWeightToLose = currentWeight - targetWeight;
+            const totalCaloricDeficitNeeded = totalWeightToLose * 7700;
+            const daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
+            const weeksToReachGoal = Math.round(daysToReachGoal / 7);
+            const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
+
+            // Update the timeline
+            weeksElement.textContent = weeksToReachGoal;
+            monthsElement.textContent = monthsToReachGoal;
+            targetWeightResultElement.textContent = targetWeight;
         } else {
             // Reset results if inputs are invalid
-            document.querySelector('.result-defizit').textContent = 0;
-            document.querySelector('.result-fettabhnahme').textContent = 0;
+            defizitElement.textContent = 0;
+            fettAbnahmeElement.textContent = 0;
             weeksElement.textContent = 0;
             monthsElement.textContent = 0;
             targetWeightResultElement.textContent = 0;
@@ -627,7 +620,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to initialize event listeners
     function initializeListeners() {
-        // Observe changes in 'Tatsächlicher Kalorienverbrauch'
         if (totalCaloriesElement) {
             const observer = new MutationObserver(updateResults);
             observer.observe(totalCaloriesElement, { childList: true, subtree: true });
@@ -656,3 +648,4 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize all listeners
     initializeListeners();
 });
+
