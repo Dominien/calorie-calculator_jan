@@ -469,19 +469,91 @@ document.addEventListener('DOMContentLoaded', function () {
     const warningMessageElement = document.querySelector('.warning-message_wrapper'); // Warning message element
     const zielKalorienElement = document.querySelector('.result_zielkalorien'); // Zielkalorien element (target calories)
     const radios = document.getElementsByName('Gewichtverlust'); // Radio buttons for weight loss speed
+    const targetWeightElement = document.getElementById('wunschgewicht'); // Wunschgewicht input
+    const weeksElement = document.querySelector('.span-result.weeks'); // Weeks to reach goal
+    const monthsElement = document.querySelector('.span-result.months'); // Months to reach goal
+    const targetWeightResultElement = document.querySelector('.span-result.target-weight'); // Target weight
 
-    // Function to handle the calculation and display logic
-    function updateWeightLossResults() {
-        // Get the total calories burned value and extract the numeric part
+    // Function to handle live validation on input fields
+    function hideWarningOnInput(inputElement, warningElement) {
+        inputElement.addEventListener('input', () => {
+            if (inputElement.value.trim() !== '' && parseInt(inputElement.value) > 0) {
+                warningElement.style.display = 'none'; // Hide the warning if the input is valid
+            }
+        });
+    }
+
+    // Add live validation for Wunschgewicht
+    const wunschgewichtInput = document.getElementById('wunschgewicht');
+    const wunschgewichtWarning = wunschgewichtInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+    hideWarningOnInput(wunschgewichtInput, wunschgewichtWarning);
+
+    // Add live validation for Age
+    const ageInput = document.getElementById('age-2');
+    const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+    hideWarningOnInput(ageInput, ageWarning);
+
+    // Add live validation for Height
+    const heightInput = document.getElementById('height-2');
+    const heightWarning = heightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+    hideWarningOnInput(heightInput, heightWarning);
+
+    // Add live validation for Weight
+    const weightWarning = weightInputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
+    hideWarningOnInput(weightInputElement, weightWarning);
+
+    // Function to validate inputs and show warnings if any are missing or invalid
+    function validateInputs() {
+        let isValid = true; // Track if all inputs are valid
+
+        // Validate Wunschgewicht
+        if (wunschgewichtInput.value.trim() === '' || parseInt(wunschgewichtInput.value) <= 0) {
+            wunschgewichtWarning.style.display = 'block'; // Show warning if empty or invalid
+            isValid = false;
+        } else {
+            wunschgewichtWarning.style.display = 'none';
+        }
+
+        // Validate Age, Height, and Weight similarly
+        if (ageInput.value.trim() === '' || parseInt(ageInput.value) <= 0) {
+            ageWarning.style.display = 'block';
+            isValid = false;
+        } else {
+            ageWarning.style.display = 'none';
+        }
+
+        if (heightInput.value.trim() === '' || parseInt(heightInput.value) <= 0) {
+            heightWarning.style.display = 'block';
+            isValid = false;
+        } else {
+            heightWarning.style.display = 'none';
+        }
+
+        if (weightInputElement.value.trim() === '' || parseInt(weightInputElement.value) <= 0) {
+            weightWarning.style.display = 'block';
+            isValid = false;
+        } else {
+            weightWarning.style.display = 'none';
+        }
+
+        return isValid;
+    }
+
+    // Unified function to handle both total calorie updates and weight loss results
+    function updateResults() {
+        // Get the total calories burned value
         const totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
         const totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0; // Extract only the numeric part
 
         // Get the user's weight input
-        const weight = parseInt(weightInputElement.value) || 0;
+        const currentWeight = parseInt(weightInputElement.value) || 0;
 
         // Get BMR (Grundumsatz) value
         const grundUmsatzText = grundUmsatzElement ? grundUmsatzElement.textContent : '';
         const grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0; // Extract only the numeric part
+
+        // Get the user's target weight (Wunschgewicht)
+        const targetWeight = parseInt(targetWeightElement.value);
 
         // Get the selected radio button value for weight loss speed
         let selectedValue = null;
@@ -492,7 +564,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Check if a weight loss option is selected
         if (!selectedValue) {
             console.log("No weight loss option selected.");
             return;
@@ -508,56 +579,73 @@ document.addEventListener('DOMContentLoaded', function () {
             weeklyWeightLossPercentage = 0.01;
         }
 
-        // Proceed with the calculation only if 'Tatsächlicher Kalorienverbrauch' is greater than 0
-        if (totalCaloriesValue > 0) {
-            const weeklyWeightLossKg = weight * weeklyWeightLossPercentage;
+        // Calculate if totalCaloriesValue is greater than 0
+        if (totalCaloriesValue > 0 && currentWeight > 0 && targetWeight > 0) {
+            const weeklyWeightLossKg = currentWeight * weeklyWeightLossPercentage;
             const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
             const targetCalories = totalCaloriesValue - calorieDeficitPerDay;
 
-            // Update Zielkalorien element (target calories)
-            zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : 0; // Show 0 if targetCalories is negative
+            // Update Zielkalorien element
+            zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : 0;
 
-            // Show the warning message if target calories fall below the BMR (Grundumsatz)
+            // Show warning if target calories fall below Grundumsatz
             if (targetCalories < grundUmsatzValue) {
-                warningMessageElement.style.display = 'flex'; // Show warning box
-                warningMessageElement.querySelector('.warning-message').textContent = `Warnhinweis: Das angestrebte Gewichtsverlustziel könnte möglicherweise nicht erreichbar sein, ohne deine Gesundheit zu riskieren. Wir empfehlen dir, nicht weniger als ${grundUmsatzValue} kcal zu essen, da dies dein Grundumsatz ist.`;
+                warningMessageElement.style.display = 'flex';
+                warningMessageElement.querySelector('.warning-message').textContent = `Warnhinweis: Nicht weniger als ${grundUmsatzValue} kcal essen, da dies dein Grundumsatz ist.`;
             } else {
-                warningMessageElement.style.display = 'none'; // Hide warning box if target calories are safe
+                warningMessageElement.style.display = 'none';
             }
 
-            // Update calorie deficit and fat loss results
-            document.querySelector('.result-defizit').textContent = calorieDeficitPerDay;
-            document.querySelector('.result-fettabhnahme').textContent = weeklyWeightLossKg.toFixed(2);
+            // Calculate timeline to reach goal
+            const totalWeightToLose = currentWeight - targetWeight;
+            const totalCaloricDeficitNeeded = totalWeightToLose * 7700;
+            const daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
+            const weeksToReachGoal = Math.round(daysToReachGoal / 7);
+            const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
+
+            // Update the HTML content
+            weeksElement.textContent = weeksToReachGoal;
+            monthsElement.textContent = monthsToReachGoal;
+            targetWeightResultElement.textContent = targetWeight;
         } else {
-            // Reset the results if 'Tatsächlicher Kalorienverbrauch' is not greater than 0
+            // Reset results if inputs are invalid
             document.querySelector('.result-defizit').textContent = 0;
             document.querySelector('.result-fettabhnahme').textContent = 0;
-            warningMessageElement.style.display = 'none'; // Hide warning box if no valid data
-            zielKalorienElement.textContent = 0; // Set Zielkalorien to 0 if no valid data
+            weeksElement.textContent = 0;
+            monthsElement.textContent = 0;
+            targetWeightResultElement.textContent = 0;
+            warningMessageElement.style.display = 'none';
         }
     }
 
     // Function to initialize event listeners
     function initializeListeners() {
-        // Event listener for changes in 'Tatsächlicher Kalorienverbrauch' (result-tats-chlich)
+        // Observe changes in 'Tatsächlicher Kalorienverbrauch'
         if (totalCaloriesElement) {
-            const observer = new MutationObserver(updateWeightLossResults);
+            const observer = new MutationObserver(updateResults);
             observer.observe(totalCaloriesElement, { childList: true, subtree: true });
         }
 
-        // Add event listeners to radio buttons to trigger recalculation when a weight loss option is selected
+        // Add event listeners to radio buttons for weight loss
         radios.forEach(radio => {
-            radio.addEventListener('change', updateWeightLossResults);
+            radio.addEventListener('change', updateResults);
         });
 
-        // Run initial calculation on page load
-        updateWeightLossResults();
+        // Add event listener for "Berechnen" button
+        const berechnenButton = document.getElementById('check-inputs');
+        if (berechnenButton) {
+            berechnenButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                if (validateInputs()) {
+                    updateResults();
+                }
+            });
+        }
+
+        // Run initial calculation
+        updateResults();
     }
 
-    // Initialize all listeners when the DOM is fully loaded
+    // Initialize all listeners
     initializeListeners();
 });
-
-
-
-
