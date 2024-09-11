@@ -470,12 +470,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const zielKalorienElement = document.querySelector('.result_zielkalorien'); // Zielkalorien element (target calories)
     const radios = document.getElementsByName('Gewichtverlust'); // Radio buttons for weight loss speed
 
-    // Ensure all essential elements are available
-    if (!totalCaloriesElement || !weightInputElement || !zielKalorienElement || !grundUmsatzElement) {
-        console.error("Missing essential elements for calculation");
-        return;
-    }
-
     // Function to handle the calculation and display logic
     function updateWeightLossResults() {
         // Get the total calories burned value and extract the numeric part
@@ -563,7 +557,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize all listeners when the DOM is fully loaded
     initializeListeners();
 });
-
 
 
 
