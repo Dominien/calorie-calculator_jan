@@ -461,7 +461,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-
 document.addEventListener('DOMContentLoaded', function () {
     // Select necessary DOM elements
     const totalCaloriesElement = document.querySelector('.result-tats-chlich'); // Total actual calories element
@@ -471,8 +470,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const zielKalorienElement = document.querySelector('.result_zielkalorien'); // Zielkalorien element (target calories)
     const radios = document.getElementsByName('Gewichtverlust'); // Radio buttons for weight loss speed
 
+    // Ensure all essential elements are available
+    if (!totalCaloriesElement || !weightInputElement || !zielKalorienElement || !grundUmsatzElement) {
+        console.error("Missing essential elements for calculation");
+        return;
+    }
+
     // Function to handle the calculation and display logic
-    function updateResults() {
+    function updateWeightLossResults() {
         // Get the total calories burned value and extract the numeric part
         const totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
         const totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0; // Extract only the numeric part
@@ -542,22 +547,23 @@ document.addEventListener('DOMContentLoaded', function () {
     function initializeListeners() {
         // Event listener for changes in 'Tatsächlicher Kalorienverbrauch' (result-tats-chlich)
         if (totalCaloriesElement) {
-            const observer = new MutationObserver(updateResults);
+            const observer = new MutationObserver(updateWeightLossResults);
             observer.observe(totalCaloriesElement, { childList: true, subtree: true });
         }
 
         // Add event listeners to radio buttons to trigger recalculation when a weight loss option is selected
         radios.forEach(radio => {
-            radio.addEventListener('change', updateResults);
+            radio.addEventListener('change', updateWeightLossResults);
         });
 
         // Run initial calculation on page load
-        updateResults();
+        updateWeightLossResults();
     }
 
     // Initialize all listeners when the DOM is fully loaded
     initializeListeners();
 });
+
 
 
 
