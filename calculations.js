@@ -461,6 +461,10 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+
+
+// Weight loss Options HERE ALL SCRIPTS MADE by Marco.P :D
+
 // Select necessary DOM elements
 const totalCaloriesElement = document.querySelector('.result-tats-chlich');
 
@@ -478,6 +482,12 @@ function updateResults() {
             selectedValue = radio.value;
             break;
         }
+    }
+
+    // Only proceed if a weight loss option is selected
+    if (!selectedValue) {
+        console.log("No weight loss option selected.");
+        return;
     }
 
     // Calculate weekly weight loss percentage based on selection
@@ -506,9 +516,17 @@ function updateResults() {
     }
 }
 
-// Add event listener to 'Tatsächlicher Kalorienverbrauch'
-totalCaloriesElement.addEventListener('DOMSubtreeModified', updateResults);
+// Event listener for changes in 'Tatsächlicher Kalorienverbrauch' (result-tats-chlich)
+const observer = new MutationObserver(updateResults);
 
-// Call the function once to initialize
+// Observe changes in the total calories burned element
+observer.observe(totalCaloriesElement, { childList: true, subtree: true });
+
+// Add event listeners to radio buttons to trigger recalculation when a weight loss option is selected
+const radios = document.getElementsByName('Gewichtverlust');
+for (const radio of radios) {
+    radio.addEventListener('change', updateResults);
+}
+
+// Initial check when the page loads
 updateResults();
-
