@@ -425,13 +425,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalCaloriesElement = document.querySelector('.result-tats-chlich');
     const nahrungsverbrennungElement = document.getElementById('nahrungsburn');
 
+    const baseCalories = 1200; // Default calories a body needs daily
+
     // Function to update the total actual calorie burn
     function updateActualCalories() {
         const grundumsatz = parseInt(grundumsatzElement.textContent, 10) || 0;
         const alltagsbewegung = parseInt(alltagsbewegungElement.textContent, 10) || 0;
         const aktivesTraining = parseInt(aktivesTrainingElement.textContent, 10) || 0;
 
-        const totalCalories = grundumsatz + alltagsbewegung + aktivesTraining;
+        // Add base calories (1200 kcal) to the total calculation
+        const totalCalories = baseCalories + grundumsatz + alltagsbewegung + aktivesTraining;
         totalCaloriesElement.textContent = `${totalCalories} kcal`;
 
         calculateNahrungsverbrennung(totalCalories);
