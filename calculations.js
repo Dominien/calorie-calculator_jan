@@ -263,8 +263,8 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     const MET_VALUES = {
         'Krafttraining': 6,
-        'cardio (LISS)': 7,
-        'cardio (HIIT)': 9
+        'cardio-liss': 7,
+        'cardio-hiit': 9
     };
 
     let weight = 0;
