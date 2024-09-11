@@ -297,6 +297,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const caloriesPerMinute = (MET * 3.5 * weight) / 200;
         const totalCalories = caloriesPerMinute * minutes * sessions;
+        console.log(`Calories for ${activityType}: ${totalCalories}`);
         return Math.round(totalCalories);
     }
 
@@ -312,9 +313,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (totalCalories > 0) {
             totalCaloriesElement.textContent = `${totalCalories} kcal`;
             totalCaloriesElement.style.display = 'flex';
+            console.log(`Total calories: ${totalCalories} kcal`);
         } else {
             totalCaloriesElement.style.display = 'none';
-            console.log(`${totalCalories} kcal`);
+            console.log(`Total calories: ${totalCalories} kcal (hidden)`);
         }
     }
 
@@ -340,10 +342,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Input events
         minutesInput.addEventListener('input', function () {
+            console.log(`Minutes input for ${minutesInputId}: ${minutesInput.value}`);
             updateTotalCalories();  // Update total calories for all sessions
         });
 
         sessionsInput.addEventListener('input', function () {
+            console.log(`Sessions input for ${sessionsInputId}: ${sessionsInput.value}`);
             updateTotalCalories();  // Update total calories for all sessions
         });
     }
