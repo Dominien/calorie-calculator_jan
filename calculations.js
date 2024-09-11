@@ -569,69 +569,70 @@ document.addEventListener('DOMContentLoaded', function () {
     const monthsElement = document.querySelector('.span-result.months'); // Months to reach goal
     const targetWeightResultElement = document.querySelector('.span-result.target-weight'); // Target weight
 
-    // Function to validate inputs and show warnings if any are missing
-    function validateInputs() {
-        let isValid = true; // Track if all inputs are valid
+    /// Function to validate inputs and show warnings if any are missing
+function validateInputs() {
+    let isValid = true; // Track if all inputs are valid
 
-        // Wunschgewicht Validation
-        const wunschgewichtInput = document.getElementById('wunschgewicht');
-        const wunschgewichtWarning = wunschgewichtInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-        if (wunschgewichtInput.value.trim() === '') {
-            wunschgewichtWarning.style.display = 'block'; // Show warning
-            isValid = false;
-        } else {
-            wunschgewichtWarning.style.display = 'none'; // Hide warning if valid
-        }
-
-        // Weight Loss Option Validation
-        const abnehmzielRadios = document.getElementsByName('Gewichtverlust');
-        const abnehmzielWarning = document.querySelector('.text-warning.here');
-        let abnehmzielSelected = false;
-        for (const radio of abnehmzielRadios) {
-            if (radio.checked) {
-                abnehmzielSelected = true;
-                break;
-            }
-        }
-        if (!abnehmzielSelected) {
-            abnehmzielWarning.style.display = 'block'; // Show warning
-            isValid = false;
-        } else {
-            abnehmzielWarning.style.display = 'none'; // Hide warning if valid
-        }
-
-        // Age Validation
-        const ageInput = document.getElementById('age-2');
-        const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-        if (ageInput.value.trim() === '') {
-            ageWarning.style.display = 'block'; // Show warning
-            isValid = false;
-        } else {
-            ageWarning.style.display = 'none'; // Hide warning if valid
-        }
-
-        // Height Validation
-        const heightInput = document.getElementById('height-2');
-        const heightWarning = heightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-        if (heightInput.value.trim() === '') {
-            heightWarning.style.display = 'block'; // Show warning
-            isValid = false;
-        } else {
-            heightWarning.style.display = 'none'; // Hide warning if valid
-        }
-
-        // Weight Validation
-        const weightInput = document.getElementById('weight-2');
-        const weightWarning = weightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-        if (weightInput.value.trim() === '') {
-            weightWarning.style.display = 'block'; // Show warning
-            isValid = false;
-        } else {
-            weightWarning.style.display = 'none'; // Hide warning if valid
-        }
-
-        return isValid;
+    // Wunschgewicht Validation
+    const wunschgewichtInput = document.getElementById('wunschgewicht');
+    const wunschgewichtWarning = wunschgewichtInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+    if (wunschgewichtInput.value.trim() === '') {
+        wunschgewichtWarning.style.display = 'block'; // Show warning
+        isValid = false;
+    } else {
+        wunschgewichtWarning.style.display = 'none'; // Hide warning if valid
     }
+
+    // Weight Loss Option Validation
+    const abnehmzielRadios = document.getElementsByName('Gewichtverlust');
+    const abnehmzielWarning = document.querySelector('.text-warning.here');
+    let abnehmzielSelected = false;
+    for (const radio of abnehmzielRadios) {
+        if (radio.checked) {
+            abnehmzielSelected = true;
+            break;
+        }
+    }
+    if (!abnehmzielSelected) {
+        abnehmzielWarning.style.display = 'block'; // Show warning
+        isValid = false;
+    } else {
+        abnehmzielWarning.style.display = 'none'; // Hide warning if valid
+    }
+
+    // Age Validation
+    const ageInput = document.getElementById('age-2');
+    const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+    if (ageInput.value.trim() === '') {
+        ageWarning.style.display = 'block'; // Show warning
+        isValid = false;
+    } else {
+        ageWarning.style.display = 'none'; // Hide warning if valid
+    }
+
+    // Height Validation
+    const heightInput = document.getElementById('height-2');
+    const heightWarning = heightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+    if (heightInput.value.trim() === '') {
+        heightWarning.style.display = 'block'; // Show warning
+        isValid = false;
+    } else {
+        heightWarning.style.display = 'none'; // Hide warning if valid
+    }
+
+    // Weight Validation
+    const weightInput = document.getElementById('weight-2');
+    const weightWarning = weightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+    if (weightInput.value.trim() === '') {
+        weightWarning.style.display = 'block'; // Show warning
+        isValid = false;
+    } else {
+        weightWarning.style.display = 'none'; // Hide warning if valid
+    }
+
+    return isValid;
+}
+
 
     // Function to handle the calculation and validation when the "Berechnen" button is clicked
     function handleCalculation(event) {
