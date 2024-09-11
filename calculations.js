@@ -461,10 +461,17 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+// Select necessary DOM elements
+const grundumsatzElement = document.getElementById('grund-right');
+const alltagsbewegungElement = document.getElementById('altag-right');
+const aktivesTrainingElement = document.getElementById('active-right');
+const totalCaloriesElement = document.querySelector('.result-tats-chlich');
+const nahrungsverbrennungElement = document.getElementById('nahrungsburn');
+
 // Function to handle the display logic
 function updateResults() {
     // Get the 'Grundumsatz' value and extract the number
-    const grundUmsatz = document.getElementById('grund-right').textContent;
+    const grundUmsatz = grundumsatzElement.textContent;
     const grundUmsatzValue = parseInt(grundUmsatz.replace(/\D/g, '')); // Extract only the numeric part
 
     // Get the selected radio button value for weight loss speed
@@ -508,6 +515,18 @@ const radios = document.getElementsByName('Gewichtverlust');
 for (const radio of radios) {
     radio.addEventListener('change', updateResults);
 }
+
+// Function to monitor and trigger recalculation when text changes
+function addContentChangeListener(element) {
+    element.addEventListener('DOMSubtreeModified', updateResults);
+}
+
+// Add event listeners for content changes
+addContentChangeListener(grundumsatzElement);
+addContentChangeListener(alltagsbewegungElement);
+addContentChangeListener(aktivesTrainingElement);
+addContentChangeListener(totalCaloriesElement);
+addContentChangeListener(nahrungsverbrennungElement);
 
 // Call the function once to initialize
 updateResults();
