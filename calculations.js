@@ -569,15 +569,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const monthsElement = document.querySelector('.span-result.months'); // Months to reach goal
     const targetWeightResultElement = document.querySelector('.span-result.target-weight'); // Target weight
 
-    /// Function to validate inputs and show warnings if any are missing
+// Function to validate inputs and show warnings if any are missing or invalid
 function validateInputs() {
     let isValid = true; // Track if all inputs are valid
 
     // Wunschgewicht Validation
     const wunschgewichtInput = document.getElementById('wunschgewicht');
     const wunschgewichtWarning = wunschgewichtInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-    if (wunschgewichtInput.value.trim() === '') {
-        wunschgewichtWarning.style.display = 'block'; // Show warning
+    if (wunschgewichtInput.value.trim() === '' || parseInt(wunschgewichtInput.value) <= 0) {
+        wunschgewichtWarning.style.display = 'block'; // Show warning if empty or less than or equal to 0
         isValid = false;
     } else {
         wunschgewichtWarning.style.display = 'none'; // Hide warning if valid
@@ -594,7 +594,7 @@ function validateInputs() {
         }
     }
     if (!abnehmzielSelected) {
-        abnehmzielWarning.style.display = 'block'; // Show warning
+        abnehmzielWarning.style.display = 'block'; // Show warning if no option is selected
         isValid = false;
     } else {
         abnehmzielWarning.style.display = 'none'; // Hide warning if valid
@@ -603,8 +603,8 @@ function validateInputs() {
     // Age Validation
     const ageInput = document.getElementById('age-2');
     const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-    if (ageInput.value.trim() === '') {
-        ageWarning.style.display = 'block'; // Show warning
+    if (ageInput.value.trim() === '' || parseInt(ageInput.value) <= 0) {
+        ageWarning.style.display = 'block'; // Show warning if empty or less than or equal to 0
         isValid = false;
     } else {
         ageWarning.style.display = 'none'; // Hide warning if valid
@@ -613,8 +613,8 @@ function validateInputs() {
     // Height Validation
     const heightInput = document.getElementById('height-2');
     const heightWarning = heightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-    if (heightInput.value.trim() === '') {
-        heightWarning.style.display = 'block'; // Show warning
+    if (heightInput.value.trim() === '' || parseInt(heightInput.value) <= 0) {
+        heightWarning.style.display = 'block'; // Show warning if empty or less than or equal to 0
         isValid = false;
     } else {
         heightWarning.style.display = 'none'; // Hide warning if valid
@@ -623,8 +623,8 @@ function validateInputs() {
     // Weight Validation
     const weightInput = document.getElementById('weight-2');
     const weightWarning = weightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-    if (weightInput.value.trim() === '') {
-        weightWarning.style.display = 'block'; // Show warning
+    if (weightInput.value.trim() === '' || parseInt(weightInput.value) <= 0) {
+        weightWarning.style.display = 'block'; // Show warning if empty or less than or equal to 0
         isValid = false;
     } else {
         weightWarning.style.display = 'none'; // Hide warning if valid
@@ -632,7 +632,6 @@ function validateInputs() {
 
     return isValid;
 }
-
 
     // Function to handle the calculation and validation when the "Berechnen" button is clicked
     function handleCalculation(event) {
