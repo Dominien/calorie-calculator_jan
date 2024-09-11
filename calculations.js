@@ -459,3 +459,55 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log('Listeners for Grundumsatz, Alltagsbewegung, and Aktives Training added successfully.');
 });
+
+
+// Function to handle the display logic
+function updateResults() {
+    // Get the 'Grundumsatz' value and extract the number
+    const grundUmsatz = document.getElementById('grund-right').textContent;
+    const grundUmsatzValue = parseInt(grundUmsatz.replace(/\D/g, '')); // Extract only the numeric part
+
+    // Get the selected radio button value for weight loss speed
+    const radios = document.getElementsByName('Gewichtverlust');
+    let selectedValue = null;
+    for (const radio of radios) {
+        if (radio.checked) {
+            selectedValue = radio.value;
+            break;
+        }
+    }
+
+    // Calculate weekly weight loss percentage based on selection
+    let weeklyWeightLossPercentage = 0;
+    if (selectedValue === 'Langsames Abnehmen') {
+        weeklyWeightLossPercentage = 0.005;
+    } else if (selectedValue === 'Moderates Abnehmen') {
+        weeklyWeightLossPercentage = 0.0075;
+    } else if (selectedValue === 'Schnelles Abnehmen') {
+        weeklyWeightLossPercentage = 0.01;
+    }
+
+    // Only display the results if 'Grundumsatz' is greater than 0
+    if (grundUmsatzValue > 0) {
+        const weight = 70; // Example weight, you should fetch this dynamically
+        const weeklyWeightLossKg = weight * weeklyWeightLossPercentage;
+        const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
+
+        // Show results
+        document.querySelector('.result-defizit').textContent = calorieDeficitPerDay;
+        document.querySelector('.result-fettabhnahme').textContent = weeklyWeightLossKg.toFixed(2);
+    } else {
+        // Hide results if 'Grundumsatz' is not greater than 0
+        document.querySelector('.result-defizit').textContent = 0;
+        document.querySelector('.result-fettabhnahme').textContent = 0;
+    }
+}
+
+// Add event listeners to radio buttons
+const radios = document.getElementsByName('Gewichtverlust');
+for (const radio of radios) {
+    radio.addEventListener('change', updateResults);
+}
+
+// Call the function once to initialize
+updateResults();
