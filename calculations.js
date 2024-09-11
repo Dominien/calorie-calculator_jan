@@ -550,73 +550,87 @@ document.addEventListener('DOMContentLoaded', function () {
         const totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0; // Extract numeric part
         const currentWeight = parseInt(weightInputElement.value) || 0;
         const grundUmsatzText = grundUmsatzElement ? grundUmsatzElement.textContent : '';
-        const grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0;
-        const targetWeight = parseInt(targetWeightElement.value);
+        const grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0; // Extract numeric part from Grundumsatz
 
-        // Get the selected radio button value for weight loss speed
-        let selectedValue = null;
-        for (const radio of radios) {
-            if (radio.checked) {
-                selectedValue = radio.value;
-                break;
+        // Only proceed with the calculations if Grundumsatz is greater than 0
+        if (grundUmsatzValue > 0) {
+            const targetWeight = parseInt(targetWeightElement.value);
+
+            // Get the selected radio button value for weight loss speed
+            let selectedValue = null;
+            for (const radio of radios) {
+                if (radio.checked) {
+                    selectedValue = radio.value;
+                    break;
+                }
             }
-        }
 
-        if (!selectedValue) {
-            console.log("No weight loss option selected.");
-            return;
-        }
+            if (!selectedValue) {
+                console.log("No weight loss option selected.");
+                return;
+            }
 
-        // Determine weekly weight loss percentage
-        let weeklyWeightLossPercentage = 0;
-        if (selectedValue === 'Langsames Abnehmen') {
-            weeklyWeightLossPercentage = 0.005;
-        } else if (selectedValue === 'Moderates Abnehmen') {
-            weeklyWeightLossPercentage = 0.0075;
-        } else if (selectedValue === 'Schnelles Abnehmen') {
-            weeklyWeightLossPercentage = 0.01;
-        }
+            // Determine weekly weight loss percentage
+            let weeklyWeightLossPercentage = 0;
+            if (selectedValue === 'Langsames Abnehmen') {
+                weeklyWeightLossPercentage = 0.005;
+            } else if (selectedValue === 'Moderates Abnehmen') {
+                weeklyWeightLossPercentage = 0.0075;
+            } else if (selectedValue === 'Schnelles Abnehmen') {
+                weeklyWeightLossPercentage = 0.01;
+            }
 
-        if (totalCaloriesValue > 0 && currentWeight > 0 && targetWeight > 0) {
-            const weeklyWeightLossKg = currentWeight * weeklyWeightLossPercentage;
-            const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
-            const targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay); // No negative target calories
+            if (totalCaloriesValue > 0 && currentWeight > 0 && targetWeight > 0) {
+                const weeklyWeightLossKg = currentWeight * weeklyWeightLossPercentage;
+                const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
+                const targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay); // No negative target calories
 
-            // Update Zielkalorien element
-            zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : 0;
-            zielKcalElement.textContent = targetCalories > 0 ? targetCalories : 0; // Update ziel-kcal span in text
+                // Update Zielkalorien element
+                zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : 0;
+                zielKcalElement.textContent = targetCalories > 0 ? targetCalories : 0; // Update ziel-kcal span in text
 
-            // Show warning if target calories fall below Grundumsatz
-            if (targetCalories < grundUmsatzValue) {
-                warningMessageElement.style.display = 'flex';
-                warningMessageElement.querySelector('.warning-message').textContent = `Warnhinweis: Nicht weniger als ${grundUmsatzValue} kcal essen, da dies dein Grundumsatz ist.`;
+                // Show warning if target calories fall below Grundumsatz
+                if (targetCalories < grundUmsatzValue) {
+                    warningMessageElement.style.display = 'flex';
+                    warningMessageElement.querySelector('.warning-message').textContent = `Warnhinweis: Nicht weniger als ${grundUmsatzValue} kcal essen, da dies dein Grundumsatz ist.`;
+                } else {
+                    warningMessageElement.style.display = 'none';
+                }
+
+                // Update fat loss and calorie deficit
+                fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2); // Fat loss per week
+                defizitElement.textContent = calorieDeficitPerDay; // Calorie deficit per day
+
+                // Calculate timeline to reach goal
+                const totalWeightToLose = currentWeight - targetWeight;
+                const totalCaloricDeficitNeeded = totalWeightToLose * 7700;
+                const daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
+                const weeksToReachGoal = Math.round(daysToReachGoal / 7);
+                const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
+
+                // Update the timeline
+                weeksElement.textContent = weeksToReachGoal;
+                monthsElement.textContent = monthsToReachGoal;
+                targetWeightResultElement.textContent = targetWeight;
             } else {
+                // Reset results if inputs are invalid
+                defizitElement.textContent = 0;
+                fettAbnahmeElement.textContent = 0;
+                weeksElement.textContent = 0;
+                monthsElement.textContent = 0;
+                targetWeightResultElement.textContent = 0;
+                zielKcalElement.textContent = 0; // Reset ziel-kcal span if invalid
                 warningMessageElement.style.display = 'none';
             }
-
-            // Update fat loss and calorie deficit
-            fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2); // Fat loss per week
-            defizitElement.textContent = calorieDeficitPerDay; // Calorie deficit per day
-
-            // Calculate timeline to reach goal
-            const totalWeightToLose = currentWeight - targetWeight;
-            const totalCaloricDeficitNeeded = totalWeightToLose * 7700;
-            const daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
-            const weeksToReachGoal = Math.round(daysToReachGoal / 7);
-            const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
-
-            // Update the timeline
-            weeksElement.textContent = weeksToReachGoal;
-            monthsElement.textContent = monthsToReachGoal;
-            targetWeightResultElement.textContent = targetWeight;
         } else {
-            // Reset results if inputs are invalid
+            // Reset all results if Grundumsatz is not valid
             defizitElement.textContent = 0;
             fettAbnahmeElement.textContent = 0;
             weeksElement.textContent = 0;
             monthsElement.textContent = 0;
             targetWeightResultElement.textContent = 0;
-            zielKcalElement.textContent = 0; // Reset ziel-kcal span if invalid
+            zielKcalElement.textContent = 0;
+            zielKalorienElement.textContent = 0;
             warningMessageElement.style.display = 'none';
         }
     }
@@ -651,5 +665,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize all listeners
     initializeListeners();
 });
+
 
 
