@@ -582,8 +582,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Calculate if totalCaloriesValue is greater than 0
         if (totalCaloriesValue > 0 && currentWeight > 0 && targetWeight > 0) {
             const weeklyWeightLossKg = currentWeight * weeklyWeightLossPercentage;
-            const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
-            const targetCalories = totalCaloriesValue - calorieDeficitPerDay;
+            const calorieDeficitPerDay = Math.max(0, Math.round((weeklyWeightLossKg * 7700) / 7)); // Ensure no negative deficit
+            const targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay); // Ensure no negative calories
 
             // Update Zielkalorien element
             zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : 0;
@@ -597,16 +597,23 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             // Calculate timeline to reach goal
-            const totalWeightToLose = currentWeight - targetWeight;
-            const totalCaloricDeficitNeeded = totalWeightToLose * 7700;
-            const daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
-            const weeksToReachGoal = Math.round(daysToReachGoal / 7);
-            const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
+            const totalWeightToLose = Math.max(0, currentWeight - targetWeight); // Ensure no negative weight to lose
+            if (totalWeightToLose > 0 && calorieDeficitPerDay > 0) {
+                const totalCaloricDeficitNeeded = totalWeightToLose * 7700;
+                const daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
+                const weeksToReachGoal = Math.round(daysToReachGoal / 7);
+                const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
 
-            // Update the HTML content
-            weeksElement.textContent = weeksToReachGoal;
-            monthsElement.textContent = monthsToReachGoal;
-            targetWeightResultElement.textContent = targetWeight;
+                // Update the HTML content
+                weeksElement.textContent = weeksToReachGoal;
+                monthsElement.textContent = monthsToReachGoal;
+                targetWeightResultElement.textContent = targetWeight;
+            } else {
+                // Reset results if weight loss is not possible
+                weeksElement.textContent = '0';
+                monthsElement.textContent = '0';
+                targetWeightResultElement.textContent = '0';
+            }
         } else {
             // Reset results if inputs are invalid
             document.querySelector('.result-defizit').textContent = 0;
