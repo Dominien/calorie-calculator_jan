@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalCaloriesElement = document.querySelector('.result-tats-chlich');
     const nahrungsverbrennungElement = document.getElementById('nahrungsburn');
 
-    const baseCalories = 1280; // Default starting calories
+    const fallbackCalories = 1280; // Fallback if no Grundumsatz is provided yet
 
     // Function to update the total actual calorie burn
     function updateActualCalories() {
@@ -433,8 +433,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const alltagsbewegung = parseInt(alltagsbewegungElement.textContent, 10) || 0;
         const aktivesTraining = parseInt(aktivesTrainingElement.textContent, 10) || 0;
 
-        // Add base calories (1280 kcal) to the total calculation
-        const totalCalories = baseCalories + grundumsatz + alltagsbewegung + aktivesTraining;
+        // If Grundumsatz is available, use it; otherwise, use fallback (1280 kcal)
+        const baseCalories = grundumsatz || fallbackCalories;
+
+        const totalCalories = baseCalories + alltagsbewegung + aktivesTraining;
         totalCaloriesElement.textContent = `${totalCalories} kcal`;
 
         calculateNahrungsverbrennung(totalCalories);
@@ -442,13 +444,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to calculate Nahrungsverbrennung
     function calculateNahrungsverbrennung(totalCalories) {
-        // You can customize the formula here if needed
-        const nahrungsverbrennung = totalCalories * 0.08; // Example: 8% of total calories
-        nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)}`;
+        const nahrungsverbrennung = totalCalories * 0.08; // 8% of total calories
+        nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)} kcal`;
     }
 
-    // Set initial value of totalCaloriesElement to 1280 kcal on page load
-    totalCaloriesElement.textContent = `${baseCalories}`;
+    // Set initial value of totalCaloriesElement to the fallback value (1280 kcal) on page load
+    totalCaloriesElement.textContent = `${fallbackCalories} kcal`;
 
     // Add listeners to the text fields for changes
     [grundumsatzElement, alltagsbewegungElement, aktivesTrainingElement].forEach(element => {
@@ -458,4 +459,3 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log('Listeners for Grundumsatz, Alltagsbewegung, and Aktives Training added successfully.');
 });
-
