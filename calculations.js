@@ -522,7 +522,7 @@ function updateResults() {
         // Check if target calories fall below BMR
         if (targetCalories < grundUmsatzValue) {
             // Show the warning message if target calories are less than BMR
-            warningMessageElement.style.display = 'block'; // Show warning box
+            warningMessageElement.style.display = 'flex'; // Show warning box
             warningMessageElement.querySelector('.warning-message').textContent = `Warnhinweis: Das angestrebte Gewichtsverlustziel könnte möglicherweise nicht erreichbar sein, ohne deine Gesundheit zu riskieren. Wir empfehlen dir, nicht weniger als ${grundUmsatzValue} kcal zu essen, da dies dein Grundumsatz ist.`;
         } else {
             warningMessageElement.style.display = 'none'; // Hide warning box if safe
