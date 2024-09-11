@@ -415,3 +415,40 @@ document.addEventListener('DOMContentLoaded', function () {
         setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
     });
 });
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Select necessary DOM elements
+    const grundumsatzElement = document.getElementById('grund-right');
+    const alltagsbewegungElement = document.getElementById('altag-right');
+    const aktivesTrainingElement = document.getElementById('active-right');
+    const totalCaloriesElement = document.querySelector('.result-tats-chlich');
+    const nahrungsverbrennungElement = document.getElementById('nahrungsburn');
+
+    // Function to update the total actual calorie burn
+    function updateActualCalories() {
+        const grundumsatz = parseInt(grundumsatzElement.textContent, 10) || 0;
+        const alltagsbewegung = parseInt(alltagsbewegungElement.textContent, 10) || 0;
+        const aktivesTraining = parseInt(aktivesTrainingElement.textContent, 10) || 0;
+
+        const totalCalories = grundumsatz + alltagsbewegung + aktivesTraining;
+        totalCaloriesElement.textContent = `${totalCalories} kcal`;
+
+        calculateNahrungsverbrennung(totalCalories);
+    }
+
+    // Function to calculate Nahrungsverbrennung
+    function calculateNahrungsverbrennung(totalCalories) {
+        // You can customize the formula here if needed
+        const nahrungsverbrennung = totalCalories * 0.08; // Example: 8% of total calories
+        nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)} kcal`;
+    }
+
+    // Add listeners to the text fields for changes
+    [grundumsatzElement, alltagsbewegungElement, aktivesTrainingElement].forEach(element => {
+        const observer = new MutationObserver(updateActualCalories);
+        observer.observe(element, { childList: true }); // Observe changes to the text content
+    });
+
+    console.log('Listeners for Grundumsatz, Alltagsbewegung, and Aktives Training added successfully.');
+});
