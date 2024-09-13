@@ -718,3 +718,4 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize all listeners
     initializeListeners();
 });
+
