@@ -462,7 +462,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 // We ADD Always here PLS :D
-
 document.addEventListener('DOMContentLoaded', function () {
     // Select necessary DOM elements
     const totalCaloriesElement = document.querySelector('.result-tats-chlich'); // Total actual calories element
@@ -500,8 +499,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 inputElement.value = sliderValue;
 
                 // Hide the warning if the input is valid
-                if (inputElement.value.trim() !== '' && parseFloat(inputElement.value) > 0) {
-                    warningElement.style.display = 'none';
+                if (sliderValue > 0) {
+                    warningElement.style.display = 'none'; // Hide the warning when value is valid
                 }
 
                 // Dispatch 'input' event on the input element to trigger other listeners
