@@ -487,54 +487,71 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         };
         inputElement.addEventListener('input', handler);
-        inputElement.addEventListener('change', handler); // Add this line to handle 'change' events
+        inputElement.addEventListener('change', handler); // Handle 'change' events
     }
 
-    // Add live validation for Wunschgewicht
+    // Function to handle live validation on slider changes
+    function hideWarningOnSliderInput(sliderElement, inputElement, warningElement) {
+        const handler = () => {
+            // Update the input field's value based on the slider's value
+            const sliderValue = getSliderValueFromSliderElement(sliderElement);
+            inputElement.value = sliderValue;
+
+            // Hide the warning if the input is valid
+            if (inputElement.value.trim() !== '' && parseFloat(inputElement.value) > 0) {
+                warningElement.style.display = 'none';
+            }
+
+            // Dispatch 'input' event on the input element to trigger other listeners
+            const event = new Event('input', { bubbles: true });
+            inputElement.dispatchEvent(event);
+        };
+        sliderElement.addEventListener('input', handler);
+        sliderElement.addEventListener('change', handler);
+    }
+
+    // Function to get slider value from the slider element
+    function getSliderValueFromSliderElement(sliderElement) {
+        // Adjust this function based on how your slider library stores the value
+        // Example for noUiSlider:
+        if (sliderElement.noUiSlider) {
+            return sliderElement.noUiSlider.get();
+        } else {
+            // Fallback or custom logic if not using noUiSlider
+            const handle = sliderElement.querySelector('.noUi-handle');
+            if (handle) {
+                const valueElement = handle.querySelector('.noUi-tooltip'); // Adjust selector as needed
+                if (valueElement) {
+                    return parseFloat(valueElement.textContent) || 0;
+                }
+            }
+            return 0;
+        }
+    }
+
+    // Function to attach validation to both input and slider
+    function attachValidation(inputId, sliderSelector) {
+        const inputElement = document.getElementById(inputId);
+        const warningElement = inputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
+        hideWarningOnInput(inputElement, warningElement);
+        const sliderElement = document.querySelector(sliderSelector);
+        if (sliderElement) {
+            hideWarningOnSliderInput(sliderElement, inputElement, warningElement);
+        }
+    }
+
+    // Add live validation for Wunschgewicht (since it may not have a slider)
     const wunschgewichtInput = document.getElementById('wunschgewicht');
     const wunschgewichtWarning = wunschgewichtInput.closest('.input-wrapper-calc').querySelector('.text-warning');
     hideWarningOnInput(wunschgewichtInput, wunschgewichtWarning);
 
-    // Add live validation for Age
-    const ageInput = document.getElementById('age-2');
-    const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-    hideWarningOnInput(ageInput, ageWarning);
-
-    // Add live validation for Height
-    const heightInput = document.getElementById('height-2');
-    const heightWarning = heightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-    hideWarningOnInput(heightInput, heightWarning);
-
-    // Add live validation for Weight
-    const weightWarning = weightInputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
-    hideWarningOnInput(weightInputElement, weightWarning);
-
-    // Function to observe slider changes and trigger 'input' events
-    function observeSliderChange(sliderSelector, inputId) {
-        const sliderElement = document.querySelector(`.${sliderSelector}`);
-        const inputElement = document.getElementById(inputId);
-
-        if (sliderElement && inputElement) {
-            // Assuming the slider library triggers a custom event when its value changes
-            sliderElement.addEventListener('input', () => {
-                // Manually trigger the 'input' event on the input element
-                const event = new Event('input', { bubbles: true });
-                inputElement.dispatchEvent(event);
-            });
-            sliderElement.addEventListener('change', () => {
-                const event = new Event('change', { bubbles: true });
-                inputElement.dispatchEvent(event);
-            });
-        }
-    }
-
-    // Observe sliders and attach events
-    observeSliderChange('wrapper-step-range_slider', 'age-2');
-    observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
-    observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
-    observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
-    observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
-    observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // Steps slider
+    // Attach validation to inputs and sliders
+    attachValidation('age-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-1"]');
+    attachValidation('height-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]');
+    attachValidation('weight-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]');
+    attachValidation('weight-3-kfa', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]');
+    attachValidation('kfa-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]');
+    attachValidation('steps-4', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]');
 
     // Function to validate inputs and show warnings if any are missing or invalid
     function validateInputs() {
@@ -549,6 +566,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Validate Age
+        const ageInput = document.getElementById('age-2');
+        const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
         if (ageInput.value.trim() === '' || parseFloat(ageInput.value) <= 0) {
             ageWarning.style.display = 'block';
             isValid = false;
@@ -557,6 +576,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Validate Height
+        const heightInput = document.getElementById('height-2');
+        const heightWarning = heightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
         if (heightInput.value.trim() === '' || parseFloat(heightInput.value) <= 0) {
             heightWarning.style.display = 'block';
             isValid = false;
@@ -565,6 +586,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Validate Weight
+        const weightInputElement = document.getElementById('weight-2');
+        const weightWarning = weightInputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
         if (weightInputElement.value.trim() === '' || parseFloat(weightInputElement.value) <= 0) {
             weightWarning.style.display = 'block';
             isValid = false;
@@ -616,13 +639,13 @@ document.addEventListener('DOMContentLoaded', function () {
             !selectedValue
         ) {
             // Reset results if inputs are invalid
-            defizitElement.textContent = '0';
-            fettAbnahmeElement.textContent = '0';
+            defizitElement.textContent = '0 kcal/Tag';
+            fettAbnahmeElement.textContent = '0 kg/Woche';
             weeksElement.textContent = '0';
             monthsElement.textContent = '0';
             targetWeightResultElement.textContent = '0';
             zielKcalElement.textContent = '0';
-            zielKalorienElement.textContent = '0';
+            zielKalorienElement.textContent = '0 kcal';
             warningMessageElement.style.display = 'none';
             return;
         }
@@ -657,8 +680,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Update fat loss and calorie deficit
-        fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2); // Fat loss per week
-        defizitElement.textContent = calorieDeficitPerDay; // Calorie deficit per day
+        fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2) + ' kg/Woche'; // Fat loss per week
+        defizitElement.textContent = calorieDeficitPerDay + ' kcal/Tag'; // Calorie deficit per day
 
         // Calculate timeline to reach goal
         const totalWeightToLose = currentWeight - targetWeight;
