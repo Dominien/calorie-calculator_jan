@@ -762,3 +762,141 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeListeners();
 });
 
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Select necessary DOM elements for span results
+    const zielKcalElement = document.querySelector('.span-result.ziel-kcal');
+    const weeksElement = document.querySelector('.span-result.weeks');
+    const monthsElement = document.querySelector('.span-result.months');
+    const targetWeightElement = document.querySelector('.span-result.target-weight');
+    const chartCanvas = document.getElementById('resultChart'); // Chart canvas element
+
+    // Function to get the span values
+    function getResultValues() {
+        const zielKcalValue = parseFloat(zielKcalElement.textContent);
+        const weeksValue = parseFloat(weeksElement.textContent);
+        const monthsValue = parseFloat(monthsElement.textContent);
+        const targetWeightValue = parseFloat(targetWeightElement.textContent);
+        
+        // Ensure all values are greater than 0
+        if (zielKcalValue > 0 && weeksValue > 0 && monthsValue > 0 && targetWeightValue > 0) {
+            return { zielKcalValue, weeksValue, monthsValue, targetWeightValue };
+        }
+        return null;
+    }
+
+    // Function to generate the chart using Chart.js
+    function generateResultChart(zielKcal, weeks, months, targetWeight) {
+        const ctx = chartCanvas.getContext('2d');
+        
+        // Create gradient background
+        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+        gradient.addColorStop(0, 'rgba(255, 0, 0, 0.5)');  // Red at the top
+        gradient.addColorStop(1, 'rgba(0, 255, 0, 0.5)');  // Green at the bottom
+        
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['HEUTE', 'Zielkalorien', 'Wochen', 'Monate'], // X-axis labels in German
+                datasets: [{
+                    label: 'Verlauf zur Zielerreichung',
+                    data: [zielKcal, weeks, months, targetWeight], // Data from the spans
+                    backgroundColor: gradient,
+                    borderColor: 'rgba(0, 150, 0, 1)', // Green border for the line
+                    borderWidth: 2,
+                    fill: true, // Fill the area under the line
+                    pointBackgroundColor: ['red', 'orange', 'green'], // Different point colors
+                    pointBorderColor: '#fff',
+                    pointHoverRadius: 6,
+                    pointHoverBackgroundColor: 'rgba(0, 150, 0, 1)',
+                    pointRadius: 5,
+                    pointHitRadius: 10
+                }]
+            },
+            options: {
+                plugins: {
+                    title: {
+                        display: true,
+                        text: 'Gewichtsverlust über die Zeit', // Chart title in German
+                        font: {
+                            size: 18
+                        },
+                        color: '#333'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                return 'Wert: ' + tooltipItem.raw;
+                            },
+                            title: function(tooltipItem) {
+                                const label = tooltipItem[0].label;
+                                return label;
+                            }
+                        },
+                        backgroundColor: 'rgba(0, 150, 0, 0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Wert', // Y-axis title in German
+                            font: {
+                                size: 14
+                            },
+                            color: '#333'
+                        },
+                        ticks: {
+                            color: '#333',
+                            stepSize: 10
+                        },
+                        grid: {
+                            display: true,
+                            color: 'rgba(200, 200, 200, 0.2)'
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Zeit & Ziel', // X-axis title in German
+                            font: {
+                                size: 14
+                            },
+                            color: '#333'
+                        },
+                        ticks: {
+                            color: '#333'
+                        },
+                        grid: {
+                            display: false
+                        }
+                    }
+                },
+                maintainAspectRatio: false
+            }
+        });
+    }
+
+    // Function to generate the chart only when all values are greater than 0
+    function checkAndGenerateChart() {
+        const resultValues = getResultValues();
+        if (resultValues) {
+            generateResultChart(resultValues.zielKcalValue, resultValues.weeksValue, resultValues.monthsValue, resultValues.targetWeightValue);
+        }
+    }
+
+    // Add event listener to generate the chart when the result text values are populated
+    const berechnenButton = document.getElementById('check-inputs'); // Assuming there's a calculate button
+    if (berechnenButton) {
+        berechnenButton.addEventListener('click', function (event) {
+            event.preventDefault();
+            checkAndGenerateChart(); // Call this function to generate the chart if values are ready
+        });
+    }
+
+    // Optionally, you can run this function on page load to check if values are already present
+    checkAndGenerateChart();
+});
