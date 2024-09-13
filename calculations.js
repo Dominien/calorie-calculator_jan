@@ -454,8 +454,8 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Function to handle live validation on slider changes using MutationObserver
-    function hideWarningOnSliderInput(sliderElement, inputElement, warningElement) {
-        const handleTextElement = sliderElement.querySelector('.inside-handle-text');
+    function hideWarningOnSliderInput(sliderElement, inputElement, warningElement, handleId = null) {
+        const handleTextElement = handleId ? document.getElementById(handleId) : sliderElement.querySelector('.inside-handle-text');
         if (handleTextElement) {
             console.log(`Found handle text element for ${inputElement.id}`);
             const observer = new MutationObserver(() => {
@@ -483,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Function to attach validation to both input and slider
-    function attachValidation(inputId, sliderSelector) {
+    function attachValidation(inputId, sliderSelector, handleId = null) {
         const inputElement = document.getElementById(inputId);
         const warningElement = inputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
         
@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded', function () {
             console.log('Attaching slider validation for age-2');
             const sliderElement = document.querySelector(sliderSelector);
             if (sliderElement) {
-                hideWarningOnSliderInput(sliderElement, inputElement, warningElement);
+                hideWarningOnSliderInput(sliderElement, inputElement, warningElement, handleId); // Pass the handleId for age-2
             } else {
                 console.log(`Slider element not found for ${inputId}`);
             }
@@ -512,7 +512,7 @@ document.addEventListener('DOMContentLoaded', function () {
     hideWarningOnInput(wunschgewichtInput, wunschgewichtWarning);
 
     // Attach validation to inputs and sliders
-    attachValidation('age-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-1"]');
+    attachValidation('age-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-1"]', 'age-2_handle'); // Added handleId for age-2
     attachValidation('height-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]');
     attachValidation('weight-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]');
     attachValidation('weight-3-kfa', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]');
