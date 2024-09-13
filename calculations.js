@@ -616,13 +616,13 @@ document.addEventListener('DOMContentLoaded', function () {
             !selectedValue
         ) {
             // Reset results if inputs are invalid
-            defizitElement.textContent = '0 kcal/Tag';
-            fettAbnahmeElement.textContent = '0 kg/Woche';
+            defizitElement.textContent = '0';
+            fettAbnahmeElement.textContent = '0';
             weeksElement.textContent = '0';
             monthsElement.textContent = '0';
             targetWeightResultElement.textContent = '0';
             zielKcalElement.textContent = '0';
-            zielKalorienElement.textContent = '0 kcal';
+            zielKalorienElement.textContent = '0';
             warningMessageElement.style.display = 'none';
             return;
         }
