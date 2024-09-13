@@ -623,13 +623,13 @@ document.addEventListener('DOMContentLoaded', function () {
             !selectedValue
         ) {
             // Reset results if inputs are invalid
-            defizitElement.textContent = '0 kcal/Tag';
-            fettAbnahmeElement.textContent = '0 kg/Woche';
+            defizitElement.textContent = '0';
+            fettAbnahmeElement.textContent = '0';
             weeksElement.textContent = '0';
             monthsElement.textContent = '0';
             targetWeightResultElement.textContent = '0';
             zielKcalElement.textContent = '0';
-            zielKalorienElement.textContent = '0 kcal';
+            zielKalorienElement.textContent = '0';
             warningMessageElement.style.display = 'none';
             return;
         }
@@ -649,7 +649,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay); // No negative target calories
 
         // Update Zielkalorien element
-        zielKalorienElement.textContent = targetCalories > 0 ? targetCalories + ' kcal' : '0 kcal';
+        zielKalorienElement.textContent = targetCalories > 0 ? targetCalories: '0';
         zielKcalElement.textContent = targetCalories > 0 ? targetCalories : '0'; // Update ziel-kcal span in text
 
         // Show warning if target calories fall below Grundumsatz
@@ -664,8 +664,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Update fat loss and calorie deficit
-        fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2) + ' kg/Woche'; // Fat loss per week
-        defizitElement.textContent = calorieDeficitPerDay + ' kcal/Tag'; // Calorie deficit per day
+        fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2); // Fat loss per week
+        defizitElement.textContent = calorieDeficitPerDay; // Calorie deficit per day
 
         // Calculate timeline to reach goal
         const totalWeightToLose = currentWeight - targetWeight;
