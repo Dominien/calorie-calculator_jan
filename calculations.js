@@ -490,42 +490,26 @@ document.addEventListener('DOMContentLoaded', function () {
         inputElement.addEventListener('change', handler); // Handle 'change' events
     }
 
-    // Function to handle live validation on slider changes
+    // Function to handle live validation on slider changes using MutationObserver
     function hideWarningOnSliderInput(sliderElement, inputElement, warningElement) {
-        const handler = () => {
-            // Update the input field's value based on the slider's value
-            const sliderValue = getSliderValueFromSliderElement(sliderElement);
-            inputElement.value = sliderValue;
+        const handleTextElement = sliderElement.querySelector('.inside-handle-text');
+        if (handleTextElement) {
+            const observer = new MutationObserver(() => {
+                // The handle's text has changed
+                const sliderValue = parseFloat(handleTextElement.textContent) || 0;
+                inputElement.value = sliderValue;
 
-            // Hide the warning if the input is valid
-            if (inputElement.value.trim() !== '' && parseFloat(inputElement.value) > 0) {
-                warningElement.style.display = 'none';
-            }
-
-            // Dispatch 'input' event on the input element to trigger other listeners
-            const event = new Event('input', { bubbles: true });
-            inputElement.dispatchEvent(event);
-        };
-        sliderElement.addEventListener('input', handler);
-        sliderElement.addEventListener('change', handler);
-    }
-
-    // Function to get slider value from the slider element
-    function getSliderValueFromSliderElement(sliderElement) {
-        // Adjust this function based on how your slider library stores the value
-        // Example for noUiSlider:
-        if (sliderElement.noUiSlider) {
-            return sliderElement.noUiSlider.get();
-        } else {
-            // Fallback or custom logic if not using noUiSlider
-            const handle = sliderElement.querySelector('.noUi-handle');
-            if (handle) {
-                const valueElement = handle.querySelector('.noUi-tooltip'); // Adjust selector as needed
-                if (valueElement) {
-                    return parseFloat(valueElement.textContent) || 0;
+                // Hide the warning if the input is valid
+                if (inputElement.value.trim() !== '' && parseFloat(inputElement.value) > 0) {
+                    warningElement.style.display = 'none';
                 }
-            }
-            return 0;
+
+                // Dispatch 'input' event on the input element to trigger other listeners
+                const event = new Event('input', { bubbles: true });
+                inputElement.dispatchEvent(event);
+            });
+
+            observer.observe(handleTextElement, { childList: true, characterData: true, subtree: true });
         }
     }
 
