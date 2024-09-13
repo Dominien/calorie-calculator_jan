@@ -516,10 +516,20 @@ document.addEventListener('DOMContentLoaded', function () {
     function attachValidation(inputId, sliderSelector) {
         const inputElement = document.getElementById(inputId);
         const warningElement = inputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
-        hideWarningOnInput(inputElement, warningElement);
-        const sliderElement = document.querySelector(sliderSelector);
-        if (sliderElement) {
-            hideWarningOnSliderInput(sliderElement, inputElement, warningElement);
+        
+        // Exception for the age input field (id: age-2)
+        if (inputId === 'age-2') {
+            const sliderElement = document.querySelector(sliderSelector);
+            if (sliderElement) {
+                hideWarningOnSliderInput(sliderElement, inputElement, warningElement);
+            }
+        } else {
+            // Default behavior for other input fields
+            hideWarningOnInput(inputElement, warningElement);
+            const sliderElement = document.querySelector(sliderSelector);
+            if (sliderElement) {
+                hideWarningOnSliderInput(sliderElement, inputElement, warningElement);
+            }
         }
     }
 
@@ -718,4 +728,3 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize all listeners
     initializeListeners();
 });
-
