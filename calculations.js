@@ -764,13 +764,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Select necessary DOM elements for span results and wrapper
+    // Select necessary DOM elements for span results, inputs, and wrapper
     const zielKcalElement = document.querySelector('.span-result.ziel-kcal');
     const weeksElement = document.querySelector('.span-result.weeks');
     const monthsElement = document.querySelector('.span-result.months');
     const targetWeightElement = document.querySelector('.span-result.target-weight');
     const chartCanvas = document.getElementById('resultChart'); // Chart canvas element
     const wrapperCanvas = document.querySelector('.wrapper-canvas'); // Wrapper that starts hidden
+
+    // Weight input fields
+    const mifflinWeightInput = document.getElementById('weight-2'); // Mifflin input field
+    const kfaWeightInput = document.getElementById('weight-3-kfa'); // KFA input field
+
+    // Radio buttons to check which calculation method is selected
+    const calcMethodMifflin = document.getElementById('miflin'); // Radio button for Mifflin method
+    const calcMethodKfa = document.getElementById('kfa'); // Radio button for KFA method
+
     let chartInstance; // To store the chart instance for re-rendering
 
     // Function to make the canvas wrapper visible
@@ -780,22 +789,60 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Function to get the starting weight based on the selected calculation method
+    function getStartingWeight() {
+        if (calcMethodMifflin.checked) {
+            return parseFloat(mifflinWeightInput.value) || 0;
+        } else if (calcMethodKfa.checked) {
+            return parseFloat(kfaWeightInput.value) || 0;
+        }
+        return 0;
+    }
+
     // Function to get the span values
     function getResultValues() {
         const zielKcalValue = parseFloat(zielKcalElement.textContent);
         const weeksValue = parseFloat(weeksElement.textContent);
         const monthsValue = parseFloat(monthsElement.textContent);
         const targetWeightValue = parseFloat(targetWeightElement.textContent);
-        
-        // Ensure all values are greater than 0
-        if (zielKcalValue > 0 && weeksValue > 0 && monthsValue > 0 && targetWeightValue > 0) {
-            return { zielKcalValue, weeksValue, monthsValue, targetWeightValue };
+
+        const startingWeight = getStartingWeight();
+
+        // Ensure all values and starting weight are greater than 0
+        if (zielKcalValue > 0 && weeksValue > 0 && monthsValue > 0 && targetWeightValue > 0 && startingWeight > 0) {
+            return { startingWeight, targetWeightValue, monthsValue };
         }
         return null;
     }
 
+    // Function to generate dates from today to the target date
+    function generateDates(numMonths) {
+        const dates = [];
+        let currentDate = new Date();
+
+        for (let i = 0; i <= numMonths; i++) {
+            dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
+            currentDate.setMonth(currentDate.getMonth() + 1);
+        }
+
+        return dates;
+    }
+
+    // Function to generate the weight data points (linear progression from start to target weight)
+    function generateWeightData(startWeight, targetWeight, months) {
+        const weightData = [];
+        const weightLossPerMonth = (startWeight - targetWeight) / months;
+
+        for (let i = 0; i <= months; i++) {
+            const currentWeight = startWeight - weightLossPerMonth * i;
+            weightData.push(currentWeight.toFixed(1)); // Keep 1 decimal place for weight
+        }
+
+        return weightData;
+    }
+
     // Function to generate or update the chart using Chart.js
-    function generateResultChart(zielKcal, weeks, months, targetWeight) {
+    function generateResultChart(startWeight, targetWeight, months) {
         const ctx = chartCanvas.getContext('2d');
 
         // Ensure the canvas wrapper is visible
@@ -805,21 +852,25 @@ document.addEventListener('DOMContentLoaded', function () {
         if (chartInstance) {
             chartInstance.destroy();
         }
-        
+
         // Create gradient background
         const gradient = ctx.createLinearGradient(0, 0, 0, 400);
         gradient.addColorStop(0, 'rgba(255, 0, 0, 0.5)');  // Red at the top
         gradient.addColorStop(1, 'rgba(0, 255, 0, 0.5)');  // Green at the bottom
-        
+
+        // Generate X-axis labels (dates) and Y-axis data (weights)
+        const dates = generateDates(months);
+        const weightData = generateWeightData(startWeight, targetWeight, months);
+
         // Delay chart creation slightly to ensure the canvas is fully visible
         setTimeout(() => {
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: ['HEUTE', 'Zielkalorien', 'Wochen', 'Monate'], // X-axis labels in German
+                    labels: dates, // Dates from today till goal date
                     datasets: [{
-                        label: 'Verlauf zur Zielerreichung',
-                        data: [zielKcal, weeks, months, targetWeight], // Data from the spans
+                        label: 'Gewicht in Kg',
+                        data: weightData, // Weight from start to target weight
                         backgroundColor: gradient,
                         borderColor: 'rgba(0, 150, 0, 1)', // Green border for the line
                         borderWidth: 2,
@@ -845,7 +896,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         tooltip: {
                             callbacks: {
                                 label: function(tooltipItem) {
-                                    return 'Wert: ' + tooltipItem.raw;
+                                    return 'Gewicht: ' + tooltipItem.raw + ' Kg';
                                 },
                                 title: function(tooltipItem) {
                                     const label = tooltipItem[0].label;
@@ -859,10 +910,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     scales: {
                         y: {
-                            beginAtZero: true,
+                            beginAtZero: false,
                             title: {
                                 display: true,
-                                text: 'Wert', // Y-axis title in German
+                                text: 'Gewicht in Kg', // Y-axis title in German
                                 font: {
                                     size: 14
                                 },
@@ -870,7 +921,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             },
                             ticks: {
                                 color: '#333',
-                                stepSize: 10
+                                stepSize: 5 // Set the Y-axis step size
                             },
                             grid: {
                                 display: true,
@@ -880,7 +931,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Zeit & Ziel', // X-axis title in German
+                                text: 'Datum', // X-axis title in German
                                 font: {
                                     size: 14
                                 },
@@ -904,7 +955,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function checkAndGenerateChart() {
         const resultValues = getResultValues();
         if (resultValues) {
-            generateResultChart(resultValues.zielKcalValue, resultValues.weeksValue, resultValues.monthsValue, resultValues.targetWeightValue);
+            generateResultChart(resultValues.startingWeight, resultValues.targetWeightValue, resultValues.monthsValue);
         }
     }
 
