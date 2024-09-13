@@ -770,6 +770,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const monthsElement = document.querySelector('.span-result.months');
     const targetWeightElement = document.querySelector('.span-result.target-weight');
     const chartCanvas = document.getElementById('resultChart'); // Chart canvas element
+    let chartInstance; // To store the chart instance for re-rendering
 
     // Function to get the span values
     function getResultValues() {
@@ -785,16 +786,21 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
 
-    // Function to generate the chart using Chart.js
+    // Function to generate or update the chart using Chart.js
     function generateResultChart(zielKcal, weeks, months, targetWeight) {
         const ctx = chartCanvas.getContext('2d');
+
+        // If a chart already exists, destroy it before creating a new one
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
         
         // Create gradient background
         const gradient = ctx.createLinearGradient(0, 0, 0, 400);
         gradient.addColorStop(0, 'rgba(255, 0, 0, 0.5)');  // Red at the top
         gradient.addColorStop(1, 'rgba(0, 255, 0, 0.5)');  // Green at the bottom
         
-        const chart = new Chart(ctx, {
+        chartInstance = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: ['HEUTE', 'Zielkalorien', 'Wochen', 'Monate'], // X-axis labels in German
@@ -880,7 +886,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Function to generate the chart only when all values are greater than 0
+    // Function to check if all values are greater than 0 and generate the chart
     function checkAndGenerateChart() {
         const resultValues = getResultValues();
         if (resultValues) {
@@ -888,14 +894,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Add event listener to generate the chart when the result text values are populated
-    const berechnenButton = document.getElementById('check-inputs'); // Assuming there's a calculate button
-    if (berechnenButton) {
-        berechnenButton.addEventListener('click', function (event) {
-            event.preventDefault();
-            checkAndGenerateChart(); // Call this function to generate the chart if values are ready
-        });
-    }
+    // Create a MutationObserver to monitor changes in the span elements
+    const observer = new MutationObserver(function() {
+        checkAndGenerateChart(); // Call this function whenever a change occurs in any span
+    });
+
+    // Configuration of the observer
+    const config = { childList: true, characterData: true, subtree: true };
+
+    // Observe each span element for changes
+    observer.observe(zielKcalElement, config);
+    observer.observe(weeksElement, config);
+    observer.observe(monthsElement, config);
+    observer.observe(targetWeightElement, config);
 
     // Optionally, you can run this function on page load to check if values are already present
     checkAndGenerateChart();
