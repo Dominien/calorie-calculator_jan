@@ -451,6 +451,40 @@ document.addEventListener('DOMContentLoaded', function () {
         inputElement.addEventListener('change', handler); // Handle 'change' events
     }
 
+    // Function to handle live validation on slider changes using MutationObserver
+    function hideWarningOnSliderInput(sliderElement, inputElement, warningElement) {
+        const handleTextElement = sliderElement.querySelector('.inside-handle-text');
+        if (handleTextElement) {
+            const observer = new MutationObserver(() => {
+                // The handle's text has changed
+                const sliderValue = parseFloat(handleTextElement.textContent) || 0;
+                inputElement.value = sliderValue;
+
+                // Hide the warning if the input is valid
+                if (sliderValue > 0) {
+                    warningElement.style.display = 'none'; // Hide the warning when value is valid
+                }
+
+                // Dispatch 'input' event on the input element to trigger other listeners
+                const event = new Event('input', { bubbles: true });
+                inputElement.dispatchEvent(event);
+            });
+
+            observer.observe(handleTextElement, { childList: true, characterData: true, subtree: true });
+        }
+    }
+
+    // Function to attach validation to both input and slider
+    function attachValidation(inputId, sliderSelector) {
+        const inputElement = document.getElementById(inputId);
+        const warningElement = inputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
+        hideWarningOnInput(inputElement, warningElement);
+        const sliderElement = document.querySelector(sliderSelector);
+        if (sliderElement) {
+            hideWarningOnSliderInput(sliderElement, inputElement, warningElement);
+        }
+    }
+
     // Add event listener specifically for age-2 handle text
     const ageHandleTextElement = document.getElementById('age-2_handle-text');
     const ageInputElement = document.getElementById('age-2');
@@ -473,14 +507,13 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(ageHandleTextElement, { childList: true, characterData: true, subtree: true });
     }
 
-    // Attach validation to other inputs and sliders
-    function attachValidation(inputId, sliderSelector) {
-        const inputElement = document.getElementById(inputId);
-        const warningElement = inputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
-        hideWarningOnInput(inputElement, warningElement);
-    }
+    // Add live validation for Wunschgewicht (since it may not have a slider)
+    const wunschgewichtInput = document.getElementById('wunschgewicht');
+    const wunschgewichtWarning = wunschgewichtInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+    hideWarningOnInput(wunschgewichtInput, wunschgewichtWarning);
 
-    // Add live validation for other inputs
+    // Attach validation to inputs and sliders
+    attachValidation('age-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-1"]');
     attachValidation('height-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]');
     attachValidation('weight-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]');
     attachValidation('weight-3-kfa', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]');
@@ -491,10 +524,22 @@ document.addEventListener('DOMContentLoaded', function () {
     function validateInputs() {
         let isValid = true;
 
-        // Validate Age (specific case for age-2)
-        if (ageInputElement.value.trim() === '' || parseFloat(ageInputElement.value) <= 0) {
-            ageWarningElement.style.display = 'block';
+        // Validate Wunschgewicht
+        if (wunschgewichtInput.value.trim() === '' || parseFloat(wunschgewichtInput.value) <= 0) {
+            wunschgewichtWarning.style.display = 'block'; // Show warning if empty or invalid
             isValid = false;
+        } else {
+            wunschgewichtWarning.style.display = 'none';
+        }
+
+        // Validate Age
+        const ageInput = document.getElementById('age-2');
+        const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+        if (ageInput.value.trim() === '' || parseFloat(ageInput.value) <= 0) {
+            ageWarning.style.display = 'block';
+            isValid = false;
+        } else {
+            ageWarning.style.display = 'none';
         }
 
         // Validate Height
@@ -656,4 +701,3 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize all listeners
     initializeListeners();
 });
-
