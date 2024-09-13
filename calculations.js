@@ -657,8 +657,8 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Update fat loss and calorie deficit
-        fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2) + ' kg/Woche'; // Fat loss per week
-        defizitElement.textContent = calorieDeficitPerDay + ' kcal/Tag'; // Calorie deficit per day
+        fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2); // Fat loss per week
+        defizitElement.textContent = calorieDeficitPerDay; // Calorie deficit per day
 
         // Calculate timeline to reach goal
         const totalWeightToLose = currentWeight - targetWeight;
