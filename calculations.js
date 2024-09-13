@@ -443,9 +443,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to handle live validation on input fields
     function hideWarningOnInput(inputElement, warningElement) {
         const handler = () => {
-            console.log(`Input field value for ${inputElement.id}:`, inputElement.value);
             if (inputElement.value.trim() !== '' && parseFloat(inputElement.value) > 0) {
-                console.log(`Hiding warning for ${inputElement.id}`);
                 warningElement.style.display = 'none'; // Hide the warning if the input is valid
             }
         };
@@ -453,66 +451,36 @@ document.addEventListener('DOMContentLoaded', function () {
         inputElement.addEventListener('change', handler); // Handle 'change' events
     }
 
-    // Function to handle live validation on slider changes using MutationObserver
-    function hideWarningOnSliderInput(sliderElement, inputElement, warningElement, handleId = null) {
-        const handleTextElement = handleId ? document.getElementById(handleId) : sliderElement.querySelector('.inside-handle-text');
-        if (handleTextElement) {
-            console.log(`Found handle text element for ${inputElement.id}`);
-            const observer = new MutationObserver(() => {
-                // The handle's text has changed
-                const sliderValue = parseFloat(handleTextElement.textContent) || 0;
-                console.log(`Slider handle value for ${inputElement.id}:`, sliderValue);
-                inputElement.value = sliderValue;
+    // Add event listener specifically for age-2 handle text
+    const ageHandleTextElement = document.getElementById('age-2_handle-text');
+    const ageInputElement = document.getElementById('age-2');
+    const ageWarningElement = ageInputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
 
-                // Hide the warning if the input is valid
-                if (sliderValue > 0) {
-                    console.log(`Hiding warning for slider ${inputElement.id}`);
-                    warningElement.style.display = 'none'; // Hide the warning when value is valid
-                }
+    if (ageHandleTextElement) {
+        const observer = new MutationObserver(() => {
+            const sliderValue = parseFloat(ageHandleTextElement.textContent) || 0;
+            console.log(`Slider value for age-2: ${sliderValue}`);
+            ageInputElement.value = sliderValue;
 
-                // Dispatch 'input' event on the input element to trigger other listeners
-                const event = new Event('input', { bubbles: true });
-                inputElement.dispatchEvent(event);
-            });
+            // Hide the warning if the input is valid
+            if (sliderValue > 0) {
+                console.log('Hiding warning for age-2');
+                ageWarningElement.style.display = 'none';
+            }
+        });
 
-            observer.observe(handleTextElement, { childList: true, characterData: true, subtree: true });
-            console.log(`MutationObserver attached for ${inputElement.id}`);
-        } else {
-            console.log(`No handle text element found for ${inputElement.id}`);
-        }
+        // Observe the changes in the text inside the handle
+        observer.observe(ageHandleTextElement, { childList: true, characterData: true, subtree: true });
     }
 
-    // Function to attach validation to both input and slider
-    function attachValidation(inputId, sliderSelector, handleId = null) {
+    // Attach validation to other inputs and sliders
+    function attachValidation(inputId, sliderSelector) {
         const inputElement = document.getElementById(inputId);
         const warningElement = inputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
-        
-        // Exception for the age input field (id: age-2)
-        if (inputId === 'age-2') {
-            console.log('Attaching slider validation for age-2');
-            const sliderElement = document.querySelector(sliderSelector);
-            if (sliderElement) {
-                hideWarningOnSliderInput(sliderElement, inputElement, warningElement, handleId); // Pass the handleId for age-2
-            } else {
-                console.log(`Slider element not found for ${inputId}`);
-            }
-        } else {
-            // Default behavior for other input fields
-            hideWarningOnInput(inputElement, warningElement);
-            const sliderElement = document.querySelector(sliderSelector);
-            if (sliderElement) {
-                hideWarningOnSliderInput(sliderElement, inputElement, warningElement);
-            }
-        }
+        hideWarningOnInput(inputElement, warningElement);
     }
 
-    // Add live validation for Wunschgewicht (since it may not have a slider)
-    const wunschgewichtInput = document.getElementById('wunschgewicht');
-    const wunschgewichtWarning = wunschgewichtInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-    hideWarningOnInput(wunschgewichtInput, wunschgewichtWarning);
-
-    // Attach validation to inputs and sliders
-    attachValidation('age-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-1"]', 'age-2_handle'); // Added handleId for age-2
+    // Add live validation for other inputs
     attachValidation('height-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]');
     attachValidation('weight-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]');
     attachValidation('weight-3-kfa', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]');
@@ -523,25 +491,10 @@ document.addEventListener('DOMContentLoaded', function () {
     function validateInputs() {
         let isValid = true;
 
-        // Validate Wunschgewicht
-        if (wunschgewichtInput.value.trim() === '' || parseFloat(wunschgewichtInput.value) <= 0) {
-            console.log('Showing warning for Wunschgewicht');
-            wunschgewichtWarning.style.display = 'block'; // Show warning if empty or invalid
+        // Validate Age (specific case for age-2)
+        if (ageInputElement.value.trim() === '' || parseFloat(ageInputElement.value) <= 0) {
+            ageWarningElement.style.display = 'block';
             isValid = false;
-        } else {
-            wunschgewichtWarning.style.display = 'none';
-        }
-
-        // Validate Age
-        const ageInput = document.getElementById('age-2');
-        const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-        if (ageInput.value.trim() === '' || parseFloat(ageInput.value) <= 0) {
-            console.log('Showing warning for age-2');
-            ageWarning.style.display = 'block';
-            isValid = false;
-        } else {
-            console.log('Hiding warning for age-2');
-            ageWarning.style.display = 'none';
         }
 
         // Validate Height
@@ -555,7 +508,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Validate Weight
-        const weightInputElement = document.getElementById('weight-2');
         const weightWarning = weightInputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
         if (weightInputElement.value.trim() === '' || parseFloat(weightInputElement.value) <= 0) {
             weightWarning.style.display = 'block';
@@ -634,7 +586,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay); // No negative target calories
 
         // Update Zielkalorien element
-        zielKalorienElement.textContent = targetCalories > 0 ? targetCalories: '0';
+        zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : '0';
         zielKcalElement.textContent = targetCalories > 0 ? targetCalories : '0'; // Update ziel-kcal span in text
 
         // Show warning if target calories fall below Grundumsatz
@@ -704,3 +656,4 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize all listeners
     initializeListeners();
 });
+
