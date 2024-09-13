@@ -481,11 +481,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to handle live validation on input fields
     function hideWarningOnInput(inputElement, warningElement) {
-        inputElement.addEventListener('input', () => {
-            if (inputElement.value.trim() !== '' && parseInt(inputElement.value) > 0) {
+        const handler = () => {
+            if (inputElement.value.trim() !== '' && parseFloat(inputElement.value) > 0) {
                 warningElement.style.display = 'none'; // Hide the warning if the input is valid
             }
-        });
+        };
+        inputElement.addEventListener('input', handler);
+        inputElement.addEventListener('change', handler); // Add this line to handle 'change' events
     }
 
     // Add live validation for Wunschgewicht
@@ -507,38 +509,81 @@ document.addEventListener('DOMContentLoaded', function () {
     const weightWarning = weightInputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
     hideWarningOnInput(weightInputElement, weightWarning);
 
+    // Function to observe slider changes and trigger 'input' events
+    function observeSliderChange(sliderSelector, inputId) {
+        const sliderElement = document.querySelector(`.${sliderSelector}`);
+        const inputElement = document.getElementById(inputId);
+
+        if (sliderElement && inputElement) {
+            // Assuming the slider library triggers a custom event when its value changes
+            sliderElement.addEventListener('input', () => {
+                // Manually trigger the 'input' event on the input element
+                const event = new Event('input', { bubbles: true });
+                inputElement.dispatchEvent(event);
+            });
+            sliderElement.addEventListener('change', () => {
+                const event = new Event('change', { bubbles: true });
+                inputElement.dispatchEvent(event);
+            });
+        }
+    }
+
+    // Observe sliders and attach events
+    observeSliderChange('wrapper-step-range_slider', 'age-2');
+    observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
+    observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
+    observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+    observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
+    observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // Steps slider
+
     // Function to validate inputs and show warnings if any are missing or invalid
     function validateInputs() {
         let isValid = true;
 
         // Validate Wunschgewicht
-        if (wunschgewichtInput.value.trim() === '' || parseInt(wunschgewichtInput.value) <= 0) {
+        if (wunschgewichtInput.value.trim() === '' || parseFloat(wunschgewichtInput.value) <= 0) {
             wunschgewichtWarning.style.display = 'block'; // Show warning if empty or invalid
             isValid = false;
         } else {
             wunschgewichtWarning.style.display = 'none';
         }
 
-        // Validate Age, Height, and Weight similarly
-        if (ageInput.value.trim() === '' || parseInt(ageInput.value) <= 0) {
+        // Validate Age
+        if (ageInput.value.trim() === '' || parseFloat(ageInput.value) <= 0) {
             ageWarning.style.display = 'block';
             isValid = false;
         } else {
             ageWarning.style.display = 'none';
         }
 
-        if (heightInput.value.trim() === '' || parseInt(heightInput.value) <= 0) {
+        // Validate Height
+        if (heightInput.value.trim() === '' || parseFloat(heightInput.value) <= 0) {
             heightWarning.style.display = 'block';
             isValid = false;
         } else {
             heightWarning.style.display = 'none';
         }
 
-        if (weightInputElement.value.trim() === '' || parseInt(weightInputElement.value) <= 0) {
+        // Validate Weight
+        if (weightInputElement.value.trim() === '' || parseFloat(weightInputElement.value) <= 0) {
             weightWarning.style.display = 'block';
             isValid = false;
         } else {
             weightWarning.style.display = 'none';
+        }
+
+        // Validate weight loss goal selection (Abnehmziel)
+        const selectedValue = Array.from(radios).find(radio => radio.checked);
+        const abnehmzielWarning = document.querySelector('.wrapper-abnehmziel .text-warning.here');
+        if (!selectedValue) {
+            isValid = false;
+            if (abnehmzielWarning) {
+                abnehmzielWarning.style.display = 'block';
+            }
+        } else {
+            if (abnehmzielWarning) {
+                abnehmzielWarning.style.display = 'none';
+            }
         }
 
         return isValid;
@@ -548,10 +593,10 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateResults() {
         const totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
         const totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0; // Extract numeric part
-        const currentWeight = parseInt(weightInputElement.value) || 0;
+        const currentWeight = parseFloat(weightInputElement.value) || 0;
         const grundUmsatzText = grundUmsatzElement ? grundUmsatzElement.textContent : '';
         const grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0;
-        const targetWeight = parseInt(targetWeightElement.value);
+        const targetWeight = parseFloat(targetWeightElement.value) || 0;
 
         // Get the selected radio button value for weight loss speed
         let selectedValue = null;
@@ -562,8 +607,23 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        if (!selectedValue) {
-            console.log("No weight loss option selected.");
+        // Validate critical values
+        if (
+            isNaN(totalCaloriesValue) || totalCaloriesValue <= 0 ||
+            isNaN(currentWeight) || currentWeight <= 0 ||
+            isNaN(grundUmsatzValue) || grundUmsatzValue <= 0 ||
+            isNaN(targetWeight) || targetWeight <= 0 ||
+            !selectedValue
+        ) {
+            // Reset results if inputs are invalid
+            defizitElement.textContent = '0 kcal/Tag';
+            fettAbnahmeElement.textContent = '0 kg/Woche';
+            weeksElement.textContent = '0';
+            monthsElement.textContent = '0';
+            targetWeightResultElement.textContent = '0';
+            zielKcalElement.textContent = '0';
+            zielKalorienElement.textContent = '0 kcal';
+            warningMessageElement.style.display = 'none';
             return;
         }
 
@@ -577,48 +637,40 @@ document.addEventListener('DOMContentLoaded', function () {
             weeklyWeightLossPercentage = 0.01;
         }
 
-        if (totalCaloriesValue > 0 && currentWeight > 0 && targetWeight > 0) {
-            const weeklyWeightLossKg = currentWeight * weeklyWeightLossPercentage;
-            const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
-            const targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay); // No negative target calories
+        const weeklyWeightLossKg = currentWeight * weeklyWeightLossPercentage;
+        const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
+        const targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay); // No negative target calories
 
-            // Update Zielkalorien element
-            zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : 0;
-            zielKcalElement.textContent = targetCalories > 0 ? targetCalories : 0; // Update ziel-kcal span in text
+        // Update Zielkalorien element
+        zielKalorienElement.textContent = targetCalories > 0 ? targetCalories + ' kcal' : '0 kcal';
+        zielKcalElement.textContent = targetCalories > 0 ? targetCalories : '0'; // Update ziel-kcal span in text
 
-            // Show warning if target calories fall below Grundumsatz
-            if (targetCalories < grundUmsatzValue) {
-                warningMessageElement.style.display = 'flex';
-                warningMessageElement.querySelector('.warning-message').textContent = `Warnhinweis: Nicht weniger als ${grundUmsatzValue} kcal essen, da dies dein Grundumsatz ist.`;
-            } else {
-                warningMessageElement.style.display = 'none';
+        // Show warning if target calories fall below Grundumsatz
+        if (targetCalories < grundUmsatzValue) {
+            warningMessageElement.style.display = 'flex';
+            const warningMessage = warningMessageElement.querySelector('.warning-message');
+            if (warningMessage) {
+                warningMessage.textContent = `Warnhinweis: Nicht weniger als ${grundUmsatzValue} kcal essen, da dies dein Grundumsatz ist.`;
             }
-
-            // Update fat loss and calorie deficit
-            fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2); // Fat loss per week
-            defizitElement.textContent = calorieDeficitPerDay; // Calorie deficit per day
-
-            // Calculate timeline to reach goal
-            const totalWeightToLose = currentWeight - targetWeight;
-            const totalCaloricDeficitNeeded = totalWeightToLose * 7700;
-            const daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
-            const weeksToReachGoal = Math.round(daysToReachGoal / 7);
-            const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
-
-            // Update the timeline
-            weeksElement.textContent = weeksToReachGoal;
-            monthsElement.textContent = monthsToReachGoal;
-            targetWeightResultElement.textContent = targetWeight;
         } else {
-            // Reset results if inputs are invalid
-            defizitElement.textContent = 0;
-            fettAbnahmeElement.textContent = 0;
-            weeksElement.textContent = 0;
-            monthsElement.textContent = 0;
-            targetWeightResultElement.textContent = 0;
-            zielKcalElement.textContent = 0; // Reset ziel-kcal span if invalid
             warningMessageElement.style.display = 'none';
         }
+
+        // Update fat loss and calorie deficit
+        fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2) + ' kg/Woche'; // Fat loss per week
+        defizitElement.textContent = calorieDeficitPerDay + ' kcal/Tag'; // Calorie deficit per day
+
+        // Calculate timeline to reach goal
+        const totalWeightToLose = currentWeight - targetWeight;
+        const totalCaloricDeficitNeeded = totalWeightToLose * 7700;
+        const daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
+        const weeksToReachGoal = Math.round(daysToReachGoal / 7);
+        const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
+
+        // Update the timeline
+        weeksElement.textContent = weeksToReachGoal;
+        monthsElement.textContent = monthsToReachGoal;
+        targetWeightResultElement.textContent = targetWeight;
     }
 
     // Function to initialize event listeners
@@ -630,7 +682,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Add event listeners to radio buttons for weight loss
         radios.forEach(radio => {
-            radio.addEventListener('change', updateResults);
+            radio.addEventListener('change', () => {
+                // Update results when the weight loss speed selection changes
+                updateResults();
+
+                // Hide warning when a radio button is selected
+                const abnehmzielWarning = document.querySelector('.wrapper-abnehmziel .text-warning.here');
+                if (abnehmzielWarning) {
+                    abnehmzielWarning.style.display = 'none';
+                }
+            });
         });
 
         // Add event listener for "Berechnen" button
@@ -651,5 +712,3 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initialize all listeners
     initializeListeners();
 });
-
-
