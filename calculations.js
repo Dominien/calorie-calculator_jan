@@ -782,11 +782,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let chartInstance; // To store the chart instance for re-rendering
 
-    // Function to make the canvas wrapper visible
-    function ensureCanvasVisibility() {
-        if (wrapperCanvas.style.display === 'none') {
-            wrapperCanvas.style.display = 'block';
-        }
+    // Function to make the canvas wrapper visible (when button is clicked)
+    function showCanvas() {
+        wrapperCanvas.style.display = 'block';
     }
 
     // Function to get the starting weight based on the selected calculation method
@@ -844,9 +842,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to generate or update the chart using Chart.js
     function generateResultChart(startWeight, targetWeight, months) {
         const ctx = chartCanvas.getContext('2d');
-
-        // Ensure the canvas wrapper is visible
-        ensureCanvasVisibility();
 
         // If a chart already exists, destroy it before creating a new one
         if (chartInstance) {
@@ -959,20 +954,12 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Create a MutationObserver to monitor changes in the span elements
-    const observer = new MutationObserver(function() {
-        checkAndGenerateChart(); // Call this function whenever a change occurs in any span
+    // Add event listener for the button (when clicked, display chart and generate it)
+    const berechnenButton = document.getElementById('check-inputs'); // Assuming this is the button you mentioned
+    berechnenButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        checkAndGenerateChart(); // Generate the chart
+        showCanvas(); // Make the chart visible
     });
 
-    // Configuration of the observer
-    const config = { childList: true, characterData: true, subtree: true };
-
-    // Observe each span element for changes
-    observer.observe(zielKcalElement, config);
-    observer.observe(weeksElement, config);
-    observer.observe(monthsElement, config);
-    observer.observe(targetWeightElement, config);
-
-    // Optionally, you can run this function on page load to check if values are already present
-    checkAndGenerateChart();
 });
