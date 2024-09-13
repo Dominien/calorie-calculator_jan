@@ -457,6 +457,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function hideWarningOnSliderInput(sliderElement, inputElement, warningElement) {
         const handleTextElement = sliderElement.querySelector('.inside-handle-text');
         if (handleTextElement) {
+            console.log(`Found handle text element for ${inputElement.id}`);
             const observer = new MutationObserver(() => {
                 // The handle's text has changed
                 const sliderValue = parseFloat(handleTextElement.textContent) || 0;
@@ -475,6 +476,9 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             observer.observe(handleTextElement, { childList: true, characterData: true, subtree: true });
+            console.log(`MutationObserver attached for ${inputElement.id}`);
+        } else {
+            console.log(`No handle text element found for ${inputElement.id}`);
         }
     }
 
@@ -489,6 +493,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const sliderElement = document.querySelector(sliderSelector);
             if (sliderElement) {
                 hideWarningOnSliderInput(sliderElement, inputElement, warningElement);
+            } else {
+                console.log(`Slider element not found for ${inputId}`);
             }
         } else {
             // Default behavior for other input fields
