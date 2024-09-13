@@ -466,6 +466,7 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     // Select necessary DOM elements
     const totalCaloriesElement = document.querySelector('.result-tats-chlich'); // Total actual calories element
+    const weightInputElement = document.getElementById('weight-2'); // Weight input element
     const grundUmsatzElement = document.getElementById('grund-right'); // BMR element
     const warningMessageElement = document.querySelector('.warning-message_wrapper'); // Warning message element
     const zielKalorienElement = document.querySelector('.result_zielkalorien'); // Zielkalorien element (target calories)
@@ -478,16 +479,11 @@ document.addEventListener('DOMContentLoaded', function () {
     const defizitElement = document.querySelector('.result-defizit'); // Deficit per day
     const fettAbnahmeElement = document.querySelector('.result-fettabhnahme'); // Fat loss per week
 
-    // Get the method radio buttons
-    const methodRadios = document.getElementsByName('kfa-or-miflin');
-
     // Function to handle live validation on input fields
     function hideWarningOnInput(inputElement, warningElement) {
         const handler = () => {
             if (inputElement.value.trim() !== '' && parseFloat(inputElement.value) > 0) {
                 warningElement.style.display = 'none'; // Hide the warning if the input is valid
-            } else {
-                warningElement.style.display = 'block'; // Show warning if input is invalid
             }
         };
         inputElement.addEventListener('input', handler);
@@ -506,8 +502,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Hide the warning if the input is valid
                 if (inputElement.value.trim() !== '' && parseFloat(inputElement.value) > 0) {
                     warningElement.style.display = 'none';
-                } else {
-                    warningElement.style.display = 'block';
                 }
 
                 // Dispatch 'input' event on the input element to trigger other listeners
@@ -541,134 +535,48 @@ document.addEventListener('DOMContentLoaded', function () {
     attachValidation('weight-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]');
     attachValidation('weight-3-kfa', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]');
     attachValidation('kfa-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]');
-
-    // Function to handle method change
-    function handleMethodChange() {
-        const selectedMethod = Array.from(methodRadios).find(radio => radio.checked).value;
-        const inputMiflin = document.getElementById('input-miflin');
-        const inputKfa = document.getElementById('input-kfa');
-        if (selectedMethod === 'miflin') {
-            inputMiflin.style.display = 'block';
-            inputMiflin.style.opacity = '1';
-            inputKfa.style.display = 'none';
-            inputKfa.style.opacity = '0';
-
-            // Clear KFA inputs
-            document.getElementById('weight-3-kfa').value = '';
-            document.getElementById('kfa-2').value = '';
-
-            // Hide warnings for KFA inputs
-            const weight3KfaWarning = document.getElementById('weight-3-kfa').closest('.input-wrapper-calc').querySelector('.text-warning');
-            weight3KfaWarning.style.display = 'none';
-            const kfa2Warning = document.getElementById('kfa-2').closest('.input-wrapper-calc').querySelector('.text-warning');
-            kfa2Warning.style.display = 'none';
-
-        } else if (selectedMethod === 'kfa') {
-            inputMiflin.style.display = 'none';
-            inputMiflin.style.opacity = '0';
-            inputKfa.style.display = 'block';
-            inputKfa.style.opacity = '1';
-
-            // Clear Mifflin inputs
-            document.getElementById('age-2').value = '';
-            document.getElementById('height-2').value = '';
-            document.getElementById('weight-2').value = '';
-
-            // Hide warnings for Mifflin inputs
-            const ageWarning = document.getElementById('age-2').closest('.input-wrapper-calc').querySelector('.text-warning');
-            ageWarning.style.display = 'none';
-            const heightWarning = document.getElementById('height-2').closest('.input-wrapper-calc').querySelector('.text-warning');
-            heightWarning.style.display = 'none';
-            const weight2Warning = document.getElementById('weight-2').closest('.input-wrapper-calc').querySelector('.text-warning');
-            weight2Warning.style.display = 'none';
-        }
-
-        // Re-validate inputs when method changes
-        validateInputs();
-    }
-
-    // Add event listeners to the method radio buttons
-    methodRadios.forEach(radio => {
-        radio.addEventListener('change', () => {
-            handleMethodChange();
-            validateInputs();
-            updateResults();
-        });
-    });
-
-    // Call handleMethodChange() initially
-    handleMethodChange();
+    attachValidation('steps-4', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]');
 
     // Function to validate inputs and show warnings if any are missing or invalid
     function validateInputs() {
         let isValid = true;
 
-        // Get the selected method
-        const selectedMethod = Array.from(methodRadios).find(radio => radio.checked).value;
-
-        if (selectedMethod === 'miflin') {
-            // Validate inputs for Mifflin method
-
-            // Validate Age
-            const ageInput = document.getElementById('age-2');
-            const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-            if (ageInput.value.trim() === '' || parseFloat(ageInput.value) <= 0) {
-                ageWarning.style.display = 'block';
-                isValid = false;
-            } else {
-                ageWarning.style.display = 'none';
-            }
-
-            // Validate Height
-            const heightInput = document.getElementById('height-2');
-            const heightWarning = heightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-            if (heightInput.value.trim() === '' || parseFloat(heightInput.value) <= 0) {
-                heightWarning.style.display = 'block';
-                isValid = false;
-            } else {
-                heightWarning.style.display = 'none';
-            }
-
-            // Validate Weight
-            const weightInputElement = document.getElementById('weight-2');
-            const weightWarning = weightInputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
-            if (weightInputElement.value.trim() === '' || parseFloat(weightInputElement.value) <= 0) {
-                weightWarning.style.display = 'block';
-                isValid = false;
-            } else {
-                weightWarning.style.display = 'none';
-            }
-
-        } else if (selectedMethod === 'kfa') {
-            // Validate inputs for KFA method
-
-            // Validate Weight
-            const weightInputElement = document.getElementById('weight-3-kfa');
-            const weightWarning = weightInputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
-            if (weightInputElement.value.trim() === '' || parseFloat(weightInputElement.value) <= 0) {
-                weightWarning.style.display = 'block';
-                isValid = false;
-            } else {
-                weightWarning.style.display = 'none';
-            }
-
-            // Validate KFA
-            const kfaInput = document.getElementById('kfa-2');
-            const kfaWarning = kfaInput.closest('.input-wrapper-calc').querySelector('.text-warning');
-            if (kfaInput.value.trim() === '' || parseFloat(kfaInput.value) <= 0) {
-                kfaWarning.style.display = 'block';
-                isValid = false;
-            } else {
-                kfaWarning.style.display = 'none';
-            }
-        }
-
-        // Validate Wunschgewicht (common to both methods)
+        // Validate Wunschgewicht
         if (wunschgewichtInput.value.trim() === '' || parseFloat(wunschgewichtInput.value) <= 0) {
             wunschgewichtWarning.style.display = 'block'; // Show warning if empty or invalid
             isValid = false;
         } else {
             wunschgewichtWarning.style.display = 'none';
+        }
+
+        // Validate Age
+        const ageInput = document.getElementById('age-2');
+        const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+        if (ageInput.value.trim() === '' || parseFloat(ageInput.value) <= 0) {
+            ageWarning.style.display = 'block';
+            isValid = false;
+        } else {
+            ageWarning.style.display = 'none';
+        }
+
+        // Validate Height
+        const heightInput = document.getElementById('height-2');
+        const heightWarning = heightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
+        if (heightInput.value.trim() === '' || parseFloat(heightInput.value) <= 0) {
+            heightWarning.style.display = 'block';
+            isValid = false;
+        } else {
+            heightWarning.style.display = 'none';
+        }
+
+        // Validate Weight
+        const weightInputElement = document.getElementById('weight-2');
+        const weightWarning = weightInputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
+        if (weightInputElement.value.trim() === '' || parseFloat(weightInputElement.value) <= 0) {
+            weightWarning.style.display = 'block';
+            isValid = false;
+        } else {
+            weightWarning.style.display = 'none';
         }
 
         // Validate weight loss goal selection (Abnehmziel)
@@ -690,55 +598,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Unified function to handle total calorie updates and weight loss results
     function updateResults() {
-        // Get the selected method
-        const selectedMethod = Array.from(methodRadios).find(radio => radio.checked).value;
-
-        let totalCaloriesValue = 0;
-        let currentWeight = 0;
-        let grundUmsatzValue = 0;
-
-        if (selectedMethod === 'miflin') {
-            // Get values for Mifflin method
-            const weightInputElement = document.getElementById('weight-2');
-            const heightInput = document.getElementById('height-2');
-            const ageInput = document.getElementById('age-2');
-
-            currentWeight = parseFloat(weightInputElement.value) || 0;
-            const height = parseFloat(heightInput.value) || 0;
-            const age = parseFloat(ageInput.value) || 0;
-
-            // Calculate BMR using Mifflin-St Jeor Equation (example calculation)
-            // Assuming male gender; adjust accordingly if needed
-            grundUmsatzValue = Math.round(10 * currentWeight + 6.25 * height - 5 * age + 5); // For male
-
-        } else if (selectedMethod === 'kfa') {
-            // Get values for KFA method
-            const weightInputElement = document.getElementById('weight-3-kfa');
-            const kfaInput = document.getElementById('kfa-2');
-
-            currentWeight = parseFloat(weightInputElement.value) || 0;
-            const kfa = parseFloat(kfaInput.value) || 0;
-
-            // Calculate BMR using Katch-McArdle formula
-            const leanMass = currentWeight * (1 - kfa / 100);
-            grundUmsatzValue = Math.round(370 + (21.6 * leanMass));
-        }
-
-        // Update Grundumsatz element
-        if (grundUmsatzElement) {
-            grundUmsatzElement.textContent = grundUmsatzValue + ' kcal';
-        }
-
-        // Total calories element may be based on grundUmsatzValue adjusted for activity level
-        // For simplicity, let's assume totalCaloriesValue is grundUmsatzValue times an activity factor
-        // Adjust according to your actual logic
-        const activityFactor = 1.2; // Example sedentary activity factor
-        totalCaloriesValue = Math.round(grundUmsatzValue * activityFactor);
-
-        if (totalCaloriesElement) {
-            totalCaloriesElement.textContent = totalCaloriesValue + ' kcal';
-        }
-
+        const totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
+        const totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0; // Extract numeric part
+        const currentWeight = parseFloat(weightInputElement.value) || 0;
+        const grundUmsatzText = grundUmsatzElement ? grundUmsatzElement.textContent : '';
+        const grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0;
         const targetWeight = parseFloat(targetWeightElement.value) || 0;
 
         // Get the selected radio button value for weight loss speed
@@ -818,6 +682,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to initialize event listeners
     function initializeListeners() {
+        if (totalCaloriesElement) {
+            const observer = new MutationObserver(updateResults);
+            observer.observe(totalCaloriesElement, { childList: true, subtree: true });
+        }
+
         // Add event listeners to radio buttons for weight loss
         radios.forEach(radio => {
             radio.addEventListener('change', () => {
@@ -843,18 +712,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // Add event listeners to inputs to update results when inputs change
-        const inputIds = ['age-2', 'height-2', 'weight-2', 'weight-3-kfa', 'kfa-2', 'wunschgewicht'];
-        inputIds.forEach(id => {
-            const inputElement = document.getElementById(id);
-            if (inputElement) {
-                inputElement.addEventListener('input', () => {
-                    if (validateInputs()) {
-                        updateResults();
-                    }
-                });
-            }
-        });
+        // Run initial calculation
+        updateResults();
     }
 
     // Initialize all listeners
