@@ -764,13 +764,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Select necessary DOM elements for span results
+    // Select necessary DOM elements for span results and wrapper
     const zielKcalElement = document.querySelector('.span-result.ziel-kcal');
     const weeksElement = document.querySelector('.span-result.weeks');
     const monthsElement = document.querySelector('.span-result.months');
     const targetWeightElement = document.querySelector('.span-result.target-weight');
     const chartCanvas = document.getElementById('resultChart'); // Chart canvas element
+    const wrapperCanvas = document.querySelector('.wrapper-canvas'); // Wrapper that starts hidden
     let chartInstance; // To store the chart instance for re-rendering
+
+    // Function to make the canvas wrapper visible
+    function ensureCanvasVisibility() {
+        if (wrapperCanvas.style.display === 'none') {
+            wrapperCanvas.style.display = 'block';
+        }
+    }
 
     // Function to get the span values
     function getResultValues() {
@@ -790,6 +798,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function generateResultChart(zielKcal, weeks, months, targetWeight) {
         const ctx = chartCanvas.getContext('2d');
 
+        // Ensure the canvas wrapper is visible
+        ensureCanvasVisibility();
+
         // If a chart already exists, destroy it before creating a new one
         if (chartInstance) {
             chartInstance.destroy();
@@ -800,90 +811,93 @@ document.addEventListener('DOMContentLoaded', function () {
         gradient.addColorStop(0, 'rgba(255, 0, 0, 0.5)');  // Red at the top
         gradient.addColorStop(1, 'rgba(0, 255, 0, 0.5)');  // Green at the bottom
         
-        chartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['HEUTE', 'Zielkalorien', 'Wochen', 'Monate'], // X-axis labels in German
-                datasets: [{
-                    label: 'Verlauf zur Zielerreichung',
-                    data: [zielKcal, weeks, months, targetWeight], // Data from the spans
-                    backgroundColor: gradient,
-                    borderColor: 'rgba(0, 150, 0, 1)', // Green border for the line
-                    borderWidth: 2,
-                    fill: true, // Fill the area under the line
-                    pointBackgroundColor: ['red', 'orange', 'green'], // Different point colors
-                    pointBorderColor: '#fff',
-                    pointHoverRadius: 6,
-                    pointHoverBackgroundColor: 'rgba(0, 150, 0, 1)',
-                    pointRadius: 5,
-                    pointHitRadius: 10
-                }]
-            },
-            options: {
-                plugins: {
-                    title: {
-                        display: true,
-                        text: 'Gewichtsverlust über die Zeit', // Chart title in German
-                        font: {
-                            size: 18
-                        },
-                        color: '#333'
-                    },
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                return 'Wert: ' + tooltipItem.raw;
+        // Delay chart creation slightly to ensure the canvas is fully visible
+        setTimeout(() => {
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['HEUTE', 'Zielkalorien', 'Wochen', 'Monate'], // X-axis labels in German
+                    datasets: [{
+                        label: 'Verlauf zur Zielerreichung',
+                        data: [zielKcal, weeks, months, targetWeight], // Data from the spans
+                        backgroundColor: gradient,
+                        borderColor: 'rgba(0, 150, 0, 1)', // Green border for the line
+                        borderWidth: 2,
+                        fill: true, // Fill the area under the line
+                        pointBackgroundColor: ['red', 'orange', 'green'], // Different point colors
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 6,
+                        pointHoverBackgroundColor: 'rgba(0, 150, 0, 1)',
+                        pointRadius: 5,
+                        pointHitRadius: 10
+                    }]
+                },
+                options: {
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Gewichtsverlust über die Zeit', // Chart title in German
+                            font: {
+                                size: 18
                             },
-                            title: function(tooltipItem) {
-                                const label = tooltipItem[0].label;
-                                return label;
+                            color: '#333'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return 'Wert: ' + tooltipItem.raw;
+                                },
+                                title: function(tooltipItem) {
+                                    const label = tooltipItem[0].label;
+                                    return label;
+                                }
+                            },
+                            backgroundColor: 'rgba(0, 150, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Wert', // Y-axis title in German
+                                font: {
+                                    size: 14
+                                },
+                                color: '#333'
+                            },
+                            ticks: {
+                                color: '#333',
+                                stepSize: 10
+                            },
+                            grid: {
+                                display: true,
+                                color: 'rgba(200, 200, 200, 0.2)'
                             }
                         },
-                        backgroundColor: 'rgba(0, 150, 0, 0.8)',
-                        titleColor: '#fff',
-                        bodyColor: '#fff'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: 'Wert', // Y-axis title in German
-                            font: {
-                                size: 14
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Zeit & Ziel', // X-axis title in German
+                                font: {
+                                    size: 14
+                                },
+                                color: '#333'
                             },
-                            color: '#333'
-                        },
-                        ticks: {
-                            color: '#333',
-                            stepSize: 10
-                        },
-                        grid: {
-                            display: true,
-                            color: 'rgba(200, 200, 200, 0.2)'
+                            ticks: {
+                                color: '#333'
+                            },
+                            grid: {
+                                display: false
+                            }
                         }
                     },
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Zeit & Ziel', // X-axis title in German
-                            font: {
-                                size: 14
-                            },
-                            color: '#333'
-                        },
-                        ticks: {
-                            color: '#333'
-                        },
-                        grid: {
-                            display: false
-                        }
-                    }
-                },
-                maintainAspectRatio: false
-            }
-        });
+                    maintainAspectRatio: false
+                }
+            });
+        }, 100); // Delay of 100ms to ensure canvas is visible before rendering the chart
     }
 
     // Function to check if all values are greater than 0 and generate the chart
