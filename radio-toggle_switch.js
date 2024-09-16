@@ -88,13 +88,9 @@ document.getElementById("popup_kfa").addEventListener("click", function(event) {
                     inputField.value = selectedValue;
                     console.log("Updated KFA input value to:", selectedValue);
 
-                    // Update the slider handle text
-                    const handleText = document.querySelector('div[fs-rangeslider-element="display-value-6"]');
-                    if (handleText) {
-                        handleText.textContent = selectedValue;
-                        console.log("Updated slider handle text to:", selectedValue);
-                    }
-
+                    // Update the slider handle text and position
+                    setHandleText('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
+                    
                     // Optionally, close the popup after selection
                     popupToShow.style.display = 'none';
                     console.log("Closing popup after selection");
@@ -108,6 +104,38 @@ document.getElementById("popup_kfa").addEventListener("click", function(event) {
         console.log("No gender selected");
     }
 });
+
+// Function to update range slider position and handle text
+function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransition) {
+    const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
+    const handle = wrapper.querySelector(".range-slider_handle");
+    const fill = wrapper.querySelector(".range-slider_fill");
+
+    const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
+    const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
+
+    // Ensure the value stays within the range
+    value = Math.max(min, Math.min(value, max));
+
+    // Calculate percentage relative to the slider's range
+    const percentage = ((value - min) / (max - min)) * 100;
+
+    // Apply transition if needed
+    handle.style.transition = withTransition ? 'left 0.3s ease' : 'none';
+    fill.style.transition = withTransition ? 'width 0.3s ease' : 'none';
+
+    // Set handle and fill to a max of 100% and a min of 0%
+    handle.style.left = `${Math.min(Math.max(percentage, 0), 100)}%`;
+    fill.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
+}
+
+// Function to update the handle text and position
+function setHandleText(rangeSliderWrapperClass, inputId) {
+    const inputValue = document.getElementById(inputId).value;
+    const handleText = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
+    handleText.textContent = inputValue;
+    updateRangeSliderPosition(rangeSliderWrapperClass, inputValue, true);
+}
 
 // Close popup when .exit-intent-popup-close is clicked
 document.querySelectorAll('.exit-intent-popup-close').forEach(closeButton => {
