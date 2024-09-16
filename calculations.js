@@ -769,7 +769,6 @@ document.addEventListener('DOMContentLoaded', function () {
     attachValidation('weight-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]');
     attachValidation('weight-3-kfa', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]');
     attachValidation('kfa-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]');
-    attachValidation('steps-4', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]');
 
     // Function to validate inputs and show warnings if any are missing or invalid
     function validateInputs() {
