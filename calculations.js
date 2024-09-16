@@ -859,11 +859,10 @@ document.addEventListener('DOMContentLoaded', function () {
             chartInstance.destroy();
         }
 
-        // Create the horizontal fill gradient (90deg, from left to right)
+        // Create the horizontal fill gradient (90deg, starting with red on the left and green on the right)
         const gradientFill = ctx.createLinearGradient(0, 0, 400, 0);
-        gradientFill.addColorStop(1, 'rgba(233, 62, 45, 0.3)');  // Light red on the right
-        gradientFill.addColorStop(0, 'rgba(26, 183, 0, 0.3)');  // Light green on the left
-      
+        gradientFill.addColorStop(0, 'rgba(233, 62, 45, 0.3)');  // Light red on the left
+        gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');  // Light green on the right
 
         // Generate X-axis labels (key dates) and Y-axis data (key weights)
         const dates = generateKeyDates(months);
@@ -881,7 +880,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     labels: dates, // Key dates (start, mid, end)
                     datasets: [{
                         data: weightData, // Weight from start to target weight
-                        backgroundColor: gradientFill, // The background gradient (90deg)
+                        backgroundColor: gradientFill, // The background gradient (red to green)
                         borderColor: 'rgba(0, 150, 0, 1)', // Solid line border
                         borderWidth: 2,
                         fill: true, // Fill the area under the line
@@ -978,3 +977,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 });
+
