@@ -637,8 +637,21 @@ document.addEventListener('DOMContentLoaded', function () {
         checkAndGenerateChart(); // Generate the chart and show canvas
     });
 
-});
+    // Use MutationObserver to watch for changes in the text of the span elements
+    const targetElements = [zielKcalElement, weeksElement, monthsElement, targetWeightElement];
 
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            checkAndGenerateChart(); // Call the chart generation when text content changes
+        });
+    });
+
+    // Start observing changes in text content for the target elements
+    targetElements.forEach(element => {
+        observer.observe(element, { childList: true, subtree: true });
+    });
+
+});
 
 
 // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D
