@@ -41,3 +41,41 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize to show the selected input on page load
     toggleInputs();
 });
+
+
+document.getElementById("popup_kfa").addEventListener("click", function(event) {
+    event.preventDefault(); // Prevent default anchor behavior
+
+    // Check which gender is selected
+    const selectedGender = document.querySelector('input[name="geschlecht"]:checked');
+    
+    if (selectedGender) {
+        const genderValue = selectedGender.value;
+
+        // Hide all popups first
+        document.querySelectorAll('.kfa-mann, .kfa-woman').forEach(popup => {
+            popup.style.display = 'none';
+        });
+
+        // Show the correct popup based on selected gender
+        if (genderValue === "Mann") {
+            document.querySelector('.kfa-mann').style.display = 'block';
+        } else if (genderValue === "frau") {
+            document.querySelector('.kfa-woman').style.display = 'block';
+        }
+    } else {
+        // No gender selected, show a warning message (optional)
+        alert("Bitte wähle dein Geschlecht aus");
+    }
+});
+
+// Close popup when .exit-intent-popup-close is clicked
+document.querySelectorAll('.exit-intent-popup-close').forEach(closeButton => {
+    closeButton.addEventListener("click", function() {
+        document.querySelectorAll('.kfa-mann, .kfa-woman').forEach(popup => {
+            popup.style.display = 'none';
+        });
+    });
+});
+
+
