@@ -1,14 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     const numericInputs = document.querySelectorAll('.input-calculator');
 
-    // Restrict input to only numeric values with debouncing
+    // Restrict input to only numeric values
     numericInputs.forEach(input => {
-        let debounceTimeout;
         input.addEventListener('input', () => {
-            clearTimeout(debounceTimeout);
-            debounceTimeout = setTimeout(() => {
-                input.value = input.value.replace(/[^0-9]/g, ''); // Allow only numbers
-            }, 300); // Debouncing with 300ms delay
+            input.value = input.value.replace(/[^0-9]/g, ''); // Allow only numbers
         });
 
         input.addEventListener('keydown', (event) => {
@@ -24,81 +20,89 @@ document.addEventListener('DOMContentLoaded', function() {
             if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && (event.keyCode < 96 || event.keyCode > 105)) {
                 event.preventDefault();
             }
-        }, { passive: true }); // Use passive listener for better performance
+        });
     });
 
+    // Function to update range slider position and value for weight and KFA
     function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransition) {
         const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
-        if (!wrapper) return;
         const handle = wrapper.querySelector(".range-slider_handle");
         const fill = wrapper.querySelector(".range-slider_fill");
 
         const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
         const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
 
+        // Ensure the value stays within the range
         value = Math.max(min, Math.min(value, max));
+
+        // Calculate percentage relative to the slider's range
         const percentage = ((value - min) / (max - min)) * 100;
 
+        // Apply transition if needed
         handle.style.transition = withTransition ? 'left 0.3s ease' : 'none';
         fill.style.transition = withTransition ? 'width 0.3s ease' : 'none';
 
+        // Set handle and fill to a max of 100% and a min of 0%
         handle.style.left = `${Math.min(Math.max(percentage, 0), 100)}%`;
         fill.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
     }
 
+    // Sync input field value with slider handle text for weight and KFA
     function setInputValue(rangeSliderWrapperClass, inputId) {
-        const handleText = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`)?.textContent;
-        if (handleText) document.getElementById(inputId).value = handleText;
+        const handleText = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`).textContent;
+        document.getElementById(inputId).value = handleText;
+        handleInputChange();
     }
 
+    // Update handle text based on input value for weight and KFA
+    function setHandleText(rangeSliderWrapperClass, inputId) {
+        const inputValue = document.getElementById(inputId).value;
+        const handleText = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
+        handleText.textContent = inputValue;
+        updateRangeSliderPosition(rangeSliderWrapperClass, inputValue, true);
+        handleInputChange();
+    }
+
+    // Function to handle input changes for weight and KFA
+    function handleInputChange() {
+        // Get the input values from the sliders
+        const weight = document.getElementById("weight-3-kfa").value;
+        const kfa = document.getElementById("kfa-2").value;
+
+    }
+
+    // Function to handle input changes and slider sync for weight and KFA
     function observeChanges(rangeSliderWrapperClass, inputId) {
         const handleTextElement = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
-        if (!handleTextElement || !inputElement) return;
 
         const observer = new MutationObserver(() => {
             if (inputElement.value !== handleTextElement.textContent) {
                 inputElement.value = handleTextElement.textContent;
+                handleInputChange();
             }
         });
 
         observer.observe(handleTextElement, { childList: true });
+
         inputElement.addEventListener('input', () => {
             if (inputElement.value !== handleTextElement.textContent) {
                 handleTextElement.textContent = inputElement.value;
                 updateRangeSliderPosition(rangeSliderWrapperClass, inputElement.value, true);
             }
-        }, { passive: true });
+        });
     }
 
+    // Add listeners for slider handle movement for weight and KFA
     function addHandleMovementListener(rangeSliderWrapperClass, inputId) {
         const handle = document.querySelector(`.${rangeSliderWrapperClass} .range-slider_handle`);
         const slider = document.querySelector(`.${rangeSliderWrapperClass} .track-range-slider`);
 
-        if (!handle || !slider) return;
-
-        // Touch support along with mouse events
-        const startEvent = (event) => {
-            event.preventDefault();
-            document.addEventListener('mousemove', onMouseMove, { passive: true });
-            document.addEventListener('mouseup', onMouseUp, { passive: true });
-            document.addEventListener('touchmove', onMouseMove, { passive: true });
-            document.addEventListener('touchend', onMouseUp, { passive: true });
-        };
-
-        const onMouseMove = () => {
-            setInputValue(rangeSliderWrapperClass, inputId);
-        };
-
-        const onMouseUp = () => {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-            document.removeEventListener('touchmove', onMouseMove);
-            document.removeEventListener('touchend', onMouseUp);
-        };
-
-        handle.addEventListener('mousedown', startEvent, { passive: true });
-        handle.addEventListener('touchstart', startEvent, { passive: true });
+        handle.addEventListener('mousedown', () => {
+            updateRangeSliderPosition(rangeSliderWrapperClass, document.getElementById(inputId).value, false);
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        });
 
         slider.addEventListener('click', (event) => {
             const rect = slider.getBoundingClientRect();
@@ -111,65 +115,128 @@ document.addEventListener('DOMContentLoaded', function() {
             const value = Math.round(min + (percentage / 100) * (max - min));
 
             document.getElementById(inputId).value = value;
-        }, { passive: true });
+            setHandleText(rangeSliderWrapperClass, inputId);
+        });
+
+        function onMouseMove() {
+            setInputValue(rangeSliderWrapperClass, inputId);
+        }
+
+        function onMouseUp() {
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+        }
     }
 
-    // Initialize the range sliders and input sync
-    function initSliders() {
-        setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
-        setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
+    // Initialize values and add listeners for weight and KFA
+    setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+    setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
 
-        addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
-        addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
+    addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+    addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
 
-        observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
-        observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
+    observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+    observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
+
+    // Additional Range Sliders for Age, Height, Steps
+    setInputValue('wrapper-step-range_slider', 'age-2');
+    setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
+    setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
+    setInputValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // New steps slider
+
+    addHandleMovementListener('wrapper-step-range_slider', 'age-2');
+    addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
+    addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
+    addHandleMovementListener('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // New steps slider
+
+    observeChanges('wrapper-step-range_slider', 'age-2');
+    observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
+    observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
+    observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // New steps slider
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Function to look for elements until they are found
+    function waitForElement(selector, callback) {
+        const elements = document.querySelectorAll(selector);
+        if (elements.length) {
+            callback(elements); // Run the callback once the elements are found
+        } else {
+            requestAnimationFrame(() => waitForElement(selector, callback)); // Keep checking
+        }
     }
 
-    initSliders();
-    
-    // Dropdown functionality for additional training steps
+    // Use the function to wait for the buttons to be present in the DOM
+    waitForElement('.woman-button', function(buttons) {
+        // Add click event listener to each button
+        buttons.forEach(function(button) {
+            button.addEventListener('click', function() {
+                // Remove 'active' class from all buttons
+                buttons.forEach(btn => btn.classList.remove('active'));
+                // Add 'active' class to the clicked button
+                this.classList.add('active');
+            });
+        });
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function() {
     const addMoreLink = document.querySelector('.link-more_training');
     const dropDown2 = document.getElementById('drop-down-2-wrapper');
     const dropDown3 = document.getElementById('drop-down-3-wrapper');
+    
+    // Initially hide dropdowns 2 and 3
+    dropDown2.style.display = 'none';
+    dropDown3.style.display = 'none';
 
-    if (addMoreLink && dropDown2 && dropDown3) {
-        dropDown2.style.display = 'none';
-        dropDown3.style.display = 'none';
+    // Smooth transition
+    dropDown2.style.transition = 'opacity 0.5s ease, height 0.5s ease';
+    dropDown3.style.transition = 'opacity 0.5s ease, height 0.5s ease';
 
-        addMoreLink.addEventListener('click', (event) => {
-            event.preventDefault();
-            if (dropDown2.style.display === 'none') {
-                dropDown2.style.display = 'flex';
-            } else if (dropDown3.style.display === 'none') {
-                dropDown3.style.display = 'flex';
-                addMoreLink.style.display = 'none';
-            }
-        }, { passive: true });
-    }
+    // Handler for clicking "Weitere hinzufügen"
+    addMoreLink.addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent default link behavior
 
-    // Radio button handler
-    document.body.addEventListener('click', function(event) {
-        const wrapper = event.target.closest('.radio-field_wrapper');
-        if (wrapper) {
-            const block = wrapper.closest('.radios-abnehmziel');
-            const wrappers = block?.querySelectorAll('.radio-field_wrapper');
-            wrappers?.forEach(wrap => resetRadio(wrap));
-            setRadio(wrapper, true);
+        if (dropDown2.style.display === 'none') {
+            dropDown2.style.display = 'flex'; // Show second dropdown
+            dropDown2.style.opacity = 1; // Add transition
+        } else if (dropDown3.style.display === 'none') {
+            dropDown3.style.display = 'flex'; // Show third dropdown
+            dropDown3.style.opacity = 1; // Add transition
+            addMoreLink.style.display = 'none'; // Hide the link after the third dropdown is shown
         }
-    }, { passive: true });
+    });
+});
 
-    function resetRadio(wrapper) {
-        wrapper.classList.remove('checked');
-        const paths = wrapper.querySelectorAll('.ms-tooltip svg path');
-        paths.forEach(path => path.setAttribute('fill', '#303030'));
-    }
+// Radio Button Handler
+document.body.addEventListener('click', function(event) {
+    const wrapper = event.target.closest('.radio-field_wrapper');
+    if (wrapper) {
+        const block = wrapper.closest('.radios-abnehmziel');
+        if (block) {
+            const wrappers = block.querySelectorAll('.radio-field_wrapper');
+            wrappers.forEach(wrap => resetRadio(wrap));
 
-    function setRadio(wrapper, isChecked) {
-        if (isChecked) {
-            wrapper.classList.add('checked');
-            const paths = wrapper.querySelectorAll('.ms-tooltip svg path');
-            paths.forEach(path => path.setAttribute('fill', 'white'));
+            // Add 'checked' class to the clicked wrapper and change SVG fill to white
+            setRadio(wrapper, true);
         }
     }
 });
+
+function resetRadio(wrapper) {
+    wrapper.classList.remove('checked');
+    const paths = wrapper.querySelectorAll('.ms-tooltip svg path');
+    paths.forEach(path => {
+        path.setAttribute('fill', '#303030'); // Reset fill to original color
+    });
+}
+
+function setRadio(wrapper, isChecked) {
+    if (isChecked) {
+        wrapper.classList.add('checked');
+        const paths = wrapper.querySelectorAll('.ms-tooltip svg path');
+        paths.forEach(path => {
+            path.setAttribute('fill', 'white'); // Set the SVG path color to white when checked
+        });
+    }
+}
