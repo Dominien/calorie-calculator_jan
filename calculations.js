@@ -870,8 +870,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const weightData = generateKeyWeightData(startWeight, targetWeight, months);
 
         // Dot size and color gradient (red to green)
-        const pointSizes = [10, 8, 6, 4]; // Bigger to smaller
-        const pointColors = ['rgba(255, 0, 0, 1)', 'rgba(255, 165, 0, 1)', 'rgba(255, 255, 0, 1)', 'rgba(0, 255, 0, 1)']; // Red to green
+        const pointSizes = [6, 6, 6, 6]; // Bigger to smaller
+        const pointColors = ['rgba(255, 0, 0, 1)', 'rgba(255, 165, 0, 1)', 'rgba(0, 255, 0, 1)', 'rgba(0, 255, 0, 1)']; // Red to green
 
         // Delay chart creation slightly to ensure the canvas is fully visible
         setTimeout(() => {
