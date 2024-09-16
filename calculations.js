@@ -649,20 +649,34 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     // Select necessary DOM elements
-    const totalCaloriesElement = document.querySelector('.result-tats-chlich'); // Total actual calories element
-    const weightInputElementMiflin = document.getElementById('weight-2'); // Weight input element for Miflin
-    const weightInputElementKfa = document.getElementById('weight-3-kfa'); // Weight input element for KFA
-    const grundUmsatzElement = document.getElementById('grund-right'); // BMR element
-    const warningMessageElement = document.querySelector('.warning-message_wrapper'); // Warning message element
-    const zielKalorienElement = document.querySelector('.result_zielkalorien'); // Zielkalorien element (target calories)
-    const zielKcalElement = document.querySelector('.span-result.ziel-kcal'); // Span for Zielkalorien display in the text
-    const radios = document.getElementsByName('Gewichtverlust'); // Radio buttons for weight loss speed
-    const targetWeightElement = document.getElementById('wunschgewicht'); // Wunschgewicht input
-    const weeksElement = document.querySelector('.span-result.weeks'); // Weeks to reach goal
-    const monthsElement = document.querySelector('.span-result.months'); // Months to reach goal
-    const targetWeightResultElement = document.querySelector('.span-result.target-weight'); // Target weight
-    const defizitElement = document.querySelector('.result-defizit'); // Deficit per day
-    const fettAbnahmeElement = document.querySelector('.result-fettabhnahme'); // Fat loss per week
+    const totalCaloriesElement = document.querySelector('.result-tats-chlich'); 
+    const weightInputElementMiflin = document.getElementById('weight-2'); 
+    const weightInputElementKfa = document.getElementById('weight-3-kfa'); 
+    const grundUmsatzElement = document.getElementById('grund-right'); 
+    const warningMessageElement = document.querySelector('.warning-message_wrapper'); 
+    const zielKalorienElement = document.querySelector('.result_zielkalorien'); 
+    const zielKcalElement = document.querySelector('.span-result.ziel-kcal'); 
+    const radios = document.getElementsByName('Gewichtverlust'); 
+    const targetWeightElement = document.getElementById('wunschgewicht'); 
+    const weeksElement = document.querySelector('.span-result.weeks'); 
+    const monthsElement = document.querySelector('.span-result.months'); 
+    const targetWeightResultElement = document.querySelector('.span-result.target-weight'); 
+    const defizitElement = document.querySelector('.result-defizit'); 
+    const fettAbnahmeElement = document.querySelector('.result-fettabhnahme'); 
+
+    // Select gender buttons
+    const womanButton = document.querySelector('.woman-button.right');
+    const manButton = document.querySelector('.woman-button.man');
+    const genderWarning = document.querySelector('.text-warning.gender');
+
+    // Function to hide the gender warning on selection
+    function hideGenderWarning() {
+        genderWarning.style.display = 'none'; // Hide the warning when a gender is selected
+    }
+
+    // Add event listeners to gender buttons
+    womanButton.addEventListener('click', hideGenderWarning);
+    manButton.addEventListener('click', hideGenderWarning);
 
     // Function to get the selected calculation method
     function getSelectedCalculationMethod() {
@@ -683,7 +697,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         };
         inputElement.addEventListener('input', handler);
-        inputElement.addEventListener('change', handler); // Handle 'change' events
+        inputElement.addEventListener('change', handler); 
     }
 
     // Function to handle live validation on slider changes using MutationObserver
@@ -691,25 +705,19 @@ document.addEventListener('DOMContentLoaded', function () {
         const handleTextElement = sliderElement.querySelector('.inside-handle-text');
         if (handleTextElement) {
             const observer = new MutationObserver(() => {
-                // The handle's text has changed
                 const sliderValue = parseFloat(handleTextElement.textContent) || 0;
                 inputElement.value = sliderValue;
-
-                // Hide the warning if the input is valid
                 if (sliderValue > 0) {
-                    warningElement.style.display = 'none'; // Hide the warning when value is valid
+                    warningElement.style.display = 'none'; 
                 }
-
-                // Dispatch 'input' event on the input element to trigger other listeners
                 const event = new Event('input', { bubbles: true });
                 inputElement.dispatchEvent(event);
             });
-
             observer.observe(handleTextElement, { childList: true, characterData: true, subtree: true });
         }
     }
 
-    // Function to attach validation to both input and slider
+    // Attach validation to inputs and sliders
     function attachValidation(inputId, sliderSelector) {
         const inputElement = document.getElementById(inputId);
         const warningElement = inputElement.closest('.input-wrapper-calc').querySelector('.text-warning');
@@ -728,17 +736,13 @@ document.addEventListener('DOMContentLoaded', function () {
     if (ageHandleTextElement) {
         const observer = new MutationObserver(() => {
             const sliderValue = parseFloat(ageHandleTextElement.textContent) || 0;
-            console.log(`Slider value for age-2: ${sliderValue}`);
             ageInputElement.value = sliderValue;
 
             // Hide the warning if the input is valid
             if (sliderValue > 0) {
-                console.log('Hiding warning for age-2');
                 ageWarningElement.style.display = 'none';
             }
         });
-
-        // Observe the changes in the text inside the handle
         observer.observe(ageHandleTextElement, { childList: true, characterData: true, subtree: true });
     }
 
@@ -761,11 +765,6 @@ document.addEventListener('DOMContentLoaded', function () {
     
         // Validate gender selection or check if one of the buttons has the 'active' class
         const selectedGender = document.querySelector('input[name="geschlecht"]:checked');
-        const genderWarning = document.querySelector('.text-warning.gender');
-        const womanButton = document.querySelector('.woman-button.right');
-        const manButton = document.querySelector('.woman-button.man');
-    
-        // Check if either of the gender buttons has the 'active' class
         const hasActiveClass = womanButton.classList.contains('active') || manButton.classList.contains('active');
     
         if (!selectedGender && !hasActiveClass) {
@@ -774,13 +773,10 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             genderWarning.style.display = 'none'; // Hide warning if gender is selected or one has active class
         }
-    
-        // Get selected calculation method
+
         const calculationMethod = getSelectedCalculationMethod();
-    
-        // Validate inputs based on calculation method
+        // Additional input validation logic for miflin and kfa
         if (calculationMethod === 'miflin') {
-            // Validate Age
             const ageInput = document.getElementById('age-2');
             const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
             if (ageInput.value.trim() === '' || parseFloat(ageInput.value) <= 0) {
@@ -789,8 +785,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 ageWarning.style.display = 'none';
             }
-    
-            // Validate Height
+
             const heightInput = document.getElementById('height-2');
             const heightWarning = heightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
             if (heightInput.value.trim() === '' || parseFloat(heightInput.value) <= 0) {
@@ -799,8 +794,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 heightWarning.style.display = 'none';
             }
-    
-            // Validate Weight (weight-2)
+
             const weightWarning = weightInputElementMiflin.closest('.input-wrapper-calc').querySelector('.text-warning');
             if (weightInputElementMiflin.value.trim() === '' || parseFloat(weightInputElementMiflin.value) <= 0) {
                 weightWarning.style.display = 'block';
@@ -809,7 +803,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 weightWarning.style.display = 'none';
             }
         } else if (calculationMethod === 'kfa') {
-            // Validate Weight (weight-3-kfa)
             const weightWarning = weightInputElementKfa.closest('.input-wrapper-calc').querySelector('.text-warning');
             if (weightInputElementKfa.value.trim() === '' || parseFloat(weightInputElementKfa.value) <= 0) {
                 weightWarning.style.display = 'block';
@@ -817,8 +810,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 weightWarning.style.display = 'none';
             }
-    
-            // Validate KFA (kfa-2)
+
             const kfaInput = document.getElementById('kfa-2');
             const kfaWarning = kfaInput.closest('.input-wrapper-calc').querySelector('.text-warning');
             if (kfaInput.value.trim() === '' || parseFloat(kfaInput.value) <= 0) {
@@ -828,15 +820,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 kfaWarning.style.display = 'none';
             }
         }
-    
+
         // Validate Wunschgewicht
         if (wunschgewichtInput.value.trim() === '' || parseFloat(wunschgewichtInput.value) <= 0) {
-            wunschgewichtWarning.style.display = 'block'; // Show warning if empty or invalid
+            wunschgewichtWarning.style.display = 'block'; 
             isValid = false;
         } else {
             wunschgewichtWarning.style.display = 'none';
         }
-    
+
         // Validate weight loss goal selection (Abnehmziel)
         const selectedValue = Array.from(radios).find(radio => radio.checked);
         const abnehmzielWarning = document.querySelector('.wrapper-abnehmziel .text-warning.here');
@@ -850,17 +842,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 abnehmzielWarning.style.display = 'none';
             }
         }
-    
+
         return isValid;
     }
-    
-    
 
     // Unified function to handle total calorie updates and weight loss results
     function updateResults() {
         const calculationMethod = getSelectedCalculationMethod();
 
-        // Get current weight based on calculation method
         let currentWeight = 0;
         if (calculationMethod === 'miflin') {
             currentWeight = parseFloat(weightInputElementMiflin.value) || 0;
@@ -868,17 +857,13 @@ document.addEventListener('DOMContentLoaded', function () {
             currentWeight = parseFloat(weightInputElementKfa.value) || 0;
         }
 
-        // Get target weight
         const targetWeight = parseFloat(targetWeightElement.value) || 0;
-
-        // Get totalCaloriesValue and grundUmsatzValue from their elements
         const totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
-        const totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0; // Extract numeric part
+        const totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0;
 
         const grundUmsatzText = grundUmsatzElement ? grundUmsatzElement.textContent : '';
         const grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0;
 
-        // Get the selected radio button value for weight loss speed
         let selectedValue = null;
         for (const radio of radios) {
             if (radio.checked) {
@@ -887,7 +872,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Validate critical values
         if (
             isNaN(totalCaloriesValue) || totalCaloriesValue <= 0 ||
             isNaN(currentWeight) || currentWeight <= 0 ||
@@ -895,7 +879,6 @@ document.addEventListener('DOMContentLoaded', function () {
             isNaN(targetWeight) || targetWeight <= 0 ||
             !selectedValue
         ) {
-            // Reset results if inputs are invalid
             defizitElement.textContent = '0';
             fettAbnahmeElement.textContent = '0';
             weeksElement.textContent = '0';
@@ -907,7 +890,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Determine weekly weight loss percentage
         let weeklyWeightLossPercentage = 0;
         if (selectedValue === 'Langsames Abnehmen') {
             weeklyWeightLossPercentage = 0.005;
@@ -919,13 +901,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const weeklyWeightLossKg = currentWeight * weeklyWeightLossPercentage;
         const calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
-        const targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay); // No negative target calories
+        const targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay);
 
-        // Update Zielkalorien element
         zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : '0';
-        zielKcalElement.textContent = targetCalories > 0 ? targetCalories : '0'; // Update ziel-kcal span in text
+        zielKcalElement.textContent = targetCalories > 0 ? targetCalories : '0'; 
 
-        // Show warning if target calories fall below Grundumsatz
         if (targetCalories < grundUmsatzValue) {
             warningMessageElement.style.display = 'flex';
             const warningMessage = warningMessageElement.querySelector('.warning-message');
@@ -936,18 +916,15 @@ document.addEventListener('DOMContentLoaded', function () {
             warningMessageElement.style.display = 'none';
         }
 
-        // Update fat loss and calorie deficit
-        fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2); // Fat loss per week
-        defizitElement.textContent = calorieDeficitPerDay; // Calorie deficit per day
+        fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2); 
+        defizitElement.textContent = calorieDeficitPerDay; 
 
-        // Calculate timeline to reach goal
         const totalWeightToLose = currentWeight - targetWeight;
         const totalCaloricDeficitNeeded = totalWeightToLose * 7700;
         const daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
         const weeksToReachGoal = Math.round(daysToReachGoal / 7);
         const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
 
-        // Update the timeline
         weeksElement.textContent = weeksToReachGoal;
         monthsElement.textContent = monthsToReachGoal;
         targetWeightResultElement.textContent = targetWeight;
@@ -960,13 +937,10 @@ document.addEventListener('DOMContentLoaded', function () {
             observer.observe(totalCaloriesElement, { childList: true, subtree: true });
         }
 
-        // Add event listeners to radio buttons for weight loss
         radios.forEach(radio => {
             radio.addEventListener('change', () => {
-                // Update results when the weight loss speed selection changes
                 updateResults();
 
-                // Hide warning when a radio button is selected
                 const abnehmzielWarning = document.querySelector('.wrapper-abnehmziel .text-warning.here');
                 if (abnehmzielWarning) {
                     abnehmzielWarning.style.display = 'none';
@@ -974,16 +948,13 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
-        // Add event listeners to calculation method radios
         const methodRadios = document.getElementsByName('kfa-or-miflin');
         methodRadios.forEach(radio => {
             radio.addEventListener('change', () => {
-                // When calculation method changes, re-validate inputs and update results
                 updateResults();
             });
         });
 
-        // Add event listener for "Berechnen" button
         const berechnenButton = document.getElementById('check-inputs');
         if (berechnenButton) {
             berechnenButton.addEventListener('click', function (event) {
@@ -994,11 +965,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
 
-        // Run initial calculation
         updateResults();
     }
 
-    // Initialize all listeners
     initializeListeners();
 });
-
