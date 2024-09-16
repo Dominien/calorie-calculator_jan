@@ -52,7 +52,7 @@ document.getElementById("popup_kfa").addEventListener("click", function(event) {
     console.log("Selected gender:", selectedGender ? selectedGender.value : "None");
 
     if (selectedGender) {
-        const genderValue = selectedGender.value;
+        const genderValue = selectedGender.value.toLowerCase(); // Lowercase 'Mann' and 'frau' to match class names
 
         // Hide all popups first
         document.querySelectorAll('.kfa-mann, .kfa-woman').forEach(popup => {
@@ -61,7 +61,7 @@ document.getElementById("popup_kfa").addEventListener("click", function(event) {
         });
 
         // Show the correct popup based on selected gender
-        if (genderValue === "Mann") {
+        if (genderValue === "mann") {
             document.querySelector('.kfa-mann').style.display = 'block';
             console.log("Showing male popup");
         } else if (genderValue === "frau") {
@@ -69,8 +69,9 @@ document.getElementById("popup_kfa").addEventListener("click", function(event) {
             console.log("Showing female popup");
         }
 
-        // Add event listener to update KFA input when radio button is selected
-        const radioButtons = document.querySelectorAll('input[name^="kfa-percent-' + genderValue + '"]');
+        // Add event listener to update KFA input when a radio button is selected
+        // Radio button query based on gender, ensure it matches
+        const radioButtons = document.querySelectorAll(`input[name="kfa-percent-${genderValue}"]`);
         console.log("Found radio buttons for gender:", radioButtons);
 
         radioButtons.forEach(radio => {
@@ -106,4 +107,3 @@ document.querySelectorAll('.exit-intent-popup-close').forEach(closeButton => {
         });
     });
 });
-
