@@ -80,9 +80,9 @@ document.getElementById("popup_kfa").addEventListener("click", function(event) {
             radioButtons.forEach(radio => {
                 console.log("Adding event listener to radio button with value:", radio.value);
                 radio.addEventListener("change", function() {
-                    const selectedValue = this.value;
+                    const selectedValue = this.value.replace('%', ''); // Remove the % sign
                     console.log("Radio button selected:", selectedValue);
-                    document.getElementById("kfa-2").value = selectedValue;
+                    document.getElementById("kfa-2").value = selectedValue; // Set the numeric value only
                     console.log("Updated KFA input value to:", selectedValue);
                     
                     // Close popup after selecting (optional)
