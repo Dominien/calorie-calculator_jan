@@ -82,10 +82,20 @@ document.getElementById("popup_kfa").addEventListener("click", function(event) {
                 radio.addEventListener("change", function() {
                     const selectedValue = this.value.replace('%', ''); // Remove the % sign
                     console.log("Radio button selected:", selectedValue);
-                    document.getElementById("kfa-2").value = selectedValue; // Set the numeric value only
+
+                    // Update input value
+                    const inputField = document.getElementById("kfa-2");
+                    inputField.value = selectedValue;
                     console.log("Updated KFA input value to:", selectedValue);
-                    
-                    // Close popup after selecting (optional)
+
+                    // Update the slider handle text
+                    const handleText = document.querySelector('div[fs-rangeslider-element="display-value-6"]');
+                    if (handleText) {
+                        handleText.textContent = selectedValue;
+                        console.log("Updated slider handle text to:", selectedValue);
+                    }
+
+                    // Optionally, close the popup after selection
                     popupToShow.style.display = 'none';
                     console.log("Closing popup after selection");
                 });
