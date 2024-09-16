@@ -860,20 +860,10 @@ document.addEventListener('DOMContentLoaded', function () {
             chartInstance.destroy();
         }
 
-        // Create the fill gradient for the background of the chart
-        const gradientFill = ctx.createLinearGradient(0, 0, 0, 400);  // Vertical gradient
-        gradientFill.addColorStop(0, 'rgba(245, 246, 247, 0.00)');  // Transparent
-        gradientFill.addColorStop(0.8558, '#F5F6F7');  // Greyish white
-
-        const gradientOverlay = ctx.createLinearGradient(0, 0, 400, 0);  // Horizontal gradient
-        gradientOverlay.addColorStop(0, 'rgba(26, 183, 0, 0.30)');  // Light green
-        gradientOverlay.addColorStop(0.9986, 'rgba(233, 62, 45, 0.30)');  // Light red
-
-        // Combine both gradients for the background of the line chart
-        const combinedGradient = ctx.createLinearGradient(0, 0, 400, 400);  // Diagonal blend of both gradients
-        combinedGradient.addColorStop(0, 'rgba(26, 183, 0, 0.30)');  // Light green at the left top
-        combinedGradient.addColorStop(0.5, 'rgba(245, 246, 247, 0.00)');  // Mid transparency
-        combinedGradient.addColorStop(1, 'rgba(233, 62, 45, 0.30)');  // Light red at the bottom
+        // Create the horizontal fill gradient (90deg, from left to right)
+        const gradientFill = ctx.createLinearGradient(0, 0, 400, 0);
+        gradientFill.addColorStop(0, 'rgba(26, 183, 0, 0.3)');  // Light green on the left
+        gradientFill.addColorStop(1, 'rgba(233, 62, 45, 0.3)');  // Light red on the right
 
         // Generate X-axis labels (key dates) and Y-axis data (key weights)
         const dates = generateKeyDates(months);
@@ -891,7 +881,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     labels: dates, // Key dates (start, mid, end)
                     datasets: [{
                         data: weightData, // Weight from start to target weight
-                        backgroundColor: combinedGradient, // Combined gradient for the background
+                        backgroundColor: gradientFill, // The background gradient (90deg)
                         borderColor: 'rgba(0, 150, 0, 1)', // Solid line border
                         borderWidth: 2,
                         fill: true, // Fill the area under the line
