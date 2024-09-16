@@ -867,6 +867,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Generate X-axis labels (key dates) and Y-axis data (key weights)
         const dates = generateKeyDates(months);
+        dates[0] = 'Heute'; // Replace the first date with "Heute"
         const weightData = generateKeyWeightData(startWeight, targetWeight, months);
 
         // Dot color gradient (red to green)
@@ -941,7 +942,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                 color: '#333'
                             },
                             ticks: {
-                                color: '#333'
+                                callback: function(value, index) {
+                                    // Replace the first date with "Heute" if not already set
+                                    return index === 0 ? 'Heute' : value;
+                                },
+                                color: '#333' // Color of the X-axis labels
                             },
                             grid: {
                                 display: false
