@@ -918,7 +918,6 @@ document.addEventListener('DOMContentLoaded', function () {
                             beginAtZero: false,
                             title: {
                                 display: true,
-                                text: 'Gewicht in Kg', // Y-axis title in German
                                 font: {
                                     size: 14
                                 },
@@ -936,7 +935,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Datum', // X-axis title in German
                                 font: {
                                     size: 14
                                 },
