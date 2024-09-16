@@ -860,18 +860,21 @@ document.addEventListener('DOMContentLoaded', function () {
             chartInstance.destroy();
         }
 
-        // Create gradient background
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(255, 0, 0, 0.5)');  // Red at the top
-        gradient.addColorStop(1, 'rgba(0, 255, 0, 0.5)');  // Green at the bottom
+        // Create the fill gradient for the chart
+        const gradientFill = ctx.createLinearGradient(0, 0, 0, 400);
+        gradientFill.addColorStop(0, 'rgba(245, 246, 247, 0.00)');  // From transparent
+        gradientFill.addColorStop(0.8558, '#F5F6F7');  // To greyish-white
+        const gradientOverlay = ctx.createLinearGradient(0, 0, 400, 0);
+        gradientOverlay.addColorStop(0, 'rgba(26, 183, 0, 0.30)');  // Light green
+        gradientOverlay.addColorStop(0.9986, 'rgba(233, 62, 45, 0.30)');  // Light red
 
         // Generate X-axis labels (key dates) and Y-axis data (key weights)
         const dates = generateKeyDates(months);
         const weightData = generateKeyWeightData(startWeight, targetWeight, months);
 
-        // Dot size and color gradient (red to green)
-        const pointSizes = [6, 6, 6, 6]; // Bigger to smaller
-        const pointColors = ['rgba(255, 0, 0, 1)', 'rgba(255, 165, 0, 1)', 'rgba(0, 255, 0, 1)', 'rgba(0, 255, 0, 1)']; // Red to green
+        // Dot color gradient (red to green)
+        const pointColors = ['rgba(233, 62, 45, 1)', 'rgba(255, 165, 0, 1)', 'rgba(26, 183, 0, 1)', 'rgba(26, 183, 0, 1)']; // Red to green
+        const pointSizes = [6, 6, 6, 6]; // Keep the size consistent across points
 
         // Delay chart creation slightly to ensure the canvas is fully visible
         setTimeout(() => {
@@ -881,15 +884,15 @@ document.addEventListener('DOMContentLoaded', function () {
                     labels: dates, // Key dates (start, mid, end)
                     datasets: [{
                         data: weightData, // Weight from start to target weight
-                        backgroundColor: gradient,
-                        borderColor: 'rgba(0, 150, 0, 1)', // Green border for the line
+                        backgroundColor: gradientFill,
+                        borderColor: gradientOverlay, // Gradient overlay for the line
                         borderWidth: 2,
                         fill: true, // Fill the area under the line
                         pointBackgroundColor: pointColors, // Red to green for points
                         pointBorderColor: '#fff',
                         pointHoverRadius: 8,
                         pointHoverBackgroundColor: 'rgba(0, 150, 0, 1)',
-                        pointRadius: pointSizes, // Dynamic sizes for points
+                        pointRadius: pointSizes, // Consistent size for points
                         pointHitRadius: 10
                     }]
                 },
