@@ -864,7 +864,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 data: {
                     labels: dates, // Dates from today till goal date
                     datasets: [{
-                        label: 'Gewicht in Kg',
                         data: weightData, // Weight from start to target weight
                         backgroundColor: gradient,
                         borderColor: 'rgba(0, 150, 0, 1)', // Green border for the line
@@ -926,7 +925,6 @@ document.addEventListener('DOMContentLoaded', function () {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Datum', // X-axis title in German
                                 font: {
                                     size: 14
                                 },
