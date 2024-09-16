@@ -63,6 +63,20 @@ document.getElementById("popup_kfa").addEventListener("click", function(event) {
         } else if (genderValue === "frau") {
             document.querySelector('.kfa-woman').style.display = 'block';
         }
+
+        // Add event listener to update KFA input when radio button is selected
+        const radioButtons = document.querySelectorAll('input[name^="kfa-percent-' + genderValue + '"]');
+        radioButtons.forEach(radio => {
+            radio.addEventListener("change", function() {
+                const selectedValue = this.value;
+                document.getElementById("kfa-2").value = selectedValue;
+                // Optionally, you can close the popup after selecting
+                document.querySelectorAll('.kfa-mann, .kfa-woman').forEach(popup => {
+                    popup.style.display = 'none';
+                });
+            });
+        });
+
     } else {
         // No gender selected, show a warning message (optional)
         alert("Bitte wähle dein Geschlecht aus");
@@ -77,5 +91,3 @@ document.querySelectorAll('.exit-intent-popup-close').forEach(closeButton => {
         });
     });
 });
-
-
