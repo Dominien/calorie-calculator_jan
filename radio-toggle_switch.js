@@ -52,7 +52,7 @@ document.getElementById("popup_kfa").addEventListener("click", function(event) {
     console.log("Selected gender:", selectedGender ? selectedGender.value : "None");
 
     if (selectedGender) {
-        const genderValue = selectedGender.value.toLowerCase(); // Lowercase 'Mann' and 'frau' to match class names
+        const genderValue = selectedGender.value.toLowerCase(); // Ensure lowercase comparison
 
         // Hide all popups first
         document.querySelectorAll('.kfa-mann, .kfa-woman').forEach(popup => {
@@ -61,34 +61,36 @@ document.getElementById("popup_kfa").addEventListener("click", function(event) {
         });
 
         // Show the correct popup based on selected gender
+        let popupToShow;
         if (genderValue === "mann") {
-            document.querySelector('.kfa-mann').style.display = 'block';
+            popupToShow = document.querySelector('.kfa-mann');
             console.log("Showing male popup");
         } else if (genderValue === "frau") {
-            document.querySelector('.kfa-woman').style.display = 'block';
+            popupToShow = document.querySelector('.kfa-woman');
             console.log("Showing female popup");
         }
+        
+        if (popupToShow) {
+            popupToShow.style.display = 'block';
+            // Now, ensure radio buttons inside the popup are selected properly
+            const radioButtons = popupToShow.querySelectorAll('input[type="radio"]');
+            console.log("Found radio buttons:", radioButtons.length);
 
-        // Add event listener to update KFA input when a radio button is selected
-        // Radio button query based on gender, ensure it matches
-        const radioButtons = document.querySelectorAll(`input[name="kfa-percent-${genderValue}"]`);
-        console.log("Found radio buttons for gender:", radioButtons);
-
-        radioButtons.forEach(radio => {
-            console.log("Adding event listener to radio button:", radio.value);
-            radio.addEventListener("change", function() {
-                const selectedValue = this.value;
-                console.log("Radio button selected:", selectedValue);
-                document.getElementById("kfa-2").value = selectedValue;
-                console.log("Updated KFA input value to:", selectedValue);
-                
-                // Optionally, you can close the popup after selecting
-                document.querySelectorAll('.kfa-mann, .kfa-woman').forEach(popup => {
-                    popup.style.display = 'none';
+            // Add event listener to each radio button
+            radioButtons.forEach(radio => {
+                console.log("Adding event listener to radio button with value:", radio.value);
+                radio.addEventListener("change", function() {
+                    const selectedValue = this.value;
+                    console.log("Radio button selected:", selectedValue);
+                    document.getElementById("kfa-2").value = selectedValue;
+                    console.log("Updated KFA input value to:", selectedValue);
+                    
+                    // Close popup after selecting (optional)
+                    popupToShow.style.display = 'none';
                     console.log("Closing popup after selection");
                 });
             });
-        });
+        }
 
     } else {
         // No gender selected, show a warning message (optional)
