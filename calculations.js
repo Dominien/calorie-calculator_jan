@@ -951,6 +951,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const resultValues = getResultValues();
         if (resultValues) {
             generateResultChart(resultValues.startingWeight, resultValues.targetWeightValue, resultValues.monthsValue);
+            showCanvas(); // Show canvas only after chart is generated
         }
     }
 
@@ -958,8 +959,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const berechnenButton = document.getElementById('check-inputs'); // Assuming this is the button you mentioned
     berechnenButton.addEventListener('click', function (event) {
         event.preventDefault();
-        checkAndGenerateChart(); // Generate the chart
-        showCanvas(); // Make the chart visible
+        checkAndGenerateChart(); // Generate the chart and show canvas
     });
 
 });
