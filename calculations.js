@@ -813,28 +813,40 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
 
-    // Function to generate dates from today to the target date
-    function generateDates(numMonths) {
+    // Function to generate 4 key points from the start date to the target date
+    function generateKeyDates(numMonths) {
         const dates = [];
         let currentDate = new Date();
 
-        for (let i = 0; i <= numMonths; i++) {
-            dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
-            currentDate.setMonth(currentDate.getMonth() + 1);
-        }
+        // Calculate the intervals for the 4 key points (start, mid1, mid2, end)
+        const interval = Math.floor(numMonths / 3);
+
+        dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
+        currentDate.setMonth(currentDate.getMonth() + interval);
+
+        dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
+        currentDate.setMonth(currentDate.getMonth() + interval);
+
+        dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
+        currentDate.setMonth(currentDate.getMonth() + (numMonths - 2 * interval));
+
+        // Add the final date (end date)
+        dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
 
         return dates;
     }
 
-    // Function to generate the weight data points (linear progression from start to target weight)
-    function generateWeightData(startWeight, targetWeight, months) {
+    // Function to generate 4 weight data points (start, mid1, mid2, target weight)
+    function generateKeyWeightData(startWeight, targetWeight, months) {
         const weightData = [];
         const weightLossPerMonth = (startWeight - targetWeight) / months;
 
-        for (let i = 0; i <= months; i++) {
-            const currentWeight = startWeight - weightLossPerMonth * i;
-            weightData.push(currentWeight.toFixed(1)); // Keep 1 decimal place for weight
-        }
+        const interval = Math.floor(months / 3);
+
+        weightData.push(startWeight.toFixed(1));
+        weightData.push((startWeight - weightLossPerMonth * interval).toFixed(1));
+        weightData.push((startWeight - weightLossPerMonth * interval * 2).toFixed(1));
+        weightData.push(targetWeight.toFixed(1));
 
         return weightData;
     }
@@ -853,39 +865,38 @@ document.addEventListener('DOMContentLoaded', function () {
         gradient.addColorStop(0, 'rgba(255, 0, 0, 0.5)');  // Red at the top
         gradient.addColorStop(1, 'rgba(0, 255, 0, 0.5)');  // Green at the bottom
 
-        // Generate X-axis labels (dates) and Y-axis data (weights)
-        const dates = generateDates(months);
-        const weightData = generateWeightData(startWeight, targetWeight, months);
+        // Generate X-axis labels (key dates) and Y-axis data (key weights)
+        const dates = generateKeyDates(months);
+        const weightData = generateKeyWeightData(startWeight, targetWeight, months);
+
+        // Dot size and color gradient (red to green)
+        const pointSizes = [10, 8, 6, 4]; // Bigger to smaller
+        const pointColors = ['rgba(255, 0, 0, 1)', 'rgba(255, 165, 0, 1)', 'rgba(255, 255, 0, 1)', 'rgba(0, 255, 0, 1)']; // Red to green
 
         // Delay chart creation slightly to ensure the canvas is fully visible
         setTimeout(() => {
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dates, // Dates from today till goal date
+                    labels: dates, // Key dates (start, mid, end)
                     datasets: [{
                         data: weightData, // Weight from start to target weight
                         backgroundColor: gradient,
                         borderColor: 'rgba(0, 150, 0, 1)', // Green border for the line
                         borderWidth: 2,
                         fill: true, // Fill the area under the line
-                        pointBackgroundColor: ['red', 'orange', 'green'], // Different point colors
+                        pointBackgroundColor: pointColors, // Red to green for points
                         pointBorderColor: '#fff',
-                        pointHoverRadius: 6,
+                        pointHoverRadius: 8,
                         pointHoverBackgroundColor: 'rgba(0, 150, 0, 1)',
-                        pointRadius: 5,
+                        pointRadius: pointSizes, // Dynamic sizes for points
                         pointHitRadius: 10
                     }]
                 },
                 options: {
                     plugins: {
                         title: {
-                            display: true,
-                            text: 'Gewichtsverlust über die Zeit', // Chart title in German
-                            font: {
-                                size: 18
-                            },
-                            color: '#333'
+                            display: false, // Remove the top headline
                         },
                         tooltip: {
                             callbacks: {
@@ -925,6 +936,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         x: {
                             title: {
                                 display: true,
+                                text: 'Datum', // X-axis title in German
                                 font: {
                                     size: 14
                                 },
