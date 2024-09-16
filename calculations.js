@@ -758,10 +758,20 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to validate inputs and show warnings if any are missing or invalid
     function validateInputs() {
         let isValid = true;
-
+    
+        // Validate gender selection
+        const selectedGender = document.querySelector('input[name="geschlecht"]:checked');
+        const genderWarning = document.querySelector('.text-warning.gender');
+        if (!selectedGender) {
+            genderWarning.style.display = 'block'; // Show warning if no gender is selected
+            isValid = false;
+        } else {
+            genderWarning.style.display = 'none'; // Hide warning if gender is selected
+        }
+    
         // Get selected calculation method
         const calculationMethod = getSelectedCalculationMethod();
-
+    
         // Validate inputs based on calculation method
         if (calculationMethod === 'miflin') {
             // Validate Age
@@ -773,7 +783,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 ageWarning.style.display = 'none';
             }
-
+    
             // Validate Height
             const heightInput = document.getElementById('height-2');
             const heightWarning = heightInput.closest('.input-wrapper-calc').querySelector('.text-warning');
@@ -783,7 +793,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 heightWarning.style.display = 'none';
             }
-
+    
             // Validate Weight (weight-2)
             const weightWarning = weightInputElementMiflin.closest('.input-wrapper-calc').querySelector('.text-warning');
             if (weightInputElementMiflin.value.trim() === '' || parseFloat(weightInputElementMiflin.value) <= 0) {
@@ -801,7 +811,7 @@ document.addEventListener('DOMContentLoaded', function () {
             } else {
                 weightWarning.style.display = 'none';
             }
-
+    
             // Validate KFA (kfa-2)
             const kfaInput = document.getElementById('kfa-2');
             const kfaWarning = kfaInput.closest('.input-wrapper-calc').querySelector('.text-warning');
@@ -812,7 +822,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 kfaWarning.style.display = 'none';
             }
         }
-
+    
         // Validate Wunschgewicht
         if (wunschgewichtInput.value.trim() === '' || parseFloat(wunschgewichtInput.value) <= 0) {
             wunschgewichtWarning.style.display = 'block'; // Show warning if empty or invalid
@@ -820,7 +830,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else {
             wunschgewichtWarning.style.display = 'none';
         }
-
+    
         // Validate weight loss goal selection (Abnehmziel)
         const selectedValue = Array.from(radios).find(radio => radio.checked);
         const abnehmzielWarning = document.querySelector('.wrapper-abnehmziel .text-warning.here');
@@ -834,9 +844,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 abnehmzielWarning.style.display = 'none';
             }
         }
-
+    
         return isValid;
     }
+    
 
     // Unified function to handle total calorie updates and weight loss results
     function updateResults() {
