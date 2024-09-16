@@ -45,34 +45,46 @@ document.addEventListener('DOMContentLoaded', function() {
 
 document.getElementById("popup_kfa").addEventListener("click", function(event) {
     event.preventDefault(); // Prevent default anchor behavior
+    console.log("Popup button clicked");
 
     // Check which gender is selected
     const selectedGender = document.querySelector('input[name="geschlecht"]:checked');
-    
+    console.log("Selected gender:", selectedGender ? selectedGender.value : "None");
+
     if (selectedGender) {
         const genderValue = selectedGender.value;
 
         // Hide all popups first
         document.querySelectorAll('.kfa-mann, .kfa-woman').forEach(popup => {
             popup.style.display = 'none';
+            console.log("Hiding popup:", popup.classList);
         });
 
         // Show the correct popup based on selected gender
         if (genderValue === "Mann") {
             document.querySelector('.kfa-mann').style.display = 'block';
+            console.log("Showing male popup");
         } else if (genderValue === "frau") {
             document.querySelector('.kfa-woman').style.display = 'block';
+            console.log("Showing female popup");
         }
 
         // Add event listener to update KFA input when radio button is selected
         const radioButtons = document.querySelectorAll('input[name^="kfa-percent-' + genderValue + '"]');
+        console.log("Found radio buttons for gender:", radioButtons);
+
         radioButtons.forEach(radio => {
+            console.log("Adding event listener to radio button:", radio.value);
             radio.addEventListener("change", function() {
                 const selectedValue = this.value;
+                console.log("Radio button selected:", selectedValue);
                 document.getElementById("kfa-2").value = selectedValue;
+                console.log("Updated KFA input value to:", selectedValue);
+                
                 // Optionally, you can close the popup after selecting
                 document.querySelectorAll('.kfa-mann, .kfa-woman').forEach(popup => {
                     popup.style.display = 'none';
+                    console.log("Closing popup after selection");
                 });
             });
         });
@@ -80,14 +92,18 @@ document.getElementById("popup_kfa").addEventListener("click", function(event) {
     } else {
         // No gender selected, show a warning message (optional)
         alert("Bitte wähle dein Geschlecht aus");
+        console.log("No gender selected");
     }
 });
 
 // Close popup when .exit-intent-popup-close is clicked
 document.querySelectorAll('.exit-intent-popup-close').forEach(closeButton => {
     closeButton.addEventListener("click", function() {
+        console.log("Exit popup close button clicked");
         document.querySelectorAll('.kfa-mann, .kfa-woman').forEach(popup => {
             popup.style.display = 'none';
+            console.log("Popup closed");
         });
     });
 });
+
