@@ -762,7 +762,6 @@ document.addEventListener('DOMContentLoaded', function () {
     initializeListeners();
 });
 
-
 document.addEventListener('DOMContentLoaded', function () {
     // Select necessary DOM elements for span results, inputs, and wrapper
     const zielKcalElement = document.querySelector('.span-result.ziel-kcal');
@@ -895,8 +894,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 options: {
                     plugins: {
+                        legend: {
+                            display: false // This removes the legend
+                        },
                         title: {
-                            display: false, // Remove the top headline
+                            display: false // Remove the top headline
                         },
                         tooltip: {
                             callbacks: {
