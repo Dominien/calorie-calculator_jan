@@ -670,7 +670,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to hide the gender warning on selection
     function hideGenderWarning() {
-        genderWarning.style.display = 'none'; // Hide the warning when a gender is selected
+        genderWarning.style.display = 'none'; 
+        validateAndCalculate(); // Trigger validation and update calculation when input changes
     }
 
     // Add event listeners to gender buttons
@@ -693,6 +694,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const handler = () => {
             if (inputElement.value.trim() !== '' && parseFloat(inputElement.value) > 0) {
                 warningElement.style.display = 'none'; // Hide the warning if the input is valid
+                validateAndCalculate(); // Trigger validation and update calculation when input changes
             }
         };
         inputElement.addEventListener('input', handler);
@@ -708,9 +710,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 inputElement.value = sliderValue;
                 if (sliderValue > 0) {
                     warningElement.style.display = 'none'; 
+                    validateAndCalculate(); // Trigger validation and update calculation when input changes
                 }
-                const event = new Event('input', { bubbles: true });
-                inputElement.dispatchEvent(event);
             });
             observer.observe(handleTextElement, { childList: true, characterData: true, subtree: true });
         }
@@ -740,6 +741,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Hide the warning if the input is valid
             if (sliderValue > 0) {
                 ageWarningElement.style.display = 'none';
+                validateAndCalculate(); // Trigger validation and update calculation when input changes
             }
         });
         observer.observe(ageHandleTextElement, { childList: true, characterData: true, subtree: true });
@@ -762,19 +764,17 @@ document.addEventListener('DOMContentLoaded', function () {
     function validateInputs() {
         let isValid = true;
     
-        // Validate gender selection or check if one of the buttons has the 'active' class
         const selectedGender = document.querySelector('input[name="geschlecht"]:checked');
         const hasActiveClass = womanButton.classList.contains('active') || manButton.classList.contains('active');
     
         if (!selectedGender && !hasActiveClass) {
-            genderWarning.style.display = 'block'; // Show warning if no gender is selected and no active class
+            genderWarning.style.display = 'block';
             isValid = false;
         } else {
-            genderWarning.style.display = 'none'; // Hide warning if gender is selected or one has active class
+            genderWarning.style.display = 'none';
         }
 
         const calculationMethod = getSelectedCalculationMethod();
-        // Additional input validation logic for miflin and kfa
         if (calculationMethod === 'miflin') {
             const ageInput = document.getElementById('age-2');
             const ageWarning = ageInput.closest('.input-wrapper-calc').querySelector('.text-warning');
@@ -820,7 +820,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Validate Wunschgewicht
         if (wunschgewichtInput.value.trim() === '' || parseFloat(wunschgewichtInput.value) <= 0) {
             wunschgewichtWarning.style.display = 'block'; 
             isValid = false;
@@ -828,7 +827,6 @@ document.addEventListener('DOMContentLoaded', function () {
             wunschgewichtWarning.style.display = 'none';
         }
 
-        // Validate weight loss goal selection (Abnehmziel)
         const selectedValue = Array.from(radios).find(radio => radio.checked);
         const abnehmzielWarning = document.querySelector('.wrapper-abnehmziel .text-warning.here');
         if (!selectedValue) {
@@ -965,6 +963,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         updateResults();
+    }
+
+    // Function to trigger validation and calculation automatically
+    function validateAndCalculate() {
+        if (validateInputs()) {
+            updateResults();
+        }
     }
 
     initializeListeners();
