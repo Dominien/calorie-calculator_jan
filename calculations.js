@@ -861,8 +861,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Create the horizontal fill gradient (90deg, from left to right)
         const gradientFill = ctx.createLinearGradient(0, 0, 400, 0);
-        gradientFill.addColorStop(0, 'rgba(26, 183, 0, 0.3)');  // Light green on the left
         gradientFill.addColorStop(1, 'rgba(233, 62, 45, 0.3)');  // Light red on the right
+        gradientFill.addColorStop(0, 'rgba(26, 183, 0, 0.3)');  // Light green on the left
+      
 
         // Generate X-axis labels (key dates) and Y-axis data (key weights)
         const dates = generateKeyDates(months);
