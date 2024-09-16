@@ -759,14 +759,20 @@ document.addEventListener('DOMContentLoaded', function () {
     function validateInputs() {
         let isValid = true;
     
-        // Validate gender selection
+        // Validate gender selection or check if one of the buttons has the 'active' class
         const selectedGender = document.querySelector('input[name="geschlecht"]:checked');
         const genderWarning = document.querySelector('.text-warning.gender');
-        if (!selectedGender) {
-            genderWarning.style.display = 'block'; // Show warning if no gender is selected
+        const womanButton = document.querySelector('.woman-button.right');
+        const manButton = document.querySelector('.woman-button.man');
+    
+        // Check if either of the gender buttons has the 'active' class
+        const hasActiveClass = womanButton.classList.contains('active') || manButton.classList.contains('active');
+    
+        if (!selectedGender && !hasActiveClass) {
+            genderWarning.style.display = 'block'; // Show warning if no gender is selected and no active class
             isValid = false;
         } else {
-            genderWarning.style.display = 'none'; // Hide warning if gender is selected
+            genderWarning.style.display = 'none'; // Hide warning if gender is selected or one has active class
         }
     
         // Get selected calculation method
@@ -847,6 +853,7 @@ document.addEventListener('DOMContentLoaded', function () {
     
         return isValid;
     }
+    
     
 
     // Unified function to handle total calorie updates and weight loss results
