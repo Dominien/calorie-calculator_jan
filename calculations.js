@@ -862,9 +862,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Create the fill gradient for the chart
         const gradientFill = ctx.createLinearGradient(0, 0, 0, 400);
-        gradientFill.addColorStop(0, 'rgba(245, 246, 247, 0.00)');  // From transparent
-        gradientFill.addColorStop(0.8558, '#F5F6F7');  // To greyish-white
-        const gradientOverlay = ctx.createLinearGradient(0, 0, 400, 0);
+        gradientFill.addColorStop(0, 'rgba(245, 246, 247, 0.00)');  // Transparent
+        gradientFill.addColorStop(0.8558, '#F5F6F7');  // Greyish white
+
+        const gradientOverlay = ctx.createLinearGradient(400, 0, 0, 0); // Adjusted for left-to-right fill
         gradientOverlay.addColorStop(0, 'rgba(26, 183, 0, 0.30)');  // Light green
         gradientOverlay.addColorStop(0.9986, 'rgba(233, 62, 45, 0.30)');  // Light red
 
