@@ -926,20 +926,20 @@ document.addEventListener('DOMContentLoaded', function () {
         if (zielKalorienElement) zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : '0';
         if (zielKcalElement) zielKcalElement.textContent = targetCalories > 0 ? targetCalories : '0'; 
 
-        if (targetCalories < grundUmsatzValue) {
-            if (warningMessageElement) {
+        if (warningMessageElement) {
+            if (targetCalories < grundUmsatzValue) {
                 warningMessageElement.style.display = 'flex';
                 const warningMessage = warningMessageElement.querySelector('.warning-message');
                 if (warningMessage) {
                     warningMessage.textContent = `Warnhinweis: Nicht weniger als ${grundUmsatzValue} kcal essen, da dies dein Grundumsatz ist.`;
                 }
+            } else {
+                warningMessageElement.style.display = 'none';
             }
-        } else {
-            if (warningMessageElement) warningMessageElement.style.display = 'none';
         }
 
         if (fettAbnahmeElement) fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2); 
-        if (defizitElement) defizitElement.textContent = calorieDeficitPerDay.toString(); 
+        if (defizitElement) defizitElement.textContent = calorieDeficitPerDay; 
 
         const totalWeightToLose = currentWeight - targetWeight;
         const totalCaloricDeficitNeeded = totalWeightToLose * 7700;
@@ -947,9 +947,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const weeksToReachGoal = Math.round(daysToReachGoal / 7);
         const monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
 
-        if (weeksElement) weeksElement.textContent = weeksToReachGoal.toString();
-        if (monthsElement) monthsElement.textContent = monthsToReachGoal.toString();
-        if (targetWeightResultElement) targetWeightResultElement.textContent = targetWeight.toString();
+        if (weeksElement) weeksElement.textContent = weeksToReachGoal;
+        if (monthsElement) monthsElement.textContent = monthsToReachGoal;
+        if (targetWeightResultElement) targetWeightResultElement.textContent = targetWeight;
     }
 
     // Function to initialize event listeners
