@@ -25,8 +25,6 @@ document.addEventListener('DOMContentLoaded', function () {
     // Hide steps result by default if value is 0
     stepsWrapperResult.style.display = 'none';
 
-
-    
     // Gender selection
     genderInputs.forEach(input => {
         input.addEventListener('change', () => {
