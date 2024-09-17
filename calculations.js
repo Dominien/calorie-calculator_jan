@@ -423,6 +423,236 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+document.addEventListener('DOMContentLoaded', function () {
+    // Select necessary DOM elements for span results, inputs, and wrapper
+    const zielKcalElement = document.querySelector('.span-result.ziel-kcal');
+    const weeksElement = document.querySelector('.span-result.weeks');
+    const monthsElement = document.querySelector('.span-result.months');
+    const targetWeightElement = document.querySelector('.span-result.target-weight');
+    const chartCanvas = document.getElementById('resultChart'); // Chart canvas element
+    const wrapperCanvas = document.querySelector('.wrapper-canvas'); // Wrapper that starts hidden
+
+    // Weight input fields
+    const mifflinWeightInput = document.getElementById('weight-2'); // Mifflin input field
+    const kfaWeightInput = document.getElementById('weight-3-kfa'); // KFA input field
+
+    // Radio buttons to check which calculation method is selected
+    const calcMethodMifflin = document.getElementById('miflin'); // Radio button for Mifflin method
+    const calcMethodKfa = document.getElementById('kfa'); // Radio button for KFA method
+
+    let chartInstance; // To store the chart instance for re-rendering
+
+    // Function to make the canvas wrapper visible (when button is clicked)
+    function showCanvas() {
+        wrapperCanvas.style.display = 'block';
+    }
+
+    // Function to get the starting weight based on the selected calculation method
+    function getStartingWeight() {
+        if (calcMethodMifflin.checked) {
+            return parseFloat(mifflinWeightInput.value) || 0;
+        } else if (calcMethodKfa.checked) {
+            return parseFloat(kfaWeightInput.value) || 0;
+        }
+        return 0;
+    }
+
+    // Function to get the span values
+    function getResultValues() {
+        const zielKcalValue = parseFloat(zielKcalElement.textContent);
+        const weeksValue = parseFloat(weeksElement.textContent);
+        const monthsValue = parseFloat(monthsElement.textContent);
+        const targetWeightValue = parseFloat(targetWeightElement.textContent);
+
+        const startingWeight = getStartingWeight();
+
+        // Ensure all values and starting weight are greater than 0
+        if (zielKcalValue > 0 && weeksValue > 0 && monthsValue > 0 && targetWeightValue > 0 && startingWeight > 0) {
+            return { startingWeight, targetWeightValue, monthsValue };
+        }
+        return null;
+    }
+
+    // Function to generate 4 key points from the start date to the target date
+    function generateKeyDates(numMonths) {
+        const dates = [];
+        let currentDate = new Date();
+
+        // Calculate the intervals for the 4 key points (start, mid1, mid2, end)
+        const interval = Math.floor(numMonths / 3);
+
+        dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
+        currentDate.setMonth(currentDate.getMonth() + interval);
+
+        dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
+        currentDate.setMonth(currentDate.getMonth() + interval);
+
+        dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
+        currentDate.setMonth(currentDate.getMonth() + (numMonths - 2 * interval));
+
+        // Add the final date (end date)
+        dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
+
+        return dates;
+    }
+
+    // Function to generate 4 weight data points (start, mid1, mid2, target weight)
+    function generateKeyWeightData(startWeight, targetWeight, months) {
+        const weightData = [];
+        const weightLossPerMonth = (startWeight - targetWeight) / months;
+
+        const interval = Math.floor(months / 3);
+
+        weightData.push(startWeight.toFixed(1));
+        weightData.push((startWeight - weightLossPerMonth * interval).toFixed(1));
+        weightData.push((startWeight - weightLossPerMonth * interval * 2).toFixed(1));
+        weightData.push(targetWeight.toFixed(1));
+
+        return weightData;
+    }
+
+    // Function to generate or update the chart using Chart.js
+    function generateResultChart(startWeight, targetWeight, months) {
+        const ctx = chartCanvas.getContext('2d');
+
+        // If a chart already exists, destroy it before creating a new one
+        if (chartInstance) {
+            chartInstance.destroy();
+        }
+
+        // Create the horizontal fill gradient (90deg, starting with red on the left and green on the right)
+        const gradientFill = ctx.createLinearGradient(0, 0, 400, 0);
+        gradientFill.addColorStop(0, 'rgba(233, 62, 45, 0.3)');  // Light red on the left
+        gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');  // Light green on the right
+
+        // Generate X-axis labels (key dates) and Y-axis data (key weights)
+        const dates = generateKeyDates(months);
+        const weightData = generateKeyWeightData(startWeight, targetWeight, months);
+
+        // Dot color gradient (red to green)
+        const pointColors = ['rgba(233, 62, 45, 1)', 'rgba(255, 165, 0, 1)', 'rgba(26, 183, 0, 1)', 'rgba(26, 183, 0, 1)']; // Red to green
+        const pointSizes = [6, 6, 6, 6]; // Keep the size consistent across points
+
+        // Delay chart creation slightly to ensure the canvas is fully visible
+        setTimeout(() => {
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates, // Key dates (start, mid, end)
+                    datasets: [{
+                        data: weightData, // Weight from start to target weight
+                        backgroundColor: gradientFill, // The background gradient (red to green)
+                        borderColor: 'rgba(0, 150, 0, 1)', // Solid line border
+                        borderWidth: 2,
+                        fill: true, // Fill the area under the line
+                        pointBackgroundColor: pointColors, // Red to green for points
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: 'rgba(0, 150, 0, 1)',
+                        pointRadius: pointSizes, // Consistent size for points
+                        pointHitRadius: 10
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: false // This removes the legend
+                        },
+                        title: {
+                            display: false // Remove the top headline
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return 'Gewicht: ' + tooltipItem.raw + ' Kg';
+                                },
+                                title: function(tooltipItem) {
+                                    const label = tooltipItem[0].label;
+                                    return label;
+                                }
+                            },
+                            backgroundColor: 'rgba(0, 150, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                font: {
+                                    size: 14
+                                },
+                                color: '#333'
+                            },
+                            ticks: {
+                                color: '#333',
+                                stepSize: 5 // Set the Y-axis step size
+                            },
+                            grid: {
+                                display: true,
+                                color: 'rgba(200, 200, 200, 0.2)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                font: {
+                                    size: 14
+                                },
+                                color: '#333'
+                            },
+                            ticks: {
+                                callback: function(value, index) {
+                                    // Replace the first date with "Heute"
+                                    return index === 0 ? 'Heute' : dates[index];
+                                },
+                                color: '#333' // Color of the X-axis labels
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    maintainAspectRatio: false
+                }
+            });
+        }, 100); // Delay of 100ms to ensure canvas is visible before rendering the chart
+    }
+
+    // Function to check if all values are greater than 0 and generate the chart
+    function checkAndGenerateChart() {
+        const resultValues = getResultValues();
+        if (resultValues) {
+            generateResultChart(resultValues.startingWeight, resultValues.targetWeightValue, resultValues.monthsValue);
+            showCanvas(); // Show canvas only after chart is generated
+        }
+    }
+
+    // Add event listener for the button (when clicked, display chart and generate it)
+    const berechnenButton = document.getElementById('check-inputs'); // Assuming this is the button you mentioned
+    berechnenButton.addEventListener('click', function (event) {
+        event.preventDefault();
+        checkAndGenerateChart(); // Generate the chart and show canvas
+    });
+
+    // Use MutationObserver to watch for changes in the text of the span elements
+    const targetElements = [zielKcalElement, weeksElement, monthsElement, targetWeightElement];
+
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            checkAndGenerateChart(); // Call the chart generation when text content changes
+        });
+    });
+
+    // Start observing changes in text content for the target elements
+    targetElements.forEach(element => {
+        observer.observe(element, { childList: true, subtree: true });
+    });
+
+});
+
 
 // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D
 // We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D
