@@ -1014,47 +1014,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (targetWeightResultElement) targetWeightResultElement.textContent = targetWeight.toString();
     }
 
-    // Function to initialize event listeners
-    function initializeListeners() {
-        if (totalCaloriesElement) {
-            var observer = new MutationObserver(updateResults);
-            observer.observe(totalCaloriesElement, { childList: true, subtree: true });
-        }
-
-        if (radios.length > 0) {
-            for (var i = 0; i < radios.length; i++) {
-                radios[i].addEventListener('change', function() {
-                    updateResults();
-
-                    var abnehmzielWarning = document.querySelector('.wrapper-abnehmziel .text-warning.here');
-                    if (abnehmzielWarning) {
-                        abnehmzielWarning.style.display = 'none';
-                    }
-                });
-            }
-        }
-
-        var methodRadios = document.getElementsByName('kfa-or-miflin');
-        if (methodRadios.length > 0) {
-            for (var i = 0; i < methodRadios.length; i++) {
-                methodRadios[i].addEventListener('change', function() {
-                    updateResults();
-                });
-            }
-        }
-
-        var berechnenButton = document.getElementById('check-inputs');
-        if (berechnenButton) {
-            berechnenButton.addEventListener('click', function (event) {
-                event.preventDefault();
-                if (validateInputs()) {
-                    updateResults();
-                }
-            });
-        }
-
-        updateResults();
-    }
+   
 
     initializeListeners();
 });
