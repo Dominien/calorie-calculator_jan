@@ -733,6 +733,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 var event = new Event('input', { bubbles: true });
                 inputElement.dispatchEvent(event);
             });
+            observer.observe(handleTextElement, { childList: true, characterData: true, subtree: true });
         }
     }
 
