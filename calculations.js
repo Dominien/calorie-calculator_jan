@@ -707,35 +707,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
 
-    // Function to handle live validation on input fields
-    function hideWarningOnInput(inputElement, warningElement) {
-        if (!inputElement || !warningElement) return;
-        var handler = function() {
-            if (inputElement.value.trim() !== '' && parseFloat(inputElement.value) > 0) {
-                warningElement.style.display = 'none'; // Hide the warning if the input is valid
-            }
-        };
-        inputElement.addEventListener('input', handler);
-        inputElement.addEventListener('change', handler); 
-    }
-
-    // Function to handle live validation on slider changes using MutationObserver
-    function hideWarningOnSliderInput(sliderElement, inputElement, warningElement) {
-        if (!sliderElement || !inputElement || !warningElement) return;
-        var handleTextElement = sliderElement.querySelector('.inside-handle-text');
-        if (handleTextElement) {
-            var observer = new MutationObserver(function() {
-                var sliderValue = parseFloat(handleTextElement.textContent) || 0;
-                inputElement.value = sliderValue;
-                if (sliderValue > 0) {
-                    warningElement.style.display = 'none'; 
-                }
-                var event = new Event('input', { bubbles: true });
-                inputElement.dispatchEvent(event);
-            });
-            observer.observe(handleTextElement, { childList: true, characterData: true, subtree: true });
-        }
-    }
+   
 
     // Attach validation to inputs and sliders
     function attachValidation(inputId, sliderSelector) {
