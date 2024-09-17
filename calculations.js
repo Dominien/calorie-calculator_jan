@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     const MET_VALUES = {
         'Krafttraining': 6,  // Updated MET value for Krafttraining
-        'cardio-liss': 6.66,
+        'cardio-liss': 5.8,
         'cardio-hiit': 9.52
     };
 
