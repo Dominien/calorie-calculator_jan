@@ -660,6 +660,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Cross-browser event creation function
+    function createNewEvent(eventName) {
+        var event;
+        if (typeof(Event) === 'function') {
+            event = new Event(eventName, { bubbles: true });
+        } else {
+            event = document.createEvent('Event');
+            event.initEvent(eventName, true, true);
+        }
+        return event;
+    }
+
     // Select necessary DOM elements
     var totalCaloriesElement = document.querySelector('.result-tats-chlich'); 
     var weightInputElementMiflin = document.getElementById('weight-2'); 
@@ -730,7 +742,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (sliderValue > 0) {
                     warningElement.style.display = 'none'; 
                 }
-                var event = new Event('input', { bubbles: true });
+                var event = createNewEvent('input');
                 inputElement.dispatchEvent(event);
             });
             observer.observe(handleTextElement, { childList: true, characterData: true, subtree: true });
@@ -773,6 +785,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (sliderValue > 0 && ageWarningElement) {
                 ageWarningElement.style.display = 'none';
             }
+
+            var event = createNewEvent('input');
+            ageInputElement.dispatchEvent(event);
         });
         observer.observe(ageHandleTextElement, { childList: true, characterData: true, subtree: true });
     }
@@ -792,7 +807,9 @@ document.addEventListener('DOMContentLoaded', function () {
     attachValidation('age-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-1"]');
     attachValidation('height-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]');
     attachValidation('weight-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]');
-    
+    attachValidation('weight-3-kfa', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]');
+    attachValidation('kfa-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]');
+
     // Function to validate inputs and show warnings if any are missing or invalid
     function validateInputs() {
         var isValid = true;
@@ -1056,3 +1073,4 @@ document.addEventListener('DOMContentLoaded', function () {
 
     initializeListeners();
 });
+
