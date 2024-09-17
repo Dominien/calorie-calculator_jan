@@ -803,7 +803,12 @@ document.addEventListener('DOMContentLoaded', function () {
         hideWarningOnInput(wunschgewichtInput, wunschgewichtWarning);
     }
 
-    
+    // Attach validation to inputs and sliders
+    attachValidation('age-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-1"]');
+    attachValidation('height-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]');
+    attachValidation('weight-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]');
+    attachValidation('weight-3-kfa', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]');
+    attachValidation('kfa-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]');
 
     // Function to validate inputs and show warnings if any are missing or invalid
     function validateInputs() {
