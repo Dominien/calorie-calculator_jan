@@ -749,7 +749,21 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-   
+    // Attach validation to inputs and sliders
+    function attachValidation(inputId, sliderSelector) {
+        var inputElement = document.getElementById(inputId);
+        if (!inputElement) return;
+        var closestWrapper = inputElement.closest('.input-wrapper-calc');
+        var warningElement = null;
+        if (closestWrapper) {
+            warningElement = closestWrapper.querySelector('.text-warning');
+        }
+        hideWarningOnInput(inputElement, warningElement);
+        var sliderElement = document.querySelector(sliderSelector);
+        if (sliderElement) {
+            hideWarningOnSliderInput(sliderElement, inputElement, warningElement);
+        }
+    }
 
     // Add event listener specifically for age-2 handle text
     var ageHandleTextElement = document.getElementById('age-2_handle-text');
@@ -789,12 +803,7 @@ document.addEventListener('DOMContentLoaded', function () {
         hideWarningOnInput(wunschgewichtInput, wunschgewichtWarning);
     }
 
-    // Attach validation to inputs and sliders
-    attachValidation('age-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-1"]');
-    attachValidation('height-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]');
-    attachValidation('weight-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]');
-    attachValidation('weight-3-kfa', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]');
-    attachValidation('kfa-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]');
+    
 
     // Function to validate inputs and show warnings if any are missing or invalid
     function validateInputs() {
