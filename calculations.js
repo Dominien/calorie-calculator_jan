@@ -660,7 +660,6 @@ document.addEventListener('DOMContentLoaded', function () {
 window.onload = function() {
     // Delay the script execution by 2 milliseconds
     setTimeout(function() {
-        // Your script goes here
         // Cross-browser event creation function
         function createNewEvent(eventName) {
             var event;
@@ -671,6 +670,17 @@ window.onload = function() {
                 event.initEvent(eventName, true, true);
             }
             return event;
+        }
+
+        // Utility function to debounce the event handler
+        function debounce(fn, delay) {
+            let timeout;
+            return function() {
+                const context = this;
+                const args = arguments;
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn.apply(context, args), delay);
+            };
         }
 
         // Select necessary DOM elements
@@ -737,7 +747,7 @@ window.onload = function() {
             if (!sliderElement || !inputElement || !warningElement) return;
             var handleTextElement = sliderElement.querySelector('.inside-handle-text');
             if (handleTextElement) {
-                var observer = new MutationObserver(function() {
+                var observer = new MutationObserver(debounce(function() {
                     var sliderValue = parseFloat(handleTextElement.textContent) || 0;
                     inputElement.value = sliderValue;
                     if (sliderValue > 0) {
@@ -745,7 +755,8 @@ window.onload = function() {
                     }
                     var event = createNewEvent('input');
                     inputElement.dispatchEvent(event);
-                });
+                }, 100)); // Add 100ms debounce to avoid too many updates
+
                 observer.observe(handleTextElement, { childList: true, characterData: true, subtree: true });
             }
         }
@@ -778,7 +789,7 @@ window.onload = function() {
         }
 
         if (ageHandleTextElement && ageInputElement) {
-            var observer = new MutationObserver(function() {
+            var observer = new MutationObserver(debounce(function() {
                 var sliderValue = parseFloat(ageHandleTextElement.textContent) || 0;
                 ageInputElement.value = sliderValue;
 
@@ -789,7 +800,8 @@ window.onload = function() {
 
                 var event = createNewEvent('input');
                 ageInputElement.dispatchEvent(event);
-            });
+            }, 100)); // 100ms debounce
+
             observer.observe(ageHandleTextElement, { childList: true, characterData: true, subtree: true });
         }
 
@@ -944,6 +956,48 @@ window.onload = function() {
             return isValid;
         }
 
+        // Function to initialize event listeners and updates
+        function initializeListeners() {
+            if (totalCaloriesElement) {
+                var observer = new MutationObserver(debounce(updateResults, 100)); // Throttling results update
+                observer.observe(totalCaloriesElement, { childList: true, subtree: true });
+            }
+
+            if (radios.length > 0) {
+                for (var i = 0; i < radios.length; i++) {
+                    radios[i].addEventListener('change', function() {
+                        updateResults();
+
+                        var abnehmzielWarning = document.querySelector('.wrapper-abnehmziel .text-warning.here');
+                        if (abnehmzielWarning) {
+                            abnehmzielWarning.style.display = 'none';
+                        }
+                    });
+                }
+            }
+
+            var methodRadios = document.getElementsByName('kfa-or-miflin');
+            if (methodRadios.length > 0) {
+                for (var i = 0; i < methodRadios.length; i++) {
+                    methodRadios[i].addEventListener('change', function() {
+                        updateResults();
+                    });
+                }
+            }
+
+            var berechnenButton = document.getElementById('check-inputs');
+            if (berechnenButton) {
+                berechnenButton.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    if (validateInputs()) {
+                        updateResults();
+                    }
+                });
+            }
+
+            updateResults();
+        }
+
         // Unified function to handle total calorie updates and weight loss results
         function updateResults() {
             var calculationMethod = getSelectedCalculationMethod();
@@ -1028,48 +1082,6 @@ window.onload = function() {
             if (weeksElement) weeksElement.textContent = weeksToReachGoal.toString();
             if (monthsElement) monthsElement.textContent = monthsToReachGoal.toString();
             if (targetWeightResultElement) targetWeightResultElement.textContent = targetWeight.toString();
-        }
-
-        // Function to initialize event listeners
-        function initializeListeners() {
-            if (totalCaloriesElement) {
-                var observer = new MutationObserver(updateResults);
-                observer.observe(totalCaloriesElement, { childList: true, subtree: true });
-            }
-
-            if (radios.length > 0) {
-                for (var i = 0; i < radios.length; i++) {
-                    radios[i].addEventListener('change', function() {
-                        updateResults();
-
-                        var abnehmzielWarning = document.querySelector('.wrapper-abnehmziel .text-warning.here');
-                        if (abnehmzielWarning) {
-                            abnehmzielWarning.style.display = 'none';
-                        }
-                    });
-                }
-            }
-
-            var methodRadios = document.getElementsByName('kfa-or-miflin');
-            if (methodRadios.length > 0) {
-                for (var i = 0; i < methodRadios.length; i++) {
-                    methodRadios[i].addEventListener('change', function() {
-                        updateResults();
-                    });
-                }
-            }
-
-            var berechnenButton = document.getElementById('check-inputs');
-            if (berechnenButton) {
-                berechnenButton.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    if (validateInputs()) {
-                        updateResults();
-                    }
-                });
-            }
-
-            updateResults();
         }
 
         initializeListeners();
