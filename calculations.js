@@ -779,7 +779,7 @@ function calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPerce
         // Unified function to handle total calorie updates and weight loss results
         function updateResults() {
             var calculationMethod = getSelectedCalculationMethod();
-        
+            
             var currentWeight = 0;
             if (calculationMethod === 'miflin') {
                 currentWeight = parseFloat(weightInputElementMiflin && weightInputElementMiflin.value) || 0;
@@ -896,6 +896,7 @@ function calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPerce
         
         // Function to generate the chart
         function generateResultChart(weightData, months) {
+            const chartCanvas = document.getElementById('resultChart');
             const ctx = chartCanvas.getContext('2d');
         
             if (chartInstance) {
