@@ -1078,7 +1078,18 @@ window.onload = function() {
             var monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
 
             if (weeksElement) weeksElement.textContent = weeksToReachGoal.toString();
-            if (monthsElement) monthsElement.textContent = monthsToReachGoal.toString();
+            if (monthsElement) {
+                // Convert the value to a number
+                var monthsValue = parseFloat(monthsToReachGoal);
+            
+                // If the number is a whole number, display it without formatting, otherwise use the comma format
+                if (Number.isInteger(monthsValue)) {
+                    monthsElement.textContent = monthsValue.toString(); // Show as whole number
+                } else {
+                    monthsElement.textContent = monthsValue.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); // Show with comma for decimal
+                }
+            }
+            
             if (targetWeightResultElement) targetWeightResultElement.textContent = targetWeight.toString();
         }
 
