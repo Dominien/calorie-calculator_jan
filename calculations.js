@@ -434,6 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const calcMethodKfa = document.getElementById('kfa');
     
     let chartInstance;
+    const MAX_DOTS = 12; // Adjust this for max number of dots
 
     function showCanvas() {
         wrapperCanvas.style.display = 'block';
@@ -462,33 +463,46 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
 
-    // Generate monthly dates till Wunschgewicht is reached
+    // Generate dates evenly over the total months
     function generateKeyDates(months) {
         const dates = [];
         let currentDate = new Date();
 
+        // Generate dates spaced by months
         for (let i = 0; i <= months; i++) {
             dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
-            currentDate.setMonth(currentDate.getMonth() + 1); // Move to the next month
+            currentDate.setMonth(currentDate.getMonth() + 1);
         }
 
         console.log("Generated Dates: ", dates); // Debugging log for generated dates
         return dates;
     }
 
-    // Generate weight data points evenly till Wunschgewicht is reached
+    // Generate weight data points based on compound weight loss effect
     function generateKeyWeightData(startWeight, targetWeight, months) {
         const weightData = [];
-        const weightLossPerMonth = (startWeight - targetWeight) / months; // Evenly distribute weight loss
-
+        const weeklyWeightLossPercentage = 0.01; // Adjust this value for stronger or milder compound effect
         let currentWeight = startWeight;
 
-        for (let i = 0; i < months; i++) {
-            weightData.push(currentWeight.toFixed(1));
-            currentWeight -= weightLossPerMonth; // Apply even weight loss per month
+        const totalWeeks = Math.round(months * 4.345); // Convert months to weeks
+
+        for (let i = 0; i <= totalWeeks; i++) {
+            // Apply the compound effect (compounded weight loss percentage)
+            currentWeight -= currentWeight * weeklyWeightLossPercentage;
+
+            // Add weight data point at the end of each month
+            if (i % 4 === 0) {
+                weightData.push(currentWeight.toFixed(1));
+            }
+
+            if (currentWeight <= targetWeight) {
+                weightData.push(targetWeight.toFixed(1)); // Ensure the target weight is reached
+                break;
+            }
         }
 
-        weightData.push(targetWeight.toFixed(1)); // Ensure the last point is the target weight
+        // Ensure the last point is the target weight
+        weightData.push(targetWeight.toFixed(1));
         console.log("Generated Weight Data: ", weightData); // Debugging log for weight data
         return weightData;
     }
@@ -505,7 +519,7 @@ document.addEventListener('DOMContentLoaded', function () {
         gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');
 
         const dates = generateKeyDates(months); // Generate dates
-        const weightData = generateKeyWeightData(startWeight, targetWeight, months); // Generate weight data evenly
+        const weightData = generateKeyWeightData(startWeight, targetWeight, months); // Generate weight data with compound effect
 
         const pointColors = weightData.map((_, index) => index === 0 ? 'rgba(233, 62, 45, 1)' : 'rgba(26, 183, 0, 1)');
         const pointSizes = Array(weightData.length).fill(6); // Consistent point size
@@ -516,7 +530,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 data: {
                     labels: dates, // X-axis: monthly dates
                     datasets: [{
-                        data: weightData, // Y-axis: weight data evenly distributed
+                        data: weightData, // Y-axis: weight data
                         backgroundColor: gradientFill,
                         borderColor: 'rgba(0, 150, 0, 1)',
                         borderWidth: 2,
@@ -595,6 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(element, { childList: true, subtree: true });
     });
 });
+
 
 
 // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D
