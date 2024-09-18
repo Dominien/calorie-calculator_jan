@@ -536,6 +536,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     }]
                 },
                 options: {
+                    responsive: true, // Make the chart responsive
+                    maintainAspectRatio: false, // Allow dynamic height changes
                     plugins: {
                         legend: { display: false },
                         tooltip: {
@@ -564,8 +566,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             },
                             grid: { display: false }
                         }
-                    },
-                    maintainAspectRatio: false
+                    }
                 }
             });
         }, 100);
@@ -597,7 +598,6 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(element, { childList: true, subtree: true });
     });
 });
-
 
 
 
