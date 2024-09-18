@@ -434,7 +434,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const calcMethodKfa = document.getElementById('kfa');
     
     let chartInstance;
-    const MAX_DOTS = 10; // Targeting 10 evenly spaced dots
 
     function showCanvas() {
         wrapperCanvas.style.display = 'block';
@@ -458,48 +457,43 @@ document.addEventListener('DOMContentLoaded', function () {
         const startingWeight = getStartingWeight();
 
         if (zielKcalValue > 0 && weeksValue > 0 && monthsValue > 0 && targetWeightValue > 0 && startingWeight > 0) {
-            return { startingWeight, targetWeightValue, monthsValue, weeksValue };
+            return { startingWeight, targetWeightValue, monthsValue };
         }
         return null;
     }
 
-    // Generate evenly spaced dates across the total weeks
-    function generateKeyDates(totalWeeks) {
+    // Generate monthly dates till Wunschgewicht is reached
+    function generateKeyDates(months) {
         const dates = [];
         let currentDate = new Date();
-        const interval = Math.ceil(totalWeeks / (MAX_DOTS - 1)); // Distribute across MAX_DOTS evenly
 
-        for (let i = 0; i < MAX_DOTS; i++) {
+        for (let i = 0; i <= months; i++) {
             dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
-            currentDate.setDate(currentDate.getDate() + interval * 7); // Add interval in weeks
+            currentDate.setMonth(currentDate.getMonth() + 1); // Move to the next month
         }
 
         console.log("Generated Dates: ", dates); // Debugging log for generated dates
         return dates;
     }
 
-    // Generate the weight data points with compounding weight reduction
-    function generateKeyWeightData(startWeight, targetWeight, totalWeeks) {
+    // Generate weight data points evenly till Wunschgewicht is reached
+    function generateKeyWeightData(startWeight, targetWeight, months) {
         const weightData = [];
-        let currentWeight = startWeight;
-        const weeklyWeightLossPercentage = 0.005; // Example of a weekly weight loss percentage (adjust if needed)
+        const weightLossPerMonth = (startWeight - targetWeight) / months; // Evenly distribute weight loss
 
-        // Loop through and apply compounding weight loss
-        for (let i = 0; i < MAX_DOTS - 1; i++) {
-            weightData.push(currentWeight.toFixed(1)); // Add current weight to the data
-            currentWeight -= currentWeight * weeklyWeightLossPercentage; // Compound effect
-            if (currentWeight <= targetWeight) {
-                break; // Stop if target weight is reached
-            }
+        let currentWeight = startWeight;
+
+        for (let i = 0; i < months; i++) {
+            weightData.push(currentWeight.toFixed(1));
+            currentWeight -= weightLossPerMonth; // Apply even weight loss per month
         }
 
-        // Ensure the last point is the target weight
-        weightData.push(targetWeight.toFixed(1));
+        weightData.push(targetWeight.toFixed(1)); // Ensure the last point is the target weight
         console.log("Generated Weight Data: ", weightData); // Debugging log for weight data
         return weightData;
     }
 
-    function generateResultChart(startWeight, targetWeight, totalWeeks) {
+    function generateResultChart(startWeight, targetWeight, months) {
         const ctx = chartCanvas.getContext('2d');
 
         if (chartInstance) {
@@ -510,8 +504,8 @@ document.addEventListener('DOMContentLoaded', function () {
         gradientFill.addColorStop(0, 'rgba(233, 62, 45, 0.3)');
         gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');
 
-        const dates = generateKeyDates(totalWeeks); // Generate dates
-        const weightData = generateKeyWeightData(startWeight, targetWeight, totalWeeks); // Generate weight data with compound effect
+        const dates = generateKeyDates(months); // Generate dates
+        const weightData = generateKeyWeightData(startWeight, targetWeight, months); // Generate weight data evenly
 
         const pointColors = weightData.map((_, index) => index === 0 ? 'rgba(233, 62, 45, 1)' : 'rgba(26, 183, 0, 1)');
         const pointSizes = Array(weightData.length).fill(6); // Consistent point size
@@ -520,9 +514,9 @@ document.addEventListener('DOMContentLoaded', function () {
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dates, // X-axis: dates evenly distributed
+                    labels: dates, // X-axis: monthly dates
                     datasets: [{
-                        data: weightData, // Y-axis: weight data with compound effect
+                        data: weightData, // Y-axis: weight data evenly distributed
                         backgroundColor: gradientFill,
                         borderColor: 'rgba(0, 150, 0, 1)',
                         borderWidth: 2,
@@ -578,8 +572,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function checkAndGenerateChart() {
         const resultValues = getResultValues();
         if (resultValues) {
-            const totalWeeks = resultValues.weeksValue; // Get total weeks from the result
-            generateResultChart(resultValues.startingWeight, resultValues.targetWeightValue, totalWeeks);
+            const totalMonths = resultValues.monthsValue; // Get total months from the result
+            generateResultChart(resultValues.startingWeight, resultValues.targetWeightValue, totalMonths);
             showCanvas();
         }
     }
@@ -601,6 +595,7 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(element, { childList: true, subtree: true });
     });
 });
+
 
 // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D
 // We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D
