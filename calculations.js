@@ -500,27 +500,26 @@ function generateResultChart(startWeight, targetWeight, weeks, weeklyWeightLossP
     const ctx = chartCanvas.getContext('2d');
 
     if (chartInstance) {
-        chartInstance.destroy();
+        chartInstance.destroy(); // Destroy old chart instance if it exists
     }
 
     const gradientFill = ctx.createLinearGradient(0, 0, 400, 0);
     gradientFill.addColorStop(0, 'rgba(233, 62, 45, 0.3)');
     gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');
 
-    // Change the interval to bi-weekly or monthly data
-    const dates = generateKeyDates(weeks, 4); // Monthly intervals
-    const weightData = generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage);
+    const dates = generateKeyDates(weeks); // Generate weekly dates
+    const weightData = generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage, weeks); // Generate weight data
 
-    const pointColors = Array(weightData.length).fill('rgba(26, 183, 0, 1)');
-    const pointSizes = Array(weightData.length).fill(6); // Consistent size
+    const pointColors = weightData.map((_, index) => index === 0 ? 'rgba(233, 62, 45, 1)' : 'rgba(26, 183, 0, 1)');
+    const pointSizes = Array(weightData.length).fill(6); // Consistent point size
 
     setTimeout(() => {
         chartInstance = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: dates,
+                labels: dates, // X-axis: weekly dates
                 datasets: [{
-                    data: weightData,
+                    data: weightData, // Y-axis: weight data
                     backgroundColor: gradientFill,
                     borderColor: 'rgba(0, 150, 0, 1)',
                     borderWidth: 2,
@@ -531,21 +530,15 @@ function generateResultChart(startWeight, targetWeight, weeks, weeklyWeightLossP
                     pointHoverBackgroundColor: 'rgba(0, 150, 0, 1)',
                     pointRadius: pointSizes,
                     pointHitRadius: 10,
-                    tension: 0.4, // Smoothing the curve
                 }]
             },
             options: {
                 plugins: {
                     legend: { display: false },
-                    title: { display: false },
                     tooltip: {
                         callbacks: {
-                            label: function (tooltipItem) {
+                            label: function(tooltipItem) {
                                 return 'Gewicht: ' + tooltipItem.raw + ' Kg';
-                            },
-                            title: function (tooltipItem) {
-                                const label = tooltipItem[0].label;
-                                return label;
                             }
                         },
                         backgroundColor: 'rgba(0, 150, 0, 0.8)',
@@ -556,16 +549,12 @@ function generateResultChart(startWeight, targetWeight, weeks, weeklyWeightLossP
                 scales: {
                     y: {
                         beginAtZero: false,
-                        min: startWeight - 5, // Adjust the Y axis to zoom
-                        max: targetWeight + 5,
-                        title: { display: true, font: { size: 14 }, color: '#333' },
-                        ticks: { color: '#333', stepSize: 2 }, // Smaller steps for zoom
-                        grid: { display: true, color: 'rgba(200, 200, 200, 0.2)' }
+                        ticks: { stepSize: 5, color: '#333' },
+                        grid: { color: 'rgba(200, 200, 200, 0.2)' }
                     },
                     x: {
-                        title: { display: true, font: { size: 14 }, color: '#333' },
                         ticks: {
-                            callback: function (value, index) {
+                            callback: function(value, index) {
                                 return index === 0 ? 'Heute' : dates[index];
                             },
                             color: '#333'
@@ -578,7 +567,6 @@ function generateResultChart(startWeight, targetWeight, weeks, weeklyWeightLossP
         });
     }, 100);
 }
-
 
 
     function checkAndGenerateChart() {
