@@ -420,7 +420,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
-
 document.addEventListener('DOMContentLoaded', function () {
     const zielKcalElement = document.querySelector('.span-result.ziel-kcal');
     const weeksElement = document.querySelector('.span-result.weeks');
@@ -435,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const calcMethodKfa = document.getElementById('kfa');
     
     let chartInstance;
-    const MAX_DOTS = 12; // Maximum number of points
+    const MAX_DOTS = 10; // Targeting 10 evenly spaced dots
 
     function showCanvas() {
         wrapperCanvas.style.display = 'block';
@@ -464,11 +463,11 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
 
-    // Generate dates that are evenly distributed for up to MAX_DOTS
+    // Generate evenly spaced dates across the total weeks
     function generateKeyDates(totalWeeks) {
         const dates = [];
         let currentDate = new Date();
-        const interval = Math.ceil(totalWeeks / (MAX_DOTS - 1)); // Even distribution across MAX_DOTS
+        const interval = Math.ceil(totalWeeks / (MAX_DOTS - 1)); // Distribute across MAX_DOTS evenly
 
         for (let i = 0; i < MAX_DOTS; i++) {
             dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
@@ -479,37 +478,24 @@ document.addEventListener('DOMContentLoaded', function () {
         return dates;
     }
 
-    // Generate the weight data points evenly spaced to match the generated dates
-    function generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage, totalWeeks) {
+    // Generate the weight data points with smooth weight reduction
+    function generateKeyWeightData(startWeight, targetWeight, totalWeeks) {
         const weightData = [];
+        const weightLossPerDot = (startWeight - targetWeight) / (MAX_DOTS - 1); // Calculate weight loss per dot evenly
+
         let currentWeight = startWeight;
-        const interval = Math.ceil(totalWeeks / (MAX_DOTS - 1)); // Calculate interval for smooth weight reduction
 
         for (let i = 0; i < MAX_DOTS - 1; i++) {
             weightData.push(currentWeight.toFixed(1));
-
-            let remainingWeight = currentWeight - targetWeight;
-            let stepWeightLoss = remainingWeight * weeklyWeightLossPercentage;
-
-            for (let j = 0; j < interval; j++) {
-                currentWeight -= stepWeightLoss;
-                if (currentWeight <= targetWeight) {
-                    currentWeight = targetWeight; // Smoothly converge to target weight
-                    break;
-                }
-            }
-
-            if (currentWeight === targetWeight) {
-                break;
-            }
+            currentWeight -= weightLossPerDot; // Apply equal weight loss per dot
         }
 
-        weightData.push(targetWeight.toFixed(1)); // Ensure the final point is the target weight
+        weightData.push(targetWeight.toFixed(1)); // Ensure the last point is the target weight
         console.log("Generated Weight Data: ", weightData); // Debugging log for weight data
         return weightData;
     }
 
-    function generateResultChart(startWeight, targetWeight, totalWeeks, weeklyWeightLossPercentage) {
+    function generateResultChart(startWeight, targetWeight, totalWeeks) {
         const ctx = chartCanvas.getContext('2d');
 
         if (chartInstance) {
@@ -521,7 +507,7 @@ document.addEventListener('DOMContentLoaded', function () {
         gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');
 
         const dates = generateKeyDates(totalWeeks); // Generate dates
-        const weightData = generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage, totalWeeks); // Generate weight data
+        const weightData = generateKeyWeightData(startWeight, targetWeight, totalWeeks); // Generate weight data
 
         const pointColors = weightData.map((_, index) => index === 0 ? 'rgba(233, 62, 45, 1)' : 'rgba(26, 183, 0, 1)');
         const pointSizes = Array(weightData.length).fill(6); // Consistent point size
@@ -588,8 +574,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function checkAndGenerateChart() {
         const resultValues = getResultValues();
         if (resultValues) {
-            const weeklyWeightLossPercentage = 0.005; // Example percentage (change as needed)
-            generateResultChart(resultValues.startingWeight, resultValues.targetWeightValue, resultValues.weeksValue, weeklyWeightLossPercentage);
+            const totalWeeks = resultValues.weeksValue; // Get total weeks from the result
+            generateResultChart(resultValues.startingWeight, resultValues.targetWeightValue, totalWeeks);
             showCanvas();
         }
     }
@@ -611,9 +597,6 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(element, { childList: true, subtree: true });
     });
 });
-
-
-
 
 
 
