@@ -458,122 +458,124 @@ document.addEventListener('DOMContentLoaded', function () {
         const startingWeight = getStartingWeight();
 
         if (zielKcalValue > 0 && weeksValue > 0 && monthsValue > 0 && targetWeightValue > 0 && startingWeight > 0) {
-            return { startingWeight, targetWeightValue, monthsValue, weeksValue };
+            return { startingWeight, targetWeightValue, monthsValue };
         }
         return null;
     }
 
-    // Generate weekly dates for better granularity in the graph
-    function generateKeyDates(weeks) {
+    // Generate monthly dates for better granularity in the graph
+    function generateKeyDates(months) {
         const dates = [];
         let currentDate = new Date();
 
-        for (let i = 0; i <= weeks; i++) {
+        // Loop through each month
+        for (let i = 0; i <= months; i++) {
             dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
-            currentDate.setDate(currentDate.getDate() + 7); // Add 7 days for each week
+            currentDate.setMonth(currentDate.getMonth() + 1); // Add 1 month for each iteration
         }
 
         return dates;
     }
 
     // Generate the weight data points based on weekly intervals and the compound weight loss effect
-function generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage, weeks) {
-    const weightData = [];
-    let currentWeight = startWeight;
-    
-    // Loop through each week and calculate the weight using the compound weight loss formula
-    for (let i = 0; i <= weeks; i++) {
-        weightData.push(currentWeight.toFixed(1));
-        currentWeight -= currentWeight * weeklyWeightLossPercentage; // Apply compound effect
-        if (currentWeight <= targetWeight) {
-            weightData.push(targetWeight.toFixed(1)); // Ensure target weight is added
-            break;
-        }
-    }
-    
-    return weightData;
-}
+    function generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage, months) {
+        const weightData = [];
+        let currentWeight = startWeight;
+        
+        // Loop through each month (simulating weekly changes internally)
+        const totalWeeks = Math.round(months * 4.345); // Convert months to weeks
 
-    
-
-function generateResultChart(startWeight, targetWeight, weeks, weeklyWeightLossPercentage) {
-    const ctx = chartCanvas.getContext('2d');
-
-    if (chartInstance) {
-        chartInstance.destroy(); // Destroy old chart instance if it exists
-    }
-
-    const gradientFill = ctx.createLinearGradient(0, 0, 400, 0);
-    gradientFill.addColorStop(0, 'rgba(233, 62, 45, 0.3)');
-    gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');
-
-    const dates = generateKeyDates(weeks); // Generate weekly dates
-    const weightData = generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage, weeks); // Generate weight data
-
-    const pointColors = weightData.map((_, index) => index === 0 ? 'rgba(233, 62, 45, 1)' : 'rgba(26, 183, 0, 1)');
-    const pointSizes = Array(weightData.length).fill(6); // Consistent point size
-
-    setTimeout(() => {
-        chartInstance = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: dates, // X-axis: weekly dates
-                datasets: [{
-                    data: weightData, // Y-axis: weight data
-                    backgroundColor: gradientFill,
-                    borderColor: 'rgba(0, 150, 0, 1)',
-                    borderWidth: 2,
-                    fill: true,
-                    pointBackgroundColor: pointColors,
-                    pointBorderColor: '#fff',
-                    pointHoverRadius: 8,
-                    pointHoverBackgroundColor: 'rgba(0, 150, 0, 1)',
-                    pointRadius: pointSizes,
-                    pointHitRadius: 10,
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(tooltipItem) {
-                                return 'Gewicht: ' + tooltipItem.raw + ' Kg';
-                            }
-                        },
-                        backgroundColor: 'rgba(0, 150, 0, 0.8)',
-                        titleColor: '#fff',
-                        bodyColor: '#fff'
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        ticks: { stepSize: 5, color: '#333' },
-                        grid: { color: 'rgba(200, 200, 200, 0.2)' }
-                    },
-                    x: {
-                        ticks: {
-                            callback: function(value, index) {
-                                return index === 0 ? 'Heute' : dates[index];
-                            },
-                            color: '#333'
-                        },
-                        grid: { display: false }
-                    }
-                },
-                maintainAspectRatio: false
+        for (let i = 0; i <= totalWeeks; i++) {
+            if (i % 4 === 0) { // Add a data point every month
+                weightData.push(currentWeight.toFixed(1));
             }
-        });
-    }, 100);
-}
+            currentWeight -= currentWeight * weeklyWeightLossPercentage; // Apply compound effect
+            if (currentWeight <= targetWeight) {
+                weightData.push(targetWeight.toFixed(1)); // Ensure target weight is added
+                break;
+            }
+        }
+        
+        return weightData;
+    }
 
+    function generateResultChart(startWeight, targetWeight, months, weeklyWeightLossPercentage) {
+        const ctx = chartCanvas.getContext('2d');
+
+        if (chartInstance) {
+            chartInstance.destroy(); // Destroy old chart instance if it exists
+        }
+
+        const gradientFill = ctx.createLinearGradient(0, 0, 400, 0);
+        gradientFill.addColorStop(0, 'rgba(233, 62, 45, 0.3)');
+        gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');
+
+        const dates = generateKeyDates(months); // Generate monthly dates
+        const weightData = generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage, months); // Generate weight data
+
+        const pointColors = weightData.map((_, index) => index === 0 ? 'rgba(233, 62, 45, 1)' : 'rgba(26, 183, 0, 1)');
+        const pointSizes = Array(weightData.length).fill(6); // Consistent point size
+
+        setTimeout(() => {
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates, // X-axis: monthly dates
+                    datasets: [{
+                        data: weightData, // Y-axis: weight data
+                        backgroundColor: gradientFill,
+                        borderColor: 'rgba(0, 150, 0, 1)',
+                        borderWidth: 2,
+                        fill: true,
+                        pointBackgroundColor: pointColors,
+                        pointBorderColor: '#fff',
+                        pointHoverRadius: 8,
+                        pointHoverBackgroundColor: 'rgba(0, 150, 0, 1)',
+                        pointRadius: pointSizes,
+                        pointHitRadius: 10,
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return 'Gewicht: ' + tooltipItem.raw + ' Kg';
+                                }
+                            },
+                            backgroundColor: 'rgba(0, 150, 0, 0.8)',
+                            titleColor: '#fff',
+                            bodyColor: '#fff'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            ticks: { stepSize: 5, color: '#333' },
+                            grid: { color: 'rgba(200, 200, 200, 0.2)' }
+                        },
+                        x: {
+                            ticks: {
+                                callback: function(value, index) {
+                                    return index === 0 ? 'Heute' : dates[index];
+                                },
+                                color: '#333'
+                            },
+                            grid: { display: false }
+                        }
+                    },
+                    maintainAspectRatio: false
+                }
+            });
+        }, 100);
+    }
 
     function checkAndGenerateChart() {
         const resultValues = getResultValues();
         if (resultValues) {
             const weeklyWeightLossPercentage = 0.005; // Example percentage (change as needed)
-            generateResultChart(resultValues.startingWeight, resultValues.targetWeightValue, resultValues.weeksValue, weeklyWeightLossPercentage);
+            generateResultChart(resultValues.startingWeight, resultValues.targetWeightValue, resultValues.monthsValue, weeklyWeightLossPercentage);
             showCanvas();
         }
     }
@@ -595,6 +597,7 @@ function generateResultChart(startWeight, targetWeight, weeks, weeklyWeightLossP
         observer.observe(element, { childList: true, subtree: true });
     });
 });
+
 
 
 
