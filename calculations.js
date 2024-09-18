@@ -477,21 +477,20 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Generate the weight data points based on weekly intervals and the compound weight loss effect
-    function generateKeyWeightData(startWeight, targetWeight, weeks, weeklyWeightLossPercentage) {
+    function generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage) {
         const weightData = [];
         let currentWeight = startWeight;
-
-        for (let i = 0; i <= weeks; i++) {
+        
+        // Loop for every week until the target weight is reached
+        while (currentWeight > targetWeight) {
             weightData.push(currentWeight.toFixed(1));
-            currentWeight -= currentWeight * weeklyWeightLossPercentage; // Apply compound effect
-            if (currentWeight <= targetWeight) {
-                weightData.push(targetWeight.toFixed(1)); // Ensure final target weight
-                break;
-            }
+            currentWeight -= currentWeight * weeklyWeightLossPercentage; // Compound weight loss
         }
-
+        weightData.push(targetWeight.toFixed(1)); // Ensure target weight is included
+        
         return weightData;
     }
+    
 
     function generateResultChart(startWeight, targetWeight, weeks, weeklyWeightLossPercentage) {
         const ctx = chartCanvas.getContext('2d');
