@@ -379,49 +379,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Select necessary DOM elements
-    const grundumsatzElement = document.getElementById('grund-right');
-    const alltagsbewegungElement = document.getElementById('altag-right');
-    const aktivesTrainingElement = document.getElementById('active-right');
-    const totalCaloriesElement = document.querySelector('.result-tats-chlich');
-    const nahrungsverbrennungElement = document.getElementById('nahrungsburn');
-
-    const fallbackCalories = 1280; // Fallback if no Grundumsatz is provided yet
-
-    // Function to update the total actual calorie burn
-    function updateActualCalories() {
-        const grundumsatz = parseInt(grundumsatzElement.textContent, 10) || 0;
-        const alltagsbewegung = parseInt(alltagsbewegungElement.textContent, 10) || 0;
-        const aktivesTraining = parseInt(aktivesTrainingElement.textContent, 10) || 0;
-
-        // If Grundumsatz is available, use it; otherwise, use fallback (1280 kcal)
-        const baseCalories = grundumsatz || fallbackCalories;
-
-        const totalCalories = baseCalories + alltagsbewegung + aktivesTraining;
-        totalCaloriesElement.textContent = `${totalCalories}`;
-
-        calculateNahrungsverbrennung(totalCalories);
-    }
-
-    // Function to calculate Nahrungsverbrennung
-    function calculateNahrungsverbrennung(totalCalories) {
-        const nahrungsverbrennung = totalCalories * 0.08; // 8% of total calories
-        nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)} kcal`;
-    }
-
-    // Set initial value of totalCaloriesElement to the fallback value (1280 kcal) on page load
-    totalCaloriesElement.textContent = `${fallbackCalories}`;
-
-    // Add listeners to the text fields for changes
-    [grundumsatzElement, alltagsbewegungElement, aktivesTrainingElement].forEach(element => {
-        const observer = new MutationObserver(updateActualCalories);
-        observer.observe(element, { childList: true, subtree: true }); // Observe changes to the text content
-    });
-
-});
-
-
-document.addEventListener('DOMContentLoaded', function () {
     const zielKcalElement = document.querySelector('.span-result.ziel-kcal');
     const weeksElement = document.querySelector('.span-result.weeks');
     const monthsElement = document.querySelector('.span-result.months');
@@ -477,22 +434,21 @@ document.addEventListener('DOMContentLoaded', function () {
         return dates;
     }
 
-    // Generate the weight data points based on weekly intervals and the compound weight loss effect
+    // Generate the weight data points based on monthly intervals and the compound weight loss effect
     function generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage, months) {
         const weightData = [];
         let currentWeight = startWeight;
-        
+
         // Loop through each month (simulating weekly changes internally)
         const totalWeeks = Math.round(months * 4.345); // Convert months to weeks
 
         for (let i = 0; i <= totalWeeks; i++) {
-            if (i % 4 === 0) { // Add a data point every month
+            if (i % 4 === 0 || i === totalWeeks) { // Add a data point every month, and ensure last data point is added
                 weightData.push(currentWeight.toFixed(1));
             }
             currentWeight -= currentWeight * weeklyWeightLossPercentage; // Apply compound effect
             if (currentWeight <= targetWeight) {
-                weightData.push(targetWeight.toFixed(1)); // Ensure target weight is added
-                break;
+                currentWeight = targetWeight; // Ensure the weight does not drop below target
             }
         }
         
@@ -562,7 +518,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 callback: function(value, index) {
                                     return index === 0 ? 'Heute' : dates[index];
                                 },
-                                color: '#333'
+                                color: '#333',
+                                autoSkip: false, // Ensure all labels are shown
                             },
                             grid: { display: false }
                         }
@@ -598,6 +555,7 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(element, { childList: true, subtree: true });
     });
 });
+
 
 
 
