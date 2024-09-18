@@ -1068,7 +1068,7 @@ window.onload = function() {
                 }
             }
 
-            if (fettAbnahmeElement) fettAbnahmeElement.textContent = weeklyWeightLossKg.toFixed(2); 
+            if (fettAbnahmeElement) fettAbnahmeElement.textContent = weeklyWeightLossKg.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             if (defizitElement) defizitElement.textContent = calorieDeficitPerDay.toString(); 
 
             var totalWeightToLose = currentWeight - targetWeight;
