@@ -379,49 +379,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Select necessary DOM elements
-    const grundumsatzElement = document.getElementById('grund-right');
-    const alltagsbewegungElement = document.getElementById('altag-right');
-    const aktivesTrainingElement = document.getElementById('active-right');
-    const totalCaloriesElement = document.querySelector('.result-tats-chlich');
-    const nahrungsverbrennungElement = document.getElementById('nahrungsburn');
-
-    const fallbackCalories = 1280; // Fallback if no Grundumsatz is provided yet
-
-    // Function to update the total actual calorie burn
-    function updateActualCalories() {
-        const grundumsatz = parseInt(grundumsatzElement.textContent, 10) || 0;
-        const alltagsbewegung = parseInt(alltagsbewegungElement.textContent, 10) || 0;
-        const aktivesTraining = parseInt(aktivesTrainingElement.textContent, 10) || 0;
-
-        // If Grundumsatz is available, use it; otherwise, use fallback (1280 kcal)
-        const baseCalories = grundumsatz || fallbackCalories;
-
-        const totalCalories = baseCalories + alltagsbewegung + aktivesTraining;
-        totalCaloriesElement.textContent = `${totalCalories}`;
-
-        calculateNahrungsverbrennung(totalCalories);
-    }
-
-    // Function to calculate Nahrungsverbrennung
-    function calculateNahrungsverbrennung(totalCalories) {
-        const nahrungsverbrennung = totalCalories * 0.08; // 8% of total calories
-        nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)} kcal`;
-    }
-
-    // Set initial value of totalCaloriesElement to the fallback value (1280 kcal) on page load
-    totalCaloriesElement.textContent = `${fallbackCalories}`;
-
-    // Add listeners to the text fields for changes
-    [grundumsatzElement, alltagsbewegungElement, aktivesTrainingElement].forEach(element => {
-        const observer = new MutationObserver(updateActualCalories);
-        observer.observe(element, { childList: true, subtree: true }); // Observe changes to the text content
-    });
-
-});
-
-
-document.addEventListener('DOMContentLoaded', function () {
     const zielKcalElement = document.querySelector('.span-result.ziel-kcal');
     const weeksElement = document.querySelector('.span-result.weeks');
     const monthsElement = document.querySelector('.span-result.months');
@@ -435,7 +392,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const calcMethodKfa = document.getElementById('kfa');
     
     let chartInstance;
-    const MAX_DOTS = 10; // Maximum number of dots to display
+    const MAX_DOTS = 12; // Maximum number of points
 
     function showCanvas() {
         wrapperCanvas.style.display = 'block';
@@ -464,37 +421,37 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
 
-    // Generate evenly spaced dates with a maximum of 10 points
-    function generateKeyDates(weeks) {
+    // Generate dates that are evenly distributed for up to MAX_DOTS
+    function generateKeyDates(totalWeeks) {
         const dates = [];
         let currentDate = new Date();
-        const interval = Math.ceil(weeks / (MAX_DOTS - 1)); // Calculate the interval for even distribution of dates
+        const interval = Math.ceil(totalWeeks / (MAX_DOTS - 1)); // Even distribution across MAX_DOTS
 
         for (let i = 0; i < MAX_DOTS; i++) {
             dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
-            currentDate.setDate(currentDate.getDate() + interval * 7); // Add the interval in weeks
+            currentDate.setDate(currentDate.getDate() + interval * 7); // Add interval in weeks
         }
 
+        console.log("Generated Dates: ", dates); // Debugging log for generated dates
         return dates;
     }
 
-    // Generate the weight data points based on evenly spaced intervals and the compound weight loss effect
-    function generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage, weeks) {
+    // Generate the weight data points evenly spaced to match the generated dates
+    function generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage, totalWeeks) {
         const weightData = [];
         let currentWeight = startWeight;
-        const interval = Math.ceil(weeks / (MAX_DOTS - 1)); // Interval to distribute data points evenly
+        const interval = Math.ceil(totalWeeks / (MAX_DOTS - 1)); // Calculate interval for smooth weight reduction
 
-        for (let i = 0; i < MAX_DOTS; i++) {
+        for (let i = 0; i < MAX_DOTS - 1; i++) {
             weightData.push(currentWeight.toFixed(1));
 
             let remainingWeight = currentWeight - targetWeight;
             let stepWeightLoss = remainingWeight * weeklyWeightLossPercentage;
 
             for (let j = 0; j < interval; j++) {
-                // Adapt the weight reduction to slow down as it approaches the target
                 currentWeight -= stepWeightLoss;
                 if (currentWeight <= targetWeight) {
-                    currentWeight = targetWeight;  // Ensure smooth convergence to target
+                    currentWeight = targetWeight; // Smoothly converge to target weight
                     break;
                 }
             }
@@ -504,15 +461,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Ensure the last point is the target weight, without a step jump
-        if (currentWeight > targetWeight) {
-            weightData.push(targetWeight.toFixed(1));
-        }
-
+        weightData.push(targetWeight.toFixed(1)); // Ensure the final point is the target weight
+        console.log("Generated Weight Data: ", weightData); // Debugging log for weight data
         return weightData;
     }
 
-    function generateResultChart(startWeight, targetWeight, weeks, weeklyWeightLossPercentage) {
+    function generateResultChart(startWeight, targetWeight, totalWeeks, weeklyWeightLossPercentage) {
         const ctx = chartCanvas.getContext('2d');
 
         if (chartInstance) {
@@ -523,8 +477,8 @@ document.addEventListener('DOMContentLoaded', function () {
         gradientFill.addColorStop(0, 'rgba(233, 62, 45, 0.3)');
         gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');
 
-        const dates = generateKeyDates(weeks); // Generate evenly spaced dates
-        const weightData = generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage, weeks); // Generate weight data
+        const dates = generateKeyDates(totalWeeks); // Generate dates
+        const weightData = generateKeyWeightData(startWeight, targetWeight, weeklyWeightLossPercentage, totalWeeks); // Generate weight data
 
         const pointColors = weightData.map((_, index) => index === 0 ? 'rgba(233, 62, 45, 1)' : 'rgba(26, 183, 0, 1)');
         const pointSizes = Array(weightData.length).fill(6); // Consistent point size
@@ -533,7 +487,7 @@ document.addEventListener('DOMContentLoaded', function () {
             chartInstance = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: dates, // X-axis: spaced dates
+                    labels: dates, // X-axis: dates evenly distributed
                     datasets: [{
                         data: weightData, // Y-axis: weight data
                         backgroundColor: gradientFill,
@@ -575,14 +529,16 @@ document.addEventListener('DOMContentLoaded', function () {
                                 callback: function(value, index) {
                                     return index === 0 ? 'Heute' : dates[index];
                                 },
-                                color: '#333',
-                                autoSkip: false, // Ensure every tick is shown
+                                color: '#333'
                             },
                             grid: { display: false }
                         }
                     }
                 }
             });
+
+            // Log the final chart data for debugging
+            console.log("Final Chart Data: ", chartInstance.data.datasets[0].data);
         }, 100);
     }
 
