@@ -897,6 +897,12 @@ function calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPerce
         
         // Function to generate the chart
         function generateResultChart(weightData, months) {
+            // Set wrapper-canvas display to block if it isn't already
+    const wrapperCanvas = document.querySelector('.wrapper-canvas');
+    if (wrapperCanvas && getComputedStyle(wrapperCanvas).display !== 'block') {
+        wrapperCanvas.style.display = 'block';
+    }
+
             const chartCanvas = document.getElementById('resultChart');
             const ctx = chartCanvas.getContext('2d');
         
