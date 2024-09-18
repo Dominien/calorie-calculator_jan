@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const calcMethodKfa = document.getElementById('kfa');
     
     let chartInstance;
-    const MAX_DOTS = 12;
+    const MAX_DOTS = 12; // Adjust this for max number of dots
 
     function showCanvas() {
         wrapperCanvas.style.display = 'block';
@@ -464,43 +464,45 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Generate dates evenly over the total months
-    function generateKeyDates(totalMonths) {
+    function generateKeyDates(months) {
         const dates = [];
         let currentDate = new Date();
 
         // Generate dates spaced by months
-        for (let i = 0; i <= totalMonths; i++) {
+        for (let i = 0; i <= months; i++) {
             dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
-            currentDate.setMonth(currentDate.getMonth() + 1); // Add a month for each interval
+            currentDate.setMonth(currentDate.getMonth() + 1);
         }
 
         console.log("Generated Dates: ", dates); // Debugging log for generated dates
         return dates;
     }
 
-    // Generate weight data points based on compound effect and target weight
+    // Generate weight data points based on compound weight loss effect
     function generateKeyWeightData(startWeight, targetWeight, months) {
         const weightData = [];
-        const weeklyWeightLossPercentage = 0.01; // Compound effect
+        const weeklyWeightLossPercentage = 0.01; // Adjust this value for stronger or milder compound effect
         let currentWeight = startWeight;
 
         const totalWeeks = Math.round(months * 4.345); // Convert months to weeks
-        let weightLossPerDot;
 
-        for (let i = 0; i < totalWeeks; i++) {
-            currentWeight -= currentWeight * weeklyWeightLossPercentage; // Apply compound weight loss
+        for (let i = 0; i <= totalWeeks; i++) {
+            // Apply the compound effect (compounded weight loss percentage)
+            currentWeight -= currentWeight * weeklyWeightLossPercentage;
 
-            if (i % Math.floor(totalWeeks / (MAX_DOTS - 1)) === 0 || i === totalWeeks - 1) {
-                // Ensure final data point is added, even if it's at the last step
+            // Add weight data point at the end of each month
+            if (i % 4 === 0) {
                 weightData.push(currentWeight.toFixed(1));
             }
 
             if (currentWeight <= targetWeight) {
-                weightData.push(targetWeight.toFixed(1));
+                weightData.push(targetWeight.toFixed(1)); // Ensure the target weight is reached
                 break;
             }
         }
 
+        // Ensure the last point is the target weight
+        weightData.push(targetWeight.toFixed(1));
         console.log("Generated Weight Data: ", weightData); // Debugging log for weight data
         return weightData;
     }
@@ -607,6 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(element, { childList: true, subtree: true });
     });
 });
+
 
 
 // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D
