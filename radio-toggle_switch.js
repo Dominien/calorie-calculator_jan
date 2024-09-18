@@ -9,8 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
     kfaInput.style.display = 'none';
 
     // Add transition for smoother showing/hiding
-    miflinInput.style.transition = 'opacity 0.5s ease';
-    kfaInput.style.transition = 'opacity 0.5s ease';
+    miflinInput.style.transition = 'opacity 0.2s ease';
+    kfaInput.style.transition = 'opacity 0.2s ease';
 
     // Function to show the correct input block based on the selected radio button
     function toggleInputs() {
@@ -121,8 +121,8 @@ function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransitio
     const percentage = ((value - min) / (max - min)) * 100;
 
     // Apply transition if needed
-    handle.style.transition = withTransition ? 'left 0.3s ease' : 'none';
-    fill.style.transition = withTransition ? 'width 0.3s ease' : 'none';
+    handle.style.transition = withTransition ? 'left 0.2s ease' : 'none';
+    fill.style.transition = withTransition ? 'width 0.2s ease' : 'none';
 
     // Set handle and fill to a max of 100% and a min of 0%
     handle.style.left = `${Math.min(Math.max(percentage, 0), 100)}%`;
