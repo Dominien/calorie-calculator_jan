@@ -890,16 +890,17 @@ window.onload = function() {
                 }
             }
 
-            // Validate Wunschgewicht
-            // Add live validation for Wunschgewicht (since it may not have a slider)
-            var wunschgewichtInput = document.getElementById('wunschgewicht');
-            var wunschgewichtWarning = null;
-            if (!wunschgewichtInput || wunschgewichtInput.value.trim() === '' || parseFloat(wunschgewichtInput.value) <= 0) {
-                if (wunschgewichtWarning) wunschgewichtWarning.style.display = 'block'; 
-                isValid = false;
-            } else {
-                if (wunschgewichtWarning) wunschgewichtWarning.style.display = 'none';
+              // Add live validation for Wunschgewicht (since it may not have a slider)
+        var wunschgewichtInput = document.getElementById('wunschgewicht');
+        var wunschgewichtWarning = null;
+        if (wunschgewichtInput) {
+            var wunschgewichtClosestWrapper = wunschgewichtInput.closest('.input-wrapper-calc');
+            if (wunschgewichtClosestWrapper) {
+                wunschgewichtWarning = wunschgewichtClosestWrapper.querySelector('.text-warning');
             }
+            hideWarningOnInput(wunschgewichtInput, wunschgewichtWarning);
+        }
+
 
             // Validate weight loss goal selection (Abnehmziel)
             var selectedValue = null;
@@ -1039,6 +1040,8 @@ window.onload = function() {
         initializeListeners();
     }, 2); // 2 milliseconds delay
 };
+
+
 
 
 
