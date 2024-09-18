@@ -997,101 +997,109 @@ window.onload = function() {
         }
 
         // Unified function to handle total calorie updates and weight loss results
-        function updateResults() {
-            var calculationMethod = getSelectedCalculationMethod();
+        // Unified function to handle total calorie updates and weight loss results
+function updateResults() {
+    var calculationMethod = getSelectedCalculationMethod();
 
-            var currentWeight = 0;
-            if (calculationMethod === 'miflin') {
-                currentWeight = parseFloat(weightInputElementMiflin && weightInputElementMiflin.value) || 0;
-            } else if (calculationMethod === 'kfa') {
-                currentWeight = parseFloat(weightInputElementKfa && weightInputElementKfa.value) || 0;
-            }
+    var currentWeight = 0;
+    if (calculationMethod === 'miflin') {
+        currentWeight = parseFloat(weightInputElementMiflin && weightInputElementMiflin.value) || 0;
+    } else if (calculationMethod === 'kfa') {
+        currentWeight = parseFloat(weightInputElementKfa && weightInputElementKfa.value) || 0;
+    }
 
-            var targetWeight = parseFloat(targetWeightElement && targetWeightElement.value) || 0;
-            var totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
-            var totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0;
+    var targetWeight = parseFloat(targetWeightElement && targetWeightElement.value) || 0;
+    var totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
+    var totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0;
 
-            var grundUmsatzText = grundUmsatzElement ? grundUmsatzElement.textContent : '';
-            var grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0;
+    var grundUmsatzText = grundUmsatzElement ? grundUmsatzElement.textContent : '';
+    var grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0;
 
-            var selectedValue = null;
-            for (var i = 0; i < radios.length; i++) {
-                if (radios[i].checked) {
-                    selectedValue = radios[i].value;
-                    break;
-                }
-            }
-
-            if (
-                isNaN(totalCaloriesValue) || totalCaloriesValue <= 0 ||
-                isNaN(currentWeight) || currentWeight <= 0 ||
-                isNaN(grundUmsatzValue) || grundUmsatzValue <= 0 ||
-                isNaN(targetWeight) || targetWeight <= 0 ||
-                !selectedValue
-            ) {
-                if (defizitElement) defizitElement.textContent = '0';
-                if (fettAbnahmeElement) fettAbnahmeElement.textContent = '0';
-                if (weeksElement) weeksElement.textContent = '0';
-                if (monthsElement) monthsElement.textContent = '0';
-                if (targetWeightResultElement) targetWeightResultElement.textContent = '0';
-                if (zielKcalElement) zielKcalElement.textContent = '0';
-                if (zielKalorienElement) zielKalorienElement.textContent = '0';
-                if (warningMessageElement) warningMessageElement.style.display = 'none';
-                return;
-            }
-
-            var weeklyWeightLossPercentage = 0;
-            if (selectedValue === 'Langsames Abnehmen') {
-                weeklyWeightLossPercentage = 0.005;
-            } else if (selectedValue === 'Moderates Abnehmen') {
-                weeklyWeightLossPercentage = 0.0075;
-            } else if (selectedValue === 'Schnelles Abnehmen') {
-                weeklyWeightLossPercentage = 0.01;
-            }
-
-            var weeklyWeightLossKg = currentWeight * weeklyWeightLossPercentage;
-            var calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
-            var targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay);
-
-            if (zielKalorienElement) zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : '0';
-            if (zielKcalElement) zielKcalElement.textContent = targetCalories > 0 ? targetCalories : '0'; 
-
-            if (warningMessageElement) {
-                if (targetCalories < grundUmsatzValue) {
-                    warningMessageElement.style.display = 'flex';
-                    var warningMessage = warningMessageElement.querySelector('.warning-message');
-                    if (warningMessage) {
-                        warningMessage.textContent = 'Warnhinweis: Nicht weniger als ' + grundUmsatzValue + ' kcal essen, da dies dein Grundumsatz ist.';
-                    }
-                } else {
-                    warningMessageElement.style.display = 'none';
-                }
-            }
-
-            if (fettAbnahmeElement) fettAbnahmeElement.textContent = weeklyWeightLossKg.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            if (defizitElement) defizitElement.textContent = calorieDeficitPerDay.toString(); 
-
-            var totalWeightToLose = currentWeight - targetWeight;
-            var totalCaloricDeficitNeeded = totalWeightToLose * 7700;
-            var daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
-            var weeksToReachGoal = Math.round(daysToReachGoal / 7);
-            var monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
-
-            if (weeksElement) weeksElement.textContent = weeksToReachGoal.toString();
-            if (monthsElement) {
-                // Convert the value to a number
-                var monthsValue = parseFloat(monthsToReachGoal);
-            
-                // If the number is a whole number, display it without formatting, otherwise use the comma format
-                if (Number.isInteger(monthsValue)) {
-                    monthsElement.textContent = monthsValue.toString(); // Show as whole number
-                } else {
-                    monthsElement.textContent = monthsValue.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); // Show with comma for decimal
-                }
-            }
-            
-            if (targetWeightResultElement) targetWeightResultElement.textContent = targetWeight.toString();
+    var selectedValue = null;
+    for (var i = 0; i < radios.length; i++) {
+        if (radios[i].checked) {
+            selectedValue = radios[i].value;
+            break;
         }
+    }
+
+    if (
+        isNaN(totalCaloriesValue) || totalCaloriesValue <= 0 ||
+        isNaN(currentWeight) || currentWeight <= 0 ||
+        isNaN(grundUmsatzValue) || grundUmsatzValue <= 0 ||
+        isNaN(targetWeight) || targetWeight <= 0 ||
+        !selectedValue
+    ) {
+        if (defizitElement) defizitElement.textContent = '0';
+        if (fettAbnahmeElement) fettAbnahmeElement.textContent = '0';
+        if (weeksElement) weeksElement.textContent = '0';
+        if (monthsElement) monthsElement.textContent = '0';
+        if (targetWeightResultElement) targetWeightResultElement.textContent = '0';
+        if (zielKcalElement) zielKcalElement.textContent = '0';
+        if (zielKalorienElement) zielKalorienElement.textContent = '0';
+        if (warningMessageElement) warningMessageElement.style.display = 'none';
+        return;
+    }
+
+    var weeklyWeightLossPercentage = 0;
+    if (selectedValue === 'Langsames Abnehmen') {
+        weeklyWeightLossPercentage = 0.005;
+    } else if (selectedValue === 'Moderates Abnehmen') {
+        weeklyWeightLossPercentage = 0.0075;
+    } else if (selectedValue === 'Schnelles Abnehmen') {
+        weeklyWeightLossPercentage = 0.01;
+    }
+
+    // Function to calculate weeks to reach goal using compound weight loss formula
+    function calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPercentage) {
+        let weeks = 0;
+        while (currentWeight > targetWeight) {
+            currentWeight -= currentWeight * weeklyWeightLossPercentage; // Compound weight loss
+            weeks++;
+        }
+        return weeks;
+    }
+
+    // Calculate weeks to reach the goal using compound weight loss
+    var weeksToReachGoal = calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPercentage);
+    var monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1); // Convert weeks to months
+
+    if (weeksElement) weeksElement.textContent = weeksToReachGoal.toString();
+    if (monthsElement) {
+        var monthsValue = parseFloat(monthsToReachGoal);
+        if (Number.isInteger(monthsValue)) {
+            monthsElement.textContent = monthsValue.toString();
+        } else {
+            monthsElement.textContent = monthsValue.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+        }
+    }
+
+    if (targetWeightResultElement) targetWeightResultElement.textContent = targetWeight.toString();
+
+    // Calculate the calorie deficit based on the last week's weight loss
+    var lastWeekWeightLossKg = currentWeight * weeklyWeightLossPercentage;
+    var calorieDeficitPerDay = Math.round((lastWeekWeightLossKg * 7700) / 7);
+    var targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay);
+
+    if (zielKalorienElement) zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : '0';
+    if (zielKcalElement) zielKcalElement.textContent = targetCalories > 0 ? targetCalories : '0';
+
+    if (warningMessageElement) {
+        if (targetCalories < grundUmsatzValue) {
+            warningMessageElement.style.display = 'flex';
+            var warningMessage = warningMessageElement.querySelector('.warning-message');
+            if (warningMessage) {
+                warningMessage.textContent = 'Warnhinweis: Nicht weniger als ' + grundUmsatzValue + ' kcal essen, da dies dein Grundumsatz ist.';
+            }
+        } else {
+            warningMessageElement.style.display = 'none';
+        }
+    }
+
+    if (fettAbnahmeElement) fettAbnahmeElement.textContent = lastWeekWeightLossKg.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    if (defizitElement) defizitElement.textContent = calorieDeficitPerDay.toString();
+}
+
 
         initializeListeners();
     }, 2); // 2 milliseconds delay
