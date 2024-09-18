@@ -432,9 +432,34 @@ document.addEventListener('DOMContentLoaded', function () {
     const kfaWeightInput = document.getElementById('weight-3-kfa');
     const calcMethodMifflin = document.getElementById('miflin');
     const calcMethodKfa = document.getElementById('kfa');
-    
+
     let chartInstance;
-    const MAX_DOTS = 12; // Adjust this for max number of dots
+
+    // Get the radio buttons for the weight loss speed
+    const slowWeightLossRadio = document.getElementById('Langsames-Abnehmen');
+    const moderateWeightLossRadio = document.getElementById('Moderates-Abnehmen');
+    const fastWeightLossRadio = document.getElementById('Schnelles-Abnehmen');
+
+    let weeklyWeightLossPercentage = 0.01; // Default to moderate
+
+    // Set the weekly weight loss percentage based on user selection
+    function setWeeklyWeightLossPercentage() {
+        if (slowWeightLossRadio.checked) {
+            weeklyWeightLossPercentage = 0.005; // Slower weight loss
+        } else if (moderateWeightLossRadio.checked) {
+            weeklyWeightLossPercentage = 0.01; // Moderate weight loss
+        } else if (fastWeightLossRadio.checked) {
+            weeklyWeightLossPercentage = 0.02; // Faster weight loss
+        }
+    }
+
+    // Add event listeners to the radio buttons to trigger recalculations when a different option is selected
+    slowWeightLossRadio.addEventListener('change', setWeeklyWeightLossPercentage);
+    moderateWeightLossRadio.addEventListener('change', setWeeklyWeightLossPercentage);
+    fastWeightLossRadio.addEventListener('change', setWeeklyWeightLossPercentage);
+
+    // Call the function to set the initial value when the page loads
+    setWeeklyWeightLossPercentage();
 
     function showCanvas() {
         wrapperCanvas.style.display = 'block';
@@ -481,13 +506,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // Generate weight data points based on compound weight loss effect
     function generateKeyWeightData(startWeight, targetWeight, months) {
         const weightData = [];
-        const weeklyWeightLossPercentage = 0.01; // Adjust this value for stronger or milder compound effect
         let currentWeight = startWeight;
 
         const totalWeeks = Math.round(months * 4.345); // Convert months to weeks
 
         for (let i = 0; i <= totalWeeks; i++) {
-            // Apply the compound effect (compounded weight loss percentage)
+            // Apply the selected weight loss percentage
             currentWeight -= currentWeight * weeklyWeightLossPercentage;
 
             // Add weight data point at the end of each month
@@ -495,14 +519,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 weightData.push(currentWeight.toFixed(1));
             }
 
+            // Ensure we don't exceed the target weight
             if (currentWeight <= targetWeight) {
                 weightData.push(targetWeight.toFixed(1)); // Ensure the target weight is reached
                 break;
             }
         }
 
-        // Ensure the last point is the target weight
-        weightData.push(targetWeight.toFixed(1));
+        // Ensure the last point is the target weight if it's not already added
+        if (weightData[weightData.length - 1] != targetWeight.toFixed(1)) {
+            weightData.push(targetWeight.toFixed(1));
+        }
+
         console.log("Generated Weight Data: ", weightData); // Debugging log for weight data
         return weightData;
     }
@@ -609,6 +637,7 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(element, { childList: true, subtree: true });
     });
 });
+
 
 
 // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D
