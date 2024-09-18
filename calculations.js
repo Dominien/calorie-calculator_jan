@@ -425,6 +425,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D
 // We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D
 let chartInstance = null; // Declare chartInstance globally
+
 window.onload = function() {
     // Delay the script execution by 2 milliseconds
     setTimeout(function() {
@@ -727,282 +728,156 @@ window.onload = function() {
         // Function to initialize event listeners and updates
         function initializeListeners() {
             if (totalCaloriesElement) {
-                var observer = new MutationObserver(debounce(updateResults, 100)); // Throttling results update
-                observer.observe(totalCaloriesElement, { childList: true, subtree: true });
+                // Add an event listener to update the chart whenever total calories change
+                totalCaloriesElement.addEventListener('DOMSubtreeModified', debounce(updateChart, 500));
             }
 
-            if (radios.length > 0) {
-                for (var i = 0; i < radios.length; i++) {
-                    radios[i].addEventListener('change', function() {
-                        updateResults();
-
-                        var abnehmzielWarning = document.querySelector('.wrapper-abnehmziel .text-warning.here');
-                        if (abnehmzielWarning) {
-                            abnehmzielWarning.style.display = 'none';
-                        }
-                    });
-                }
+            // Also update the chart when the target weight changes
+            if (targetWeightElement) {
+                targetWeightElement.addEventListener('input', debounce(updateChart, 500));
+                targetWeightElement.addEventListener('change', debounce(updateChart, 500));
             }
 
+            // Update the chart when weight inputs change
+            if (weightInputElementMiflin) {
+                weightInputElementMiflin.addEventListener('input', debounce(updateChart, 500));
+                weightInputElementMiflin.addEventListener('change', debounce(updateChart, 500));
+            }
+            if (weightInputElementKfa) {
+                weightInputElementKfa.addEventListener('input', debounce(updateChart, 500));
+                weightInputElementKfa.addEventListener('change', debounce(updateChart, 500));
+            }
+
+            // Update the chart when weeks to goal change
+            if (weeksElement) {
+                // Assuming weeksElement is updated via DOM, use MutationObserver
+                var weeksObserver = new MutationObserver(debounce(updateChart, 500));
+                weeksObserver.observe(weeksElement, { childList: true, characterData: true, subtree: true });
+            }
+
+            // Update the chart when calculation method changes
             var methodRadios = document.getElementsByName('kfa-or-miflin');
-            if (methodRadios.length > 0) {
-                for (var i = 0; i < methodRadios.length; i++) {
-                    methodRadios[i].addEventListener('change', function() {
-                        updateResults();
-                    });
-                }
+            methodRadios.forEach(function(radio) {
+                radio.addEventListener('change', debounce(updateChart, 500));
+            });
+
+            // Update the chart when gender changes
+            if (womanButton) {
+                womanButton.addEventListener('click', debounce(updateChart, 500));
+            }
+            if (manButton) {
+                manButton.addEventListener('click', debounce(updateChart, 500));
             }
 
-            var berechnenButton = document.getElementById('check-inputs');
-            if (berechnenButton) {
-                berechnenButton.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    if (validateInputs()) {
-                        updateResults();
-                    }
-                });
-            }
+            // Update the chart when activity level changes
+            var activityRadios = document.getElementsByName('activity-level');
+            activityRadios.forEach(function(radio) {
+                radio.addEventListener('change', debounce(updateChart, 500));
+            });
 
-            updateResults();
+            // Update the chart when weight loss goal selection changes
+            radios.forEach(function(radio) {
+                radio.addEventListener('change', debounce(updateChart, 500));
+            });
         }
 
-        // Function to calculate weeks to reach the goal using compound weight loss formula
-function calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPercentage) {
-    let weeks = 0;
-    while (currentWeight > targetWeight) {
-        currentWeight -= currentWeight * weeklyWeightLossPercentage; // Compound weight loss
-        weeks++;
-    }
-    return weeks;
-}
-
-
-        // Unified function to handle total calorie updates and weight loss results
-        function updateResults() {
-            var calculationMethod = getSelectedCalculationMethod();
-            
-            var currentWeight = 0;
-            if (calculationMethod === 'miflin') {
-                currentWeight = parseFloat(weightInputElementMiflin && weightInputElementMiflin.value) || 0;
-            } else if (calculationMethod === 'kfa') {
-                currentWeight = parseFloat(weightInputElementKfa && weightInputElementKfa.value) || 0;
-            }
-        
-            var targetWeight = parseFloat(targetWeightElement && targetWeightElement.value) || 0;
-            var totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
-            var totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0;
-        
-            var grundUmsatzText = grundUmsatzElement ? grundUmsatzElement.textContent : '';
-            var grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0;
-        
-            var selectedValue = null;
-            for (var i = 0; i < radios.length; i++) {
-                if (radios[i].checked) {
-                    selectedValue = radios[i].value;
-                    break;
+        // Function to update the chart
+        function updateChart() {
+            // First, validate the inputs
+            if (!validateInputs()) {
+                if (chartInstance) {
+                    chartInstance.destroy();
+                    chartInstance = null;
                 }
-            }
-        
-            if (
-                isNaN(totalCaloriesValue) || totalCaloriesValue <= 0 ||
-                isNaN(currentWeight) || currentWeight <= 0 ||
-                isNaN(grundUmsatzValue) || grundUmsatzValue <= 0 ||
-                isNaN(targetWeight) || targetWeight <= 0 ||
-                !selectedValue
-            ) {
-                resetResults(); // Reset if inputs are invalid
                 return;
             }
-        
-            // Set the weekly weight loss percentage based on selected value
-            var weeklyWeightLossPercentage = 0;
-            if (selectedValue === 'Langsames Abnehmen') {
-                weeklyWeightLossPercentage = 0.005;
-            } else if (selectedValue === 'Moderates Abnehmen') {
-                weeklyWeightLossPercentage = 0.0075;
-            } else if (selectedValue === 'Schnelles Abnehmen') {
-                weeklyWeightLossPercentage = 0.01;
-            }
-        
-            // Calculate weeks to reach the goal using compound weight loss
-            var weeksToReachGoal = calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPercentage);
-            var monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1); // Convert weeks to months
-        
-            if (weeksElement) weeksElement.textContent = weeksToReachGoal.toString();
-            if (monthsElement) {
-                var monthsValue = parseFloat(monthsToReachGoal);
-                if (Number.isInteger(monthsValue)) {
-                    monthsElement.textContent = monthsValue.toString();
-                } else {
-                    monthsElement.textContent = monthsValue.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-                }
-            }
-        
-            if (targetWeightResultElement) targetWeightResultElement.textContent = targetWeight.toString();
-        
-            // Calculate the calorie deficit based on the last week's weight loss
-            var lastWeekWeightLossKg = currentWeight * weeklyWeightLossPercentage;
-            var calorieDeficitPerDay = Math.round((lastWeekWeightLossKg * 7700) / 7);
-            var targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay);
-        
-            if (zielKalorienElement) zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : '0';
-            if (zielKcalElement) zielKcalElement.textContent = targetCalories > 0 ? targetCalories : '0';
-        
-            if (warningMessageElement) {
-                if (targetCalories < grundUmsatzValue) {
-                    warningMessageElement.style.display = 'flex';
-                    var warningMessage = warningMessageElement.querySelector('.warning-message');
-                    if (warningMessage) {
-                        warningMessage.textContent = 'Warnhinweis: Nicht weniger als ' + grundUmsatzValue + ' kcal essen, da dies dein Grundumsatz ist.';
-                    }
-                } else {
-                    warningMessageElement.style.display = 'none';
-                }
-            }
-        
-            if (fettAbnahmeElement) fettAbnahmeElement.textContent = lastWeekWeightLossKg.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-            if (defizitElement) defizitElement.textContent = calorieDeficitPerDay.toString();
-        
-            // Generate weight data points based on pre-calculated weeks and weight loss percentage
-            const weightData = calculateWeightDataPoints(currentWeight, targetWeight, weeksToReachGoal, weeklyWeightLossPercentage);
-        
-            // Generate the chart with calculated weight data
-            generateResultChart(weightData, monthsToReachGoal);
-        }
-        
-        // Function to calculate weight data points (for the chart)
-        function calculateWeightDataPoints(currentWeight, targetWeight, totalWeeks, weeklyWeightLossPercentage) {
-            const weightData = [];
-        
-            for (let i = 0; i <= totalWeeks; i++) {
-                currentWeight -= currentWeight * weeklyWeightLossPercentage;
-        
-                // Add weight data point at the end of each month
-                if (i % 4 === 0) {
-                    weightData.push(currentWeight.toFixed(1));
-                }
-        
-                if (currentWeight <= targetWeight) {
-                    weightData.push(targetWeight.toFixed(1));
-                    break;
-                }
-            }
-        
-            if (weightData[weightData.length - 1] != targetWeight.toFixed(1)) {
-                weightData.push(targetWeight.toFixed(1));
-            }
-        
-            return weightData;
-        }
-        
-        // Function to generate the chart
-        function generateResultChart(weightData, months) {
-            // Set wrapper-canvas display to block if it isn't already
-    const wrapperCanvas = document.querySelector('.wrapper-canvas');
-    if (wrapperCanvas && getComputedStyle(wrapperCanvas).display !== 'block') {
-        wrapperCanvas.style.display = 'block';
-    }
 
-            const chartCanvas = document.getElementById('resultChart');
-            const ctx = chartCanvas.getContext('2d');
-        
-            if (chartInstance) {
-                chartInstance.destroy(); // Destroy old chart instance if it exists
+            // Get necessary values for the chart
+            var currentWeight = parseFloat(weightInputElementMiflin.value || weightInputElementKfa.value);
+            var desiredWeight = parseFloat(targetWeightElement.value);
+            var weeksToGoal = parseFloat(weeksElement.textContent);
+
+            // Ensure we have valid numbers
+            if (isNaN(currentWeight) || isNaN(desiredWeight) || isNaN(weeksToGoal) || weeksToGoal <= 0) {
+                return;
             }
-        
-            const gradientFill = ctx.createLinearGradient(0, 0, 400, 0);
-            gradientFill.addColorStop(0, 'rgba(233, 62, 45, 0.3)');
-            gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');
-        
-            const dates = generateKeyDates(months); // Generate dates based on months
-            const pointColors = weightData.map((_, index) => index === 0 ? 'rgba(233, 62, 45, 1)' : 'rgba(26, 183, 0, 1)');
-            const pointSizes = Array(weightData.length).fill(6); // Consistent point size
-        
-            setTimeout(() => {
-                chartInstance = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: dates, // X-axis: monthly dates
-                        datasets: [{
-                            data: weightData, // Y-axis: weight data
-                            backgroundColor: gradientFill,
-                            borderColor: 'rgba(0, 150, 0, 1)',
-                            borderWidth: 2,
-                            fill: true,
-                            pointBackgroundColor: pointColors,
-                            pointBorderColor: '#fff',
-                            pointHoverRadius: 8,
-                            pointHoverBackgroundColor: 'rgba(0, 150, 0, 1)',
-                            pointRadius: pointSizes,
-                            pointHitRadius: 10,
-                        }]
+
+            // Generate data points for the chart
+            var numberOfPoints = 10; // Choose the number of points you want in the chart
+            var weightData = [];
+            var labels = [];
+
+            for (var i = 0; i <= numberOfPoints; i++) {
+                // Evenly distribute the x-axis labels
+                var week = Math.round((weeksToGoal / numberOfPoints) * i);
+                labels.push('Woche ' + week);
+
+                // Calculate the corresponding weight
+                var weight = currentWeight - ((currentWeight - desiredWeight) * (i / numberOfPoints));
+                weightData.push(weight.toFixed(2));
+            }
+
+            // Ensure the last data point is exactly the desired weight
+            weightData[weightData.length - 1] = desiredWeight.toFixed(2);
+
+            // Prepare the chart data
+            var chartData = {
+                labels: labels,
+                datasets: [{
+                    label: 'Gewichtsverlust Fortschritt',
+                    data: weightData,
+                    fill: false,
+                    borderColor: '#f27935',
+                    backgroundColor: '#f27935',
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                }]
+            };
+
+            // Chart options
+            var chartOptions = {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        display: true,
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(tooltipItem) {
-                                        return 'Gewicht: ' + tooltipItem.raw + ' Kg';
-                                    }
-                                },
-                                backgroundColor: 'rgba(0, 150, 0, 0.8)',
-                                titleColor: '#fff',
-                                bodyColor: '#fff'
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: false,
-                                ticks: { stepSize: 5, color: '#333' },
-                                grid: { color: 'rgba(200, 200, 200, 0.2)' }
-                            },
-                            x: {
-                                ticks: {
-                                    callback: function(value, index) {
-                                        return index === 0 ? 'Heute' : dates[index];
-                                    },
-                                    color: '#333'
-                                },
-                                grid: { display: false }
-                            }
-                        }
+                    y: {
+                        display: true,
+                        beginAtZero: false,
+                        suggestedMin: desiredWeight - 5, // Adjust as needed
+                        suggestedMax: currentWeight + 5, // Adjust as needed
+                        reverse: true // Flip the y-axis so that lower weights are at the bottom
                     }
-                });
-        
-                console.log("Final Chart Data: ", chartInstance.data.datasets[0].data); // Debugging log
-            }, 100);
-        }
-        
-        // Helper function to generate dates for the chart
-        function generateKeyDates(months) {
-            const dates = [];
-            let currentDate = new Date();
-        
-            for (let i = 0; i <= months; i++) {
-                dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
-                currentDate.setMonth(currentDate.getMonth() + 1);
+                },
+                plugins: {
+                    legend: {
+                        display: false,
+                    }
+                }
+            };
+
+            // Destroy existing chart instance if it exists
+            if (chartInstance) {
+                chartInstance.destroy();
             }
-        
-            return dates;
-        }
-        
-        // Helper function to reset results when inputs are invalid
-        function resetResults() {
-            if (defizitElement) defizitElement.textContent = '0';
-            if (fettAbnahmeElement) fettAbnahmeElement.textContent = '0';
-            if (weeksElement) weeksElement.textContent = '0';
-            if (monthsElement) monthsElement.textContent = '0';
-            if (targetWeightResultElement) targetWeightResultElement.textContent = '0';
-            if (zielKcalElement) zielKcalElement.textContent = '0';
-            if (zielKalorienElement) zielKalorienElement.textContent = '0';
-            if (warningMessageElement) warningMessageElement.style.display = 'none';
-        }
-        
 
+            // Get the context of the chart canvas
+            var ctx = document.getElementById('myChart').getContext('2d');
 
+            // Create the new chart instance
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: chartData,
+                options: chartOptions
+            });
+        }
+
+        // Call initializeListeners to set up event listeners
         initializeListeners();
-    }, 2); // 2 milliseconds delay
+
+        // Call updateChart initially to render the chart on page load
+        updateChart();
+
+    }, 2);
 };
