@@ -1,14 +1,15 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const numericInputs = document.querySelectorAll('.input-calculator');
+    const inputWunschgewicht = document.getElementById('wunschgewicht');
 
-    // Restrict input to only numeric values and commas
-    numericInputs.forEach(input => {
-        input.addEventListener('input', () => {
+    // Ensure the input field exists
+    if (inputWunschgewicht) {
+        // Restrict input to only numeric values and commas for the 'wunschgewicht' field
+        inputWunschgewicht.addEventListener('input', () => {
             // Allow numbers and commas
-            input.value = input.value.replace(/[^0-9,]/g, ''); // Allow only numbers and commas
+            inputWunschgewicht.value = inputWunschgewicht.value.replace(/[^0-9,]/g, ''); // Allow only numbers and commas
         });
 
-        input.addEventListener('keydown', (event) => {
+        inputWunschgewicht.addEventListener('keydown', (event) => {
             // Allow certain keys such as backspace, delete, tab, etc.
             if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'].includes(event.key) ||
                 (event.key === 'a' && (event.ctrlKey || event.metaKey)) || 
@@ -24,12 +25,39 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        input.addEventListener('blur', () => {
+        inputWunschgewicht.addEventListener('blur', () => {
             // Replace comma with dot for calculations
-            input.value = input.value.replace(',', '.');
+            inputWunschgewicht.value = inputWunschgewicht.value.replace(',', '.');
+        });
+    }
+});
+
+
+
+document.addEventListener('DOMContentLoaded', function() {
+    const numericInputs = document.querySelectorAll('.input-calculator');
+
+    // Restrict input to only numeric values
+    numericInputs.forEach(input => {
+        input.addEventListener('input', () => {
+            input.value = input.value.replace(/[^0-9]/g, ''); // Allow only numbers
+        });
+
+        input.addEventListener('keydown', (event) => {
+            // Allow certain keys such as backspace, delete, tab, etc.
+            if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'].includes(event.key) ||
+                (event.key === 'a' && (event.ctrlKey || event.metaKey)) || 
+                (event.key === 'c' && (event.ctrlKey || event.metaKey)) || 
+                (event.key === 'v' && (event.ctrlKey || event.metaKey)) || 
+                (event.key === 'x' && (event.ctrlKey || event.metaKey))) {
+                return;
+            }
+            // Ensure numeric input
+            if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && (event.keyCode < 96 || event.keyCode > 105)) {
+                event.preventDefault();
+            }
         });
     });
-
 
     // Function to update range slider position and value for weight and KFA
     function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransition) {
