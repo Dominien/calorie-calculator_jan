@@ -530,7 +530,6 @@ function generateResultChart(startWeight, targetWeight, weeks, weeklyWeightLossP
                     pointHoverBackgroundColor: 'rgba(0, 150, 0, 1)',
                     pointRadius: pointSizes,
                     pointHitRadius: 10,
-                    tension: 0.4, // Smoothing the curve
                 }]
             },
             options: {
