@@ -463,7 +463,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return null;
     }
 
-    // Generate monthly dates for better granularity in the graph
+    // Generate monthly dates for the graph, ensuring the final date is added
     function generateKeyDates(months) {
         const dates = [];
         let currentDate = new Date();
@@ -473,6 +473,9 @@ document.addEventListener('DOMContentLoaded', function () {
             dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
             currentDate.setMonth(currentDate.getMonth() + 1); // Add 1 month for each iteration
         }
+
+        // Add the final month explicitly to ensure the last date is shown
+        dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
 
         return dates;
     }
@@ -495,7 +498,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 break;
             }
         }
-        
+
+        // Ensure that the final target weight is always included
+        if (currentWeight > targetWeight) {
+            weightData.push(targetWeight.toFixed(1));
+        }
+
         return weightData;
     }
 
@@ -598,6 +606,7 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(element, { childList: true, subtree: true });
     });
 });
+
 
 
 
