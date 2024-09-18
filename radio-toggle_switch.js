@@ -8,9 +8,9 @@ document.addEventListener('DOMContentLoaded', function() {
     miflinInput.style.display = 'block';
     kfaInput.style.display = 'none';
 
-    // Add transition for smoother showing/hiding
-    miflinInput.style.transition = 'opacity 0.2s ease';
-    kfaInput.style.transition = 'opacity 0.2s ease';
+    // Add faster transition for showing/hiding
+    miflinInput.style.transition = 'opacity 0.1s ease';
+    kfaInput.style.transition = 'opacity 0.1s ease';
 
     // Function to show the correct input block based on the selected radio button
     function toggleInputs() {
@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 kfaInput.style.display = 'none';
                 miflinInput.style.display = 'block';
                 setTimeout(() => miflinInput.style.opacity = '1', 10); // Small delay to trigger opacity transition
-            }, 500); // Duration to match the transition
+            }, 200); // Reduced delay for faster animation
 
         } else if (kfaRadio.checked) {
             // Show kfa input, hide miflin input
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 miflinInput.style.display = 'none';
                 kfaInput.style.display = 'block';
                 setTimeout(() => kfaInput.style.opacity = '1', 10); // Small delay to trigger opacity transition
-            }, 500); // Duration to match the transition
+            }, 200); // Reduced delay for faster animation
         }
     }
 
@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize to show the selected input on page load
     toggleInputs();
 });
+
 
 
 document.getElementById("popup_kfa").addEventListener("click", function(event) {
