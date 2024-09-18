@@ -891,6 +891,9 @@ window.onload = function() {
             }
 
             // Validate Wunschgewicht
+            // Add live validation for Wunschgewicht (since it may not have a slider)
+            var wunschgewichtInput = document.getElementById('wunschgewicht');
+            var wunschgewichtWarning = null;
             if (!wunschgewichtInput || wunschgewichtInput.value.trim() === '' || parseFloat(wunschgewichtInput.value) <= 0) {
                 if (wunschgewichtWarning) wunschgewichtWarning.style.display = 'block'; 
                 isValid = false;
@@ -1036,3 +1039,6 @@ window.onload = function() {
         initializeListeners();
     }, 2); // 2 milliseconds delay
 };
+
+
+
