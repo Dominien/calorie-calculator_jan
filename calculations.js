@@ -478,19 +478,23 @@ document.addEventListener('DOMContentLoaded', function () {
         return dates;
     }
 
-    // Generate the weight data points with smooth weight reduction
+    // Generate the weight data points with compounding weight reduction
     function generateKeyWeightData(startWeight, targetWeight, totalWeeks) {
         const weightData = [];
-        const weightLossPerDot = (startWeight - targetWeight) / (MAX_DOTS - 1); // Calculate weight loss per dot evenly
-
         let currentWeight = startWeight;
+        const weeklyWeightLossPercentage = 0.005; // Example of a weekly weight loss percentage (adjust if needed)
 
+        // Loop through and apply compounding weight loss
         for (let i = 0; i < MAX_DOTS - 1; i++) {
-            weightData.push(currentWeight.toFixed(1));
-            currentWeight -= weightLossPerDot; // Apply equal weight loss per dot
+            weightData.push(currentWeight.toFixed(1)); // Add current weight to the data
+            currentWeight -= currentWeight * weeklyWeightLossPercentage; // Compound effect
+            if (currentWeight <= targetWeight) {
+                break; // Stop if target weight is reached
+            }
         }
 
-        weightData.push(targetWeight.toFixed(1)); // Ensure the last point is the target weight
+        // Ensure the last point is the target weight
+        weightData.push(targetWeight.toFixed(1));
         console.log("Generated Weight Data: ", weightData); // Debugging log for weight data
         return weightData;
     }
@@ -507,7 +511,7 @@ document.addEventListener('DOMContentLoaded', function () {
         gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');
 
         const dates = generateKeyDates(totalWeeks); // Generate dates
-        const weightData = generateKeyWeightData(startWeight, targetWeight, totalWeeks); // Generate weight data
+        const weightData = generateKeyWeightData(startWeight, targetWeight, totalWeeks); // Generate weight data with compound effect
 
         const pointColors = weightData.map((_, index) => index === 0 ? 'rgba(233, 62, 45, 1)' : 'rgba(26, 183, 0, 1)');
         const pointSizes = Array(weightData.length).fill(6); // Consistent point size
@@ -518,7 +522,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 data: {
                     labels: dates, // X-axis: dates evenly distributed
                     datasets: [{
-                        data: weightData, // Y-axis: weight data
+                        data: weightData, // Y-axis: weight data with compound effect
                         backgroundColor: gradientFill,
                         borderColor: 'rgba(0, 150, 0, 1)',
                         borderWidth: 2,
@@ -597,8 +601,6 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(element, { childList: true, subtree: true });
     });
 });
-
-
 
 // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D
 // We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D
