@@ -486,13 +486,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
         for (let i = 0; i < MAX_DOTS; i++) {
             weightData.push(currentWeight.toFixed(1));
+
+            let remainingWeight = currentWeight - targetWeight;
+            let stepWeightLoss = remainingWeight * weeklyWeightLossPercentage;
+
             for (let j = 0; j < interval; j++) {
-                currentWeight -= currentWeight * weeklyWeightLossPercentage; // Apply compound effect for each week
+                // Adapt the weight reduction to slow down as it approaches the target
+                currentWeight -= stepWeightLoss;
                 if (currentWeight <= targetWeight) {
-                    weightData.push(targetWeight.toFixed(1)); // Ensure target weight is added
-                    return weightData;
+                    currentWeight = targetWeight;  // Ensure smooth convergence to target
+                    break;
                 }
             }
+
+            if (currentWeight === targetWeight) {
+                break;
+            }
+        }
+
+        // Ensure the last point is the target weight, without a step jump
+        if (currentWeight > targetWeight) {
+            weightData.push(targetWeight.toFixed(1));
         }
 
         return weightData;
@@ -561,7 +575,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 callback: function(value, index) {
                                     return index === 0 ? 'Heute' : dates[index];
                                 },
-                                color: '#333'
+                                color: '#333',
+                                autoSkip: false, // Ensure every tick is shown
                             },
                             grid: { display: false }
                         }
@@ -597,6 +612,7 @@ document.addEventListener('DOMContentLoaded', function () {
         observer.observe(element, { childList: true, subtree: true });
     });
 });
+
 
 
 
