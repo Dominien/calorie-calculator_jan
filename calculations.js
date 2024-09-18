@@ -961,7 +961,6 @@ window.onload = function() {
                         scales: {
                             y: {
                                 beginAtZero: false,
-                                reverse: true, // Flip the y-axis so lower weights are at the bottom
                                 ticks: { stepSize: 5, color: '#333' },
                                 grid: { color: 'rgba(200, 200, 200, 0.2)' }
                             },
