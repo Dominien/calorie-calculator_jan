@@ -1096,4 +1096,3 @@ window.onload = function() {
         initializeListeners();
     }, 2); // 2 milliseconds delay
 };
-
