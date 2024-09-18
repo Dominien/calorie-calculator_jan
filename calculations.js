@@ -767,15 +767,14 @@ window.onload = function() {
         }
 
         // Function to calculate weeks to reach the goal using compound weight loss formula
-function calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPercentage) {
-    let weeks = 0;
-    while (currentWeight > targetWeight) {
-        currentWeight -= currentWeight * weeklyWeightLossPercentage; // Compound weight loss
-        weeks++;
-    }
-    return weeks;
-}
-
+        function calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPercentage) {
+            let weeks = 0;
+            while (currentWeight > targetWeight) {
+                currentWeight -= currentWeight * weeklyWeightLossPercentage; // Compound weight loss
+                weeks++;
+            }
+            return weeks;
+        }
 
         // Unified function to handle total calorie updates and weight loss results
         function updateResults() {
@@ -863,66 +862,72 @@ function calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPerce
             if (fettAbnahmeElement) fettAbnahmeElement.textContent = lastWeekWeightLossKg.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             if (defizitElement) defizitElement.textContent = calorieDeficitPerDay.toString();
         
-            // Generate weight data points based on pre-calculated weeks and weight loss percentage
+            // Generate weight data points based on calculated weeks and weight loss percentage
             const weightData = calculateWeightDataPoints(currentWeight, targetWeight, weeksToReachGoal, weeklyWeightLossPercentage);
         
             // Generate the chart with calculated weight data
-            generateResultChart(weightData, monthsToReachGoal);
+            generateResultChart(weightData, weightData.length - 1);
         }
         
         // Function to calculate weight data points (for the chart)
         function calculateWeightDataPoints(currentWeight, targetWeight, totalWeeks, weeklyWeightLossPercentage) {
             const weightData = [];
-        
-            for (let i = 0; i <= totalWeeks; i++) {
-                currentWeight -= currentWeight * weeklyWeightLossPercentage;
-        
-                // Add weight data point at the end of each month
-                if (i % 4 === 0) {
-                    weightData.push(currentWeight.toFixed(1));
-                }
-        
-                if (currentWeight <= targetWeight) {
-                    weightData.push(targetWeight.toFixed(1));
-                    break;
-                }
+            const numberOfPoints = 10; // Adjust the number of data points (dots) here
+            const timeIntervals = [];
+
+            // Calculate evenly spaced time intervals
+            for (let i = 0; i <= numberOfPoints; i++) {
+                let t = (totalWeeks / numberOfPoints) * i;
+                timeIntervals.push(t);
             }
-        
-            if (weightData[weightData.length - 1] != targetWeight.toFixed(1)) {
-                weightData.push(targetWeight.toFixed(1));
+
+            // Generate weight data using compound weight loss formula
+            for (let i = 0; i <= numberOfPoints; i++) {
+                let weeksPassed = timeIntervals[i];
+
+                // Using compound interest formula for weight loss
+                // weight = initialWeight * (1 - weeklyWeightLossPercentage)^(weeksPassed)
+                let weight = currentWeight * Math.pow(1 - weeklyWeightLossPercentage, weeksPassed);
+
+                // Ensure the last weight is exactly the target weight
+                if (i === numberOfPoints) {
+                    weight = targetWeight;
+                }
+
+                weightData.push(weight.toFixed(1));
             }
-        
+
             return weightData;
         }
-        
+
         // Function to generate the chart
-        function generateResultChart(weightData, months) {
+        function generateResultChart(weightData, numberOfPoints) {
             // Set wrapper-canvas display to block if it isn't already
-    const wrapperCanvas = document.querySelector('.wrapper-canvas');
-    if (wrapperCanvas && getComputedStyle(wrapperCanvas).display !== 'block') {
-        wrapperCanvas.style.display = 'block';
-    }
+            const wrapperCanvas = document.querySelector('.wrapper-canvas');
+            if (wrapperCanvas && getComputedStyle(wrapperCanvas).display !== 'block') {
+                wrapperCanvas.style.display = 'block';
+            }
 
             const chartCanvas = document.getElementById('resultChart');
             const ctx = chartCanvas.getContext('2d');
-        
+
             if (chartInstance) {
                 chartInstance.destroy(); // Destroy old chart instance if it exists
             }
-        
-            const gradientFill = ctx.createLinearGradient(0, 0, 400, 0);
+
+            const gradientFill = ctx.createLinearGradient(0, 0, 0, chartCanvas.height);
             gradientFill.addColorStop(0, 'rgba(233, 62, 45, 0.3)');
             gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');
-        
-            const dates = generateKeyDates(months); // Generate dates based on months
+
+            const dates = generateKeyDates(numberOfPoints); // Generate dates based on number of data points
             const pointColors = weightData.map((_, index) => index === 0 ? 'rgba(233, 62, 45, 1)' : 'rgba(26, 183, 0, 1)');
             const pointSizes = Array(weightData.length).fill(6); // Consistent point size
-        
+
             setTimeout(() => {
                 chartInstance = new Chart(ctx, {
                     type: 'line',
                     data: {
-                        labels: dates, // X-axis: monthly dates
+                        labels: dates, // X-axis: dates
                         datasets: [{
                             data: weightData, // Y-axis: weight data
                             backgroundColor: gradientFill,
@@ -956,6 +961,7 @@ function calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPerce
                         scales: {
                             y: {
                                 beginAtZero: false,
+                                reverse: true, // Flip the y-axis so lower weights are at the bottom
                                 ticks: { stepSize: 5, color: '#333' },
                                 grid: { color: 'rgba(200, 200, 200, 0.2)' }
                             },
@@ -971,24 +977,26 @@ function calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPerce
                         }
                     }
                 });
-        
+
                 console.log("Final Chart Data: ", chartInstance.data.datasets[0].data); // Debugging log
             }, 100);
         }
-        
+
         // Helper function to generate dates for the chart
-        function generateKeyDates(months) {
+        function generateKeyDates(numberOfPoints) {
             const dates = [];
             let currentDate = new Date();
-        
-            for (let i = 0; i <= months; i++) {
+
+            const intervalDays = 7 * (numberOfPoints / (numberOfPoints)); // Evenly distribute over weeks
+
+            for (let i = 0; i <= numberOfPoints; i++) {
                 dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
-                currentDate.setMonth(currentDate.getMonth() + 1);
+                currentDate.setDate(currentDate.getDate() + intervalDays);
             }
-        
+
             return dates;
         }
-        
+
         // Helper function to reset results when inputs are invalid
         function resetResults() {
             if (defizitElement) defizitElement.textContent = '0';
@@ -999,9 +1007,13 @@ function calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPerce
             if (zielKcalElement) zielKcalElement.textContent = '0';
             if (zielKalorienElement) zielKalorienElement.textContent = '0';
             if (warningMessageElement) warningMessageElement.style.display = 'none';
-        }
-        
 
+            // Destroy the chart if it exists
+            if (chartInstance) {
+                chartInstance.destroy();
+                chartInstance = null;
+            }
+        }
 
         initializeListeners();
     }, 2); // 2 milliseconds delay
