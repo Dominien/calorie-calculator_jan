@@ -775,18 +775,51 @@ window.onload = function() {
             }
         }
 
-        // Function to calculate weight loss with decreasing weekly percentage
-        function calculateWeeklyWeightLoss(initialWeight, weeklyPercentageLoss, targetWeight) {
-            let currentWeight = initialWeight;
-            let weeks = 0;
-            
-            while (currentWeight > targetWeight) {
-                const weeklyLoss = currentWeight * weeklyPercentageLoss;
-                currentWeight -= weeklyLoss;
-                weeks++;
+        // Add event listener specifically for age-2 handle text
+        var ageHandleTextElement = document.getElementById('age-2_handle-text');
+        var ageInputElement = document.getElementById('age-2');
+        var ageWarningElement = null;
+        if (ageInputElement) {
+            var ageClosestWrapper = ageInputElement.closest('.input-wrapper-calc');
+            if (ageClosestWrapper) {
+                ageWarningElement = ageClosestWrapper.querySelector('.text-warning');
             }
-            return weeks;
         }
+
+        if (ageHandleTextElement && ageInputElement) {
+            var observer = new MutationObserver(debounce(function() {
+                var sliderValue = parseFloat(ageHandleTextElement.textContent) || 0;
+                ageInputElement.value = sliderValue;
+
+                // Hide the warning if the input is valid
+                if (sliderValue > 0 && ageWarningElement) {
+                    ageWarningElement.style.display = 'none';
+                }
+
+                var event = createNewEvent('input');
+                ageInputElement.dispatchEvent(event);
+            }, 100)); // 100ms debounce
+
+            observer.observe(ageHandleTextElement, { childList: true, characterData: true, subtree: true });
+        }
+
+        // Add live validation for Wunschgewicht (since it may not have a slider)
+        var wunschgewichtInput = document.getElementById('wunschgewicht');
+        var wunschgewichtWarning = null;
+        if (wunschgewichtInput) {
+            var wunschgewichtClosestWrapper = wunschgewichtInput.closest('.input-wrapper-calc');
+            if (wunschgewichtClosestWrapper) {
+                wunschgewichtWarning = wunschgewichtClosestWrapper.querySelector('.text-warning');
+            }
+            hideWarningOnInput(wunschgewichtInput, wunschgewichtWarning);
+        }
+
+        // Attach validation to inputs and sliders
+        attachValidation('age-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-1"]');
+        attachValidation('height-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]');
+        attachValidation('weight-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]');
+        attachValidation('weight-3-kfa', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]');
+        attachValidation('kfa-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]');
 
         // Function to validate inputs and show warnings if any are missing or invalid
         function validateInputs() {
@@ -890,17 +923,13 @@ window.onload = function() {
                 }
             }
 
-              // Add live validation for Wunschgewicht (since it may not have a slider)
-        var wunschgewichtInput = document.getElementById('wunschgewicht');
-        var wunschgewichtWarning = null;
-        if (wunschgewichtInput) {
-            var wunschgewichtClosestWrapper = wunschgewichtInput.closest('.input-wrapper-calc');
-            if (wunschgewichtClosestWrapper) {
-                wunschgewichtWarning = wunschgewichtClosestWrapper.querySelector('.text-warning');
+            // Validate Wunschgewicht
+            if (!wunschgewichtInput || wunschgewichtInput.value.trim() === '' || parseFloat(wunschgewichtInput.value) <= 0) {
+                if (wunschgewichtWarning) wunschgewichtWarning.style.display = 'block'; 
+                isValid = false;
+            } else {
+                if (wunschgewichtWarning) wunschgewichtWarning.style.display = 'none';
             }
-            hideWarningOnInput(wunschgewichtInput, wunschgewichtWarning);
-        }
-
 
             // Validate weight loss goal selection (Abnehmziel)
             var selectedValue = null;
@@ -1020,28 +1049,51 @@ window.onload = function() {
                 weeklyWeightLossPercentage = 0.01;
             }
 
-            // Calculate the number of weeks to reach the goal using compounding weight loss
-            var weeksToReachGoal = calculateWeeklyWeightLoss(currentWeight, weeklyWeightLossPercentage, targetWeight);
+            var weeklyWeightLossKg = currentWeight * weeklyWeightLossPercentage;
+            var calorieDeficitPerDay = Math.round((weeklyWeightLossKg * 7700) / 7);
+            var targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay);
+
+            if (zielKalorienElement) zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : '0';
+            if (zielKcalElement) zielKcalElement.textContent = targetCalories > 0 ? targetCalories : '0'; 
+
+            if (warningMessageElement) {
+                if (targetCalories < grundUmsatzValue) {
+                    warningMessageElement.style.display = 'flex';
+                    var warningMessage = warningMessageElement.querySelector('.warning-message');
+                    if (warningMessage) {
+                        warningMessage.textContent = 'Warnhinweis: Nicht weniger als ' + grundUmsatzValue + ' kcal essen, da dies dein Grundumsatz ist.';
+                    }
+                } else {
+                    warningMessageElement.style.display = 'none';
+                }
+            }
+
+            if (fettAbnahmeElement) fettAbnahmeElement.textContent = weeklyWeightLossKg.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            if (defizitElement) defizitElement.textContent = calorieDeficitPerDay.toString(); 
+
+            var totalWeightToLose = currentWeight - targetWeight;
+            var totalCaloricDeficitNeeded = totalWeightToLose * 7700;
+            var daysToReachGoal = Math.round(totalCaloricDeficitNeeded / calorieDeficitPerDay);
+            var weeksToReachGoal = Math.round(daysToReachGoal / 7);
             var monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1);
 
             if (weeksElement) weeksElement.textContent = weeksToReachGoal.toString();
             if (monthsElement) {
+                // Convert the value to a number
                 var monthsValue = parseFloat(monthsToReachGoal);
+            
+                // If the number is a whole number, display it without formatting, otherwise use the comma format
                 if (Number.isInteger(monthsValue)) {
-                    monthsElement.textContent = monthsValue.toString();
+                    monthsElement.textContent = monthsValue.toString(); // Show as whole number
                 } else {
-                    monthsElement.textContent = monthsValue.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+                    monthsElement.textContent = monthsValue.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); // Show with comma for decimal
                 }
             }
-
+            
             if (targetWeightResultElement) targetWeightResultElement.textContent = targetWeight.toString();
         }
 
         initializeListeners();
     }, 2); // 2 milliseconds delay
 };
-
-
-
-
 
