@@ -765,6 +765,17 @@ window.onload = function() {
             updateResults();
         }
 
+        // Function to calculate weeks to reach the goal using compound weight loss formula
+function calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPercentage) {
+    let weeks = 0;
+    while (currentWeight > targetWeight) {
+        currentWeight -= currentWeight * weeklyWeightLossPercentage; // Compound weight loss
+        weeks++;
+    }
+    return weeks;
+}
+
+
         // Unified function to handle total calorie updates and weight loss results
         function updateResults() {
             var calculationMethod = getSelectedCalculationMethod();
