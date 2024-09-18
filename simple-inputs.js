@@ -1,62 +1,28 @@
 document.addEventListener('DOMContentLoaded', function() {
-    const inputWunschgewicht = document.getElementById('wunschgewicht');
-
-    // Ensure the input field exists
-    if (inputWunschgewicht) {
-        // Restrict input to only numeric values and commas for the 'wunschgewicht' field
-        inputWunschgewicht.addEventListener('input', () => {
-            // Allow numbers and commas
-            inputWunschgewicht.value = inputWunschgewicht.value.replace(/[^0-9,]/g, ''); // Allow only numbers and commas
-        });
-
-        inputWunschgewicht.addEventListener('keydown', (event) => {
-            // Allow certain keys such as backspace, delete, tab, etc.
-            if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'].includes(event.key) ||
-                (event.key === 'a' && (event.ctrlKey || event.metaKey)) || 
-                (event.key === 'c' && (event.ctrlKey || event.metaKey)) || 
-                (event.key === 'v' && (event.ctrlKey || event.metaKey)) || 
-                (event.key === 'x' && (event.ctrlKey || event.metaKey)) ||
-                event.key === ',') { // Allow comma
-                return;
-            }
-            // Ensure numeric input
-            if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && (event.keyCode < 96 || event.keyCode > 105)) {
-                event.preventDefault();
-            }
-        });
-
-        inputWunschgewicht.addEventListener('blur', () => {
-            // Replace comma with dot for calculations
-            inputWunschgewicht.value = inputWunschgewicht.value.replace(',', '.');
-        });
-    }
-});
-
-
-
-document.addEventListener('DOMContentLoaded', function() {
     const numericInputs = document.querySelectorAll('.input-calculator');
 
-    // Restrict input to only numeric values
+    // Restrict input to only numeric values, but exclude 'wunschgewicht' field
     numericInputs.forEach(input => {
-        input.addEventListener('input', () => {
-            input.value = input.value.replace(/[^0-9]/g, ''); // Allow only numbers
-        });
+        if (input.id !== 'wunschgewicht') { // Exclude the 'wunschgewicht' field
+            input.addEventListener('input', () => {
+                input.value = input.value.replace(/[^0-9]/g, ''); // Allow only numbers
+            });
 
-        input.addEventListener('keydown', (event) => {
-            // Allow certain keys such as backspace, delete, tab, etc.
-            if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'].includes(event.key) ||
-                (event.key === 'a' && (event.ctrlKey || event.metaKey)) || 
-                (event.key === 'c' && (event.ctrlKey || event.metaKey)) || 
-                (event.key === 'v' && (event.ctrlKey || event.metaKey)) || 
-                (event.key === 'x' && (event.ctrlKey || event.metaKey))) {
-                return;
-            }
-            // Ensure numeric input
-            if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && (event.keyCode < 96 || event.keyCode > 105)) {
-                event.preventDefault();
-            }
-        });
+            input.addEventListener('keydown', (event) => {
+                // Allow certain keys such as backspace, delete, tab, etc.
+                if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'].includes(event.key) ||
+                    (event.key === 'a' && (event.ctrlKey || event.metaKey)) || 
+                    (event.key === 'c' && (event.ctrlKey || event.metaKey)) || 
+                    (event.key === 'v' && (event.ctrlKey || event.metaKey)) || 
+                    (event.key === 'x' && (event.ctrlKey || event.metaKey))) {
+                    return;
+                }
+                // Ensure numeric input
+                if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && (event.keyCode < 96 || event.keyCode > 105)) {
+                    event.preventDefault();
+                }
+            });
+        }
     });
 
     // Function to update range slider position and value for weight and KFA
