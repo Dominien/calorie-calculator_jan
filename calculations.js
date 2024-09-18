@@ -424,6 +424,7 @@ document.addEventListener('DOMContentLoaded', function () {
 // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D
 // We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D
 // We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D
+let chartInstance = null; // Declare chartInstance globally
 window.onload = function() {
     // Delay the script execution by 2 milliseconds
     setTimeout(function() {
