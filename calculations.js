@@ -1108,11 +1108,15 @@ document.addEventListener('DOMContentLoaded', function () {
     function calculateWeightLoss() {
         // Get the current weight from the KFA input or another source
         const currentWeight = parseInt(document.querySelector('#weight-3-kfa').value); // Example: current weight
+        console.log('Current weight:', currentWeight); // Debugging current weight
+        
         // Get the goal weight (this value should come from another input or handle)
         const goalWeight = parseInt(document.querySelector('.target-weight').textContent); // Example: goal weight
+        console.log('Goal weight:', goalWeight); // Debugging goal weight
 
         // Calculate weight loss: current weight - goal weight
         const weightLoss = currentWeight - goalWeight;
+        console.log('Weight loss:', weightLoss); // Debugging weight loss calculation
 
         return weightLoss > 0 ? weightLoss : 0; // Ensure the value is non-negative
     }
@@ -1123,8 +1127,13 @@ document.addEventListener('DOMContentLoaded', function () {
         const weeks = parseInt(document.querySelector('.weeks').textContent);
         const months = parseInt(document.querySelector('.months').textContent);
 
+        console.log('Ziel kcal:', zielKcal); // Debugging kcal
+        console.log('Weeks:', weeks); // Debugging weeks
+        console.log('Months:', months); // Debugging months
+
         // Calculate weight loss
         const weightLoss = calculateWeightLoss();
+        console.log('Final weight loss:', weightLoss); // Debugging final weight loss
 
         // Proceed only if all values are greater than 1
         if (zielKcal > 1 && weeks > 1 && months > 1 && weightLoss > 1) {
@@ -1136,6 +1145,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     gender = radio.value;
                 }
             });
+            console.log('Selected gender:', gender); // Debugging selected gender
 
             if (gender) {
                 // Show the correct div based on weight loss and gender
@@ -1143,21 +1153,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (weightLoss >= 1 && weightLoss <= 15) {
                         const element = document.querySelector('._1-15.woman');
                         if (element) {
+                            console.log('Showing 1-15kg weight loss div'); // Debugging div visibility
                             element.style.display = 'block';
                         }
                     } else if (weightLoss >= 16 && weightLoss <= 25) {
                         const element = document.querySelector('._16-25.woman');
                         if (element) {
+                            console.log('Showing 16-25kg weight loss div');
                             element.style.display = 'block';
                         }
                     } else if (weightLoss >= 26 && weightLoss <= 35) {
                         const element = document.querySelector('._26-35.woman');
                         if (element) {
+                            console.log('Showing 26-35kg weight loss div');
                             element.style.display = 'block';
                         }
                     } else if (weightLoss > 35) {
                         const element = document.querySelector('._36-more.woman');
                         if (element) {
+                            console.log('Showing >35kg weight loss div');
                             element.style.display = 'block';
                         }
                     }
@@ -1195,5 +1209,6 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Start observing value changes once the DOM is loaded
+    console.log('DOM fully loaded. Starting observation.'); // Debugging DOM loaded
     observeValueChanges();
 });
