@@ -1103,7 +1103,7 @@ wunschgewichtInput.addEventListener('input', function() {
     }, 2); // 2 milliseconds delay
 };
 
-document.getElementById('calculate-button').addEventListener('click', function() {
+document.getElementById('check-inputs').addEventListener('click', function() {
     // Get values from span elements
     const zielKcal = parseInt(document.querySelector('.ziel-kcal').textContent);
     const weeks = parseInt(document.querySelector('.weeks').textContent);
