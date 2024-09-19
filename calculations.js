@@ -1104,13 +1104,18 @@ wunschgewichtInput.addEventListener('input', function() {
 };
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Function to hide all CTAs
+    function hideAllCTAs() {
+        const ctas = document.querySelectorAll('.cta_card-wrapper.cta-calculator');
+        ctas.forEach(cta => {
+            cta.style.display = 'none'; // Hide all CTAs
+        });
+    }
+
     // Function to get slider value from either the handle text or input field
     function getSliderValue(wrapperClass, inputId) {
-        // Select the element containing the handle text for the slider
         const handleText = document.querySelector(`.${wrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
-
-        // Use the handle text value if available, else fall back to the input value
         const valueFromHandle = handleText ? parseInt(handleText.textContent, 10) : 0;
         const valueFromInput = inputElement ? parseInt(inputElement.value, 10) || 0 : 0;
 
@@ -1120,38 +1125,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to calculate weight loss based on current weight and goal weight
     function calculateWeightLoss() {
-        // Get the current weight from the slider handle or input field
         const currentWeight = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
-        console.log('Current weight:', currentWeight); // Debugging current weight
+        console.log('Current weight:', currentWeight);
 
-        // Get the goal weight from another input or handle
         const goalWeight = parseInt(document.querySelector('.target-weight').textContent) || 0;
-        console.log('Goal weight:', goalWeight); // Debugging goal weight
+        console.log('Goal weight:', goalWeight);
 
-        // Calculate weight loss
         const weightLoss = currentWeight - goalWeight;
-        console.log('Weight loss:', weightLoss); // Debugging weight loss calculation
+        console.log('Weight loss:', weightLoss);
 
-        return weightLoss > 0 ? weightLoss : 0; // Ensure the value is non-negative
+        return weightLoss > 0 ? weightLoss : 0;
     }
 
-    // Function to display the correct block based on the weight loss and gender
+    // Function to display the correct CTA based on weight loss and gender
     function checkValuesAndDisplay() {
         const zielKcal = parseInt(document.querySelector('.ziel-kcal').textContent);
         const weeks = parseInt(document.querySelector('.weeks').textContent);
         const months = parseInt(document.querySelector('.months').textContent);
 
-        console.log('Ziel kcal:', zielKcal); // Debugging kcal
-        console.log('Weeks:', weeks); // Debugging weeks
-        console.log('Months:', months); // Debugging months
+        console.log('Ziel kcal:', zielKcal);
+        console.log('Weeks:', weeks);
+        console.log('Months:', months);
 
-        // Calculate weight loss
         const weightLoss = calculateWeightLoss();
-        console.log('Final weight loss:', weightLoss); // Debugging final weight loss
+        console.log('Final weight loss:', weightLoss);
 
-        // Proceed only if all values are greater than 1
         if (zielKcal > 1 && weeks > 1 && months > 1 && weightLoss > 1) {
-            // Check selected gender
             let gender = null;
             const radioButtons = document.querySelectorAll('input[name="geschlecht"]');
             radioButtons.forEach(radio => {
@@ -1159,15 +1158,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     gender = radio.value;
                 }
             });
-            console.log('Selected gender:', gender); // Debugging selected gender
+            console.log('Selected gender:', gender);
 
             if (gender) {
-                // Show the correct div based on weight loss and gender
+                // Hide all previous CTAs
+                hideAllCTAs();
+
+                // Show the correct CTA based on weight loss and gender
                 if (gender === 'frau') {
                     if (weightLoss >= 1 && weightLoss <= 15) {
                         const element = document.querySelector('._1-15.woman');
                         if (element) {
-                            console.log('Showing 1-15kg weight loss div'); // Debugging div visibility
+                            console.log('Showing 1-15kg weight loss div');
                             element.style.display = 'block';
                         }
                     } else if (weightLoss >= 16 && weightLoss <= 25) {
@@ -1207,22 +1209,18 @@ document.addEventListener('DOMContentLoaded', function () {
             checkValuesAndDisplay();
         });
 
-        // Observe changes to text content of target elements
         targetElements.forEach(el => {
             observer.observe(el, { childList: true, subtree: true });
         });
 
-        // Also observe the input field for current weight (KFA)
         const currentWeightInput = document.getElementById('weight-2');
         currentWeightInput.addEventListener('input', checkValuesAndDisplay);
 
-        // Ensure it works with the gender radio buttons as well
         document.querySelectorAll('input[name="geschlecht"]').forEach(radio => {
             radio.addEventListener('change', checkValuesAndDisplay);
         });
     }
 
-    // Start observing value changes once the DOM is loaded
-    console.log('DOM fully loaded. Starting observation.'); // Debugging DOM loaded
+    console.log('DOM fully loaded. Starting observation.');
     observeValueChanges();
 });
