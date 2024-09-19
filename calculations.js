@@ -1104,7 +1104,6 @@ wunschgewichtInput.addEventListener('input', function() {
 };
 
 document.addEventListener('DOMContentLoaded', function () {
-
     // Function to check if all values are greater than 1
     function checkValuesAndDisplay() {
         const zielKcal = parseInt(document.querySelector('.ziel-kcal').textContent);
@@ -1125,22 +1124,31 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             if (gender) {
-                // Hide all .cta_card-wrapper.cta-calculator elements first
-                document.querySelectorAll('.cta_card-wrapper.cta-calculator').forEach(el => el.style.display = 'none');
-
                 // Show the correct div based on weight loss and gender
                 if (gender === 'frau') {
                     if (weightLoss >= 1 && weightLoss <= 15) {
-                        document.querySelector('._1-15.woman').style.display = 'block';
+                        const element = document.querySelector('._1-15.woman');
+                        if (element) {
+                            element.style.display = 'block';
+                        }
                     } else if (weightLoss >= 16 && weightLoss <= 25) {
-                        document.querySelector('._16-25.woman').style.display = 'block';
+                        const element = document.querySelector('._16-25.woman');
+                        if (element) {
+                            element.style.display = 'block';
+                        }
                     } else if (weightLoss >= 26 && weightLoss <= 35) {
-                        document.querySelector('._26-35.woman').style.display = 'block';
+                        const element = document.querySelector('._26-35.woman');
+                        if (element) {
+                            element.style.display = 'block';
+                        }
                     } else if (weightLoss > 35) {
-                        document.querySelector('._36-more.woman').style.display = 'block';
+                        const element = document.querySelector('._36-more.woman');
+                        if (element) {
+                            element.style.display = 'block';
+                        }
                     }
                 }
-                // You can implement the same logic for "Mann" here
+                // Add similar logic for "Mann" here if needed
             }
         }
     }
@@ -1173,6 +1181,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Call the function to start observing when the window loads
+    // Start observing value changes once the DOM is loaded
     observeValueChanges();
 });
