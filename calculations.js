@@ -605,21 +605,18 @@ function validateInputs() {
         hasActiveClass = true;
     }
 
-    // Flags to track missing inputs
+    // Flag to check if gender is missing
     var isGenderMissing = false;
-    var isWunschgewichtMissing = false;
 
-    // Validate Gender
     if (!selectedGender && !hasActiveClass) {
         if (genderWarning) {
-            genderWarning.style.display = 'block'; // Show gender warning
-            genderWarning.textContent = 'Bitte wähle oben dein Geschlecht aus.'; // Ensure the gender warning has the correct message
+            genderWarning.style.display = 'block'; // Show warning if no gender is selected and no active class
         }
         isValid = false;
         isGenderMissing = true; // Set flag indicating gender is missing
     } else {
         if (genderWarning) {
-            genderWarning.style.display = 'none'; // Hide gender warning if gender is selected or has active class
+            genderWarning.style.display = 'none'; // Hide warning if gender is selected or one has active class
         }
     }
 
@@ -635,15 +632,10 @@ function validateInputs() {
             }
         }
         if (!ageInput || ageInput.value.trim() === '' || parseFloat(ageInput.value) <= 0) {
-            if (ageWarning) {
-                ageWarning.style.display = 'block';
-                ageWarning.textContent = 'Bitte gib dein Alter ein.'; // Default age warning message
-            }
+            if (ageWarning) ageWarning.style.display = 'block';
             isValid = false;
         } else {
-            if (ageWarning) {
-                ageWarning.style.display = 'none';
-            }
+            if (ageWarning) ageWarning.style.display = 'none';
         }
 
         var heightInput = document.getElementById('height-2');
@@ -655,15 +647,10 @@ function validateInputs() {
             }
         }
         if (!heightInput || heightInput.value.trim() === '' || parseFloat(heightInput.value) <= 0) {
-            if (heightWarning) {
-                heightWarning.style.display = 'block';
-                heightWarning.textContent = 'Bitte gib deine Größe ein.'; // Default height warning message
-            }
+            if (heightWarning) heightWarning.style.display = 'block';
             isValid = false;
         } else {
-            if (heightWarning) {
-                heightWarning.style.display = 'none';
-            }
+            if (heightWarning) heightWarning.style.display = 'none';
         }
 
         var weightWarning = null;
@@ -674,15 +661,10 @@ function validateInputs() {
             }
         }
         if (!weightInputElementMiflin || weightInputElementMiflin.value.trim() === '' || parseFloat(weightInputElementMiflin.value) <= 0) {
-            if (weightWarning) {
-                weightWarning.style.display = 'block';
-                weightWarning.textContent = 'Bitte gib dein Gewicht ein.'; // Default weight warning message
-            }
+            if (weightWarning) weightWarning.style.display = 'block';
             isValid = false;
         } else {
-            if (weightWarning) {
-                weightWarning.style.display = 'none';
-            }
+            if (weightWarning) weightWarning.style.display = 'none';
         }
     } else if (calculationMethod === 'kfa') {
         var weightWarningKfa = null;
@@ -693,15 +675,10 @@ function validateInputs() {
             }
         }
         if (!weightInputElementKfa || weightInputElementKfa.value.trim() === '' || parseFloat(weightInputElementKfa.value) <= 0) {
-            if (weightWarningKfa) {
-                weightWarningKfa.style.display = 'block';
-                weightWarningKfa.textContent = 'Bitte gib dein Gewicht ein.'; // Default weight warning message for KFA
-            }
+            if (weightWarningKfa) weightWarningKfa.style.display = 'block';
             isValid = false;
         } else {
-            if (weightWarningKfa) {
-                weightWarningKfa.style.display = 'none';
-            }
+            if (weightWarningKfa) weightWarningKfa.style.display = 'none';
         }
 
         var kfaInput = document.getElementById('kfa-2');
@@ -713,40 +690,29 @@ function validateInputs() {
             }
         }
         if (!kfaInput || kfaInput.value.trim() === '' || parseFloat(kfaInput.value) <= 0) {
-            if (kfaWarning) {
-                kfaWarning.style.display = 'block';
-                kfaWarning.textContent = 'Bitte gib deinen KFA-Wert ein.'; // Default KFA warning message
-            }
+            if (kfaWarning) kfaWarning.style.display = 'block';
             isValid = false;
         } else {
-            if (kfaWarning) {
-                kfaWarning.style.display = 'none';
-            }
+            if (kfaWarning) kfaWarning.style.display = 'none';
         }
     }
 
     // Validate Wunschgewicht
     if (!wunschgewichtInput || wunschgewichtInput.value.trim() === '' || parseFloat(wunschgewichtInput.value) <= 0) {
+        if (wunschgewichtWarning) {
+            // **Added Conditional Logic Starts Here**
+            if (isGenderMissing) {
+                // If gender is missing, set the specific message
+                wunschgewichtWarning.textContent = 'Bitte wähle oben dein Geschlecht aus.';
+            } else {
+                // Otherwise, set the default warning message
+                wunschgewichtWarning.textContent = 'Bitte gib dein Wunschgewicht ein.'; // Adjust this message as per your default
+            }
+            wunschgewichtWarning.style.display = 'block'; 
+        }
         isValid = false;
-        isWunschgewichtMissing = true; // Set flag indicating wunschgewicht is missing
-    }
-
-    // Set the wunschgewichtWarning message based on missing inputs
-    if (wunschgewichtWarning) {
-        if (isGenderMissing && isWunschgewichtMissing) {
-            // Both gender and wunschgewicht are missing
-            wunschgewichtWarning.textContent = 'Bitte wähle oben dein Geschlecht aus und gib dein Wunschgewicht ein.';
-            wunschgewichtWarning.style.display = 'block';
-        } else if (isGenderMissing) {
-            // Only gender is missing
-            wunschgewichtWarning.textContent = 'Bitte wähle oben dein Geschlecht aus.';
-            wunschgewichtWarning.style.display = 'block';
-        } else if (isWunschgewichtMissing) {
-            // Only wunschgewicht is missing
-            wunschgewichtWarning.textContent = 'Bitte gib dein Wunschgewicht ein.';
-            wunschgewichtWarning.style.display = 'block';
-        } else {
-            // Neither is missing
+    } else {
+        if (wunschgewichtWarning) {
             wunschgewichtWarning.style.display = 'none';
         }
     }
@@ -764,7 +730,6 @@ function validateInputs() {
         isValid = false;
         if (abnehmzielWarning) {
             abnehmzielWarning.style.display = 'block';
-            abnehmzielWarning.textContent = 'Bitte wähle dein Abnehmziel aus.'; // Default Abnehmziel warning message
         }
     } else {
         if (abnehmzielWarning) {
@@ -774,7 +739,6 @@ function validateInputs() {
 
     return isValid;
 }
-
 
 
         // Function to initialize event listeners and updates
