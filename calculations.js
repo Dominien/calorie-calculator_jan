@@ -1103,7 +1103,8 @@ wunschgewichtInput.addEventListener('input', function() {
     }, 2); // 2 milliseconds delay
 };
 
-window.onload = function() {
+document.addEventListener('DOMContentLoaded', function () {
+
     // Function to check if all values are greater than 1
     function checkValuesAndDisplay() {
         const zielKcal = parseInt(document.querySelector('.ziel-kcal').textContent);
@@ -1174,4 +1175,4 @@ window.onload = function() {
 
     // Call the function to start observing when the window loads
     observeValueChanges();
-};
+});
