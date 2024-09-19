@@ -1104,12 +1104,25 @@ wunschgewichtInput.addEventListener('input', function() {
 };
 
 document.addEventListener('DOMContentLoaded', function () {
+    // Function to get slider value from either the handle text or input field
+    function getSliderValue(wrapperClass, inputId) {
+        const handleText = document.querySelector(`.${wrapperClass} .inside-handle-text`);
+        const inputElement = document.getElementById(inputId);
+
+        // Use the handle text value if available, else fall back to the input value
+        const valueFromHandle = handleText ? parseInt(handleText.textContent, 10) || 0 : 0;
+        const valueFromInput = parseInt(inputElement.value, 10) || 0;
+
+        console.log(`Value from slider (${inputId}):`, valueFromHandle || valueFromInput); // Debugging slider value
+        return valueFromHandle || valueFromInput;
+    }
+
     // Function to calculate weight loss based on current weight and goal weight
     function calculateWeightLoss() {
-        // Get the current weight from the KFA input or another source
-        const currentWeight = parseInt(document.querySelector('#weight-3-kfa').value); // Example: current weight
+        // Get the current weight from either the slider or input
+        const currentWeight = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
         console.log('Current weight:', currentWeight); // Debugging current weight
-        
+
         // Get the goal weight (this value should come from another input or handle)
         const goalWeight = parseInt(document.querySelector('.target-weight').textContent); // Example: goal weight
         console.log('Goal weight:', goalWeight); // Debugging goal weight
