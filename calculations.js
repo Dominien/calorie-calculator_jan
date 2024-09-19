@@ -1126,15 +1126,51 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to calculate weight loss based on current weight and goal weight
     function calculateWeightLoss() {
         const currentWeight = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
-        console.log('Current weight:', currentWeight);
-
         const goalWeight = parseInt(document.querySelector('.target-weight').textContent) || 0;
-        console.log('Goal weight:', goalWeight);
-
         const weightLoss = currentWeight - goalWeight;
+
+        console.log('Current weight:', currentWeight);
+        console.log('Goal weight:', goalWeight);
         console.log('Weight loss:', weightLoss);
 
         return weightLoss > 0 ? weightLoss : 0;
+    }
+
+    // Function to show the correct CTA based on weight loss and gender
+    function showCTA(gender, weightLoss) {
+        // Hide all previous CTAs
+        hideAllCTAs();
+
+        let element;
+
+        if (gender === 'frau') {
+            if (weightLoss >= 1 && weightLoss <= 15) {
+                element = document.querySelector('._1-15.woman');
+            } else if (weightLoss >= 16 && weightLoss <= 25) {
+                element = document.querySelector('._16-25.woman');
+            } else if (weightLoss >= 26 && weightLoss <= 35) {
+                element = document.querySelector('._26-35.woman');
+            } else if (weightLoss > 35) {
+                element = document.querySelector('._36-more.woman');
+            }
+        } else if (gender === 'mann') {
+            if (weightLoss >= 1 && weightLoss <= 15) {
+                element = document.querySelector('._1-15.man');
+            } else if (weightLoss >= 16 && weightLoss <= 25) {
+                element = document.querySelector('._16-25.man');
+            } else if (weightLoss >= 26 && weightLoss <= 35) {
+                element = document.querySelector('._26-35.man');
+            } else if (weightLoss > 35) {
+                element = document.querySelector('._36-more.man');
+            }
+        }
+
+        if (element) {
+            console.log(`Showing correct CTA for ${gender} with weight loss: ${weightLoss}`);
+            element.style.display = 'block';
+        } else {
+            console.log(`No matching CTA found for ${gender} with weight loss: ${weightLoss}`);
+        }
     }
 
     // Function to display the correct CTA based on weight loss and gender
@@ -1155,79 +1191,18 @@ document.addEventListener('DOMContentLoaded', function () {
             const radioButtons = document.querySelectorAll('input[name="geschlecht"]');
             radioButtons.forEach(radio => {
                 if (radio.checked) {
-                    gender = radio.value;
+                    gender = radio.value.toLowerCase();
                 }
             });
             console.log('Selected gender:', gender);
 
             if (gender) {
-                // Hide all previous CTAs
-                hideAllCTAs();
-
-                // Show the correct CTA based on weight loss and gender
-                if (gender === 'frau') {
-                    if (weightLoss >= 1 && weightLoss <= 15) {
-                        const element = document.querySelector('._1-15.woman');
-                        if (element) {
-                            console.log('Showing 1-15kg weight loss div for woman');
-                            element.style.display = 'block';
-                        }
-                    } else if (weightLoss >= 16 && weightLoss <= 25) {
-                        const element = document.querySelector('._16-25.woman');
-                        if (element) {
-                            console.log('Showing 16-25kg weight loss div for woman');
-                            element.style.display = 'block';
-                        }
-                    } else if (weightLoss >= 26 && weightLoss <= 35) {
-                        const element = document.querySelector('._26-35.woman');
-                        if (element) {
-                            console.log('Showing 26-35kg weight loss div for woman');
-                            element.style.display = 'block';
-                        }
-                    } else if (weightLoss > 35) {
-                        const element = document.querySelector('._36-more.woman');
-                        if (element) {
-                            console.log('Showing >35kg weight loss div for woman');
-                            element.style.display = 'block';
-                        }
-                    }
-                } else if (gender === 'mann') {
-                    // Adding more debugging to confirm element selection and visibility
-                    if (weightLoss >= 1 && weightLoss <= 15) {
-                        const element = document.querySelector('._1-15.man');
-                        if (element) {
-                            console.log('Showing 1-15kg weight loss div for man', element);
-                            element.style.display = 'block';
-                        } else {
-                            console.log('Could not find ._1-15.man');
-                        }
-                    } else if (weightLoss >= 16 && weightLoss <= 25) {
-                        const element = document.querySelector('._16-25.man');
-                        if (element) {
-                            console.log('Showing 16-25kg weight loss div for man', element);
-                            element.style.display = 'block';
-                        } else {
-                            console.log('Could not find ._16-25.man');
-                        }
-                    } else if (weightLoss >= 26 && weightLoss <= 35) {
-                        const element = document.querySelector('._26-35.man');
-                        if (element) {
-                            console.log('Showing 26-35kg weight loss div for man', element);
-                            element.style.display = 'block';
-                        } else {
-                            console.log('Could not find ._26-35.man');
-                        }
-                    } else if (weightLoss > 35) {
-                        const element = document.querySelector('._36-more.man');
-                        if (element) {
-                            console.log('Showing >35kg weight loss div for man', element);
-                            element.style.display = 'block';
-                        } else {
-                            console.log('Could not find ._36-more.man');
-                        }
-                    }
-                }
+                showCTA(gender, weightLoss);
+            } else {
+                console.log('No gender selected');
             }
+        } else {
+            console.log('One or more values are less than or equal to 1');
         }
     }
 
