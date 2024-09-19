@@ -1106,28 +1106,29 @@ wunschgewichtInput.addEventListener('input', function() {
 document.addEventListener('DOMContentLoaded', function () {
     // Function to get slider value from either the handle text or input field
     function getSliderValue(wrapperClass, inputId) {
+        // Select the element containing the handle text for the slider
         const handleText = document.querySelector(`.${wrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
 
         // Use the handle text value if available, else fall back to the input value
-        const valueFromHandle = handleText ? parseInt(handleText.textContent, 10) || 0 : 0;
-        const valueFromInput = parseInt(inputElement.value, 10) || 0;
+        const valueFromHandle = handleText ? parseInt(handleText.textContent, 10) : 0;
+        const valueFromInput = inputElement ? parseInt(inputElement.value, 10) || 0 : 0;
 
-        console.log(`Value from slider (${inputId}):`, valueFromHandle || valueFromInput); // Debugging slider value
+        console.log(`Slider Handle Value: ${valueFromHandle}, Input Value: ${valueFromInput}`);
         return valueFromHandle || valueFromInput;
     }
 
     // Function to calculate weight loss based on current weight and goal weight
     function calculateWeightLoss() {
-        // Get the current weight from either the slider or input
+        // Get the current weight from the slider handle or input field
         const currentWeight = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
         console.log('Current weight:', currentWeight); // Debugging current weight
 
-        // Get the goal weight (this value should come from another input or handle)
-        const goalWeight = parseInt(document.querySelector('.target-weight').textContent); // Example: goal weight
+        // Get the goal weight from another input or handle
+        const goalWeight = parseInt(document.querySelector('.target-weight').textContent) || 0;
         console.log('Goal weight:', goalWeight); // Debugging goal weight
 
-        // Calculate weight loss: current weight - goal weight
+        // Calculate weight loss
         const weightLoss = currentWeight - goalWeight;
         console.log('Weight loss:', weightLoss); // Debugging weight loss calculation
 
