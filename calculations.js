@@ -772,6 +772,9 @@ window.onload = function() {
             while (currentWeight > targetWeight) {
                 currentWeight -= currentWeight * weeklyWeightLossPercentage; // Compound weight loss
                 weeks++;
+                if (weeks > 1000) { // Safety to prevent infinite loops
+                    break;
+                }
             }
             return weeks;
         }
@@ -863,66 +866,66 @@ window.onload = function() {
             if (defizitElement) defizitElement.textContent = calorieDeficitPerDay.toString();
         
             // Generate weight data points based on calculated weeks and weight loss percentage
-            const weightData = calculateWeightDataPoints(currentWeight, targetWeight, weeksToReachGoal, weeklyWeightLossPercentage);
+            const { weightData, timeIntervals } = calculateWeightDataPoints(currentWeight, targetWeight, weeksToReachGoal, weeklyWeightLossPercentage);
         
-            // Generate the chart with calculated weight data
-            generateResultChart(weightData, weightData.length - 1);
+            // Generate the chart with calculated weight data and time intervals
+            generateResultChart(weightData, timeIntervals);
         }
         
         // Function to calculate weight data points (for the chart)
         function calculateWeightDataPoints(currentWeight, targetWeight, totalWeeks, weeklyWeightLossPercentage) {
             const weightData = [];
-            const numberOfPoints = 10; // Adjust the number of data points (dots) here
             const timeIntervals = [];
-
+            const numberOfPoints = 10; // Number of data points (dots)
+    
             // Calculate evenly spaced time intervals
             for (let i = 0; i <= numberOfPoints; i++) {
                 let t = (totalWeeks / numberOfPoints) * i;
                 timeIntervals.push(t);
             }
-
+    
             // Generate weight data using compound weight loss formula
             for (let i = 0; i <= numberOfPoints; i++) {
                 let weeksPassed = timeIntervals[i];
-
+    
                 // Using compound interest formula for weight loss
                 // weight = initialWeight * (1 - weeklyWeightLossPercentage)^(weeksPassed)
                 let weight = currentWeight * Math.pow(1 - weeklyWeightLossPercentage, weeksPassed);
-
+    
                 // Ensure the last weight is exactly the target weight
                 if (i === numberOfPoints) {
                     weight = targetWeight;
                 }
-
+    
                 weightData.push(weight.toFixed(1));
             }
-
-            return weightData;
+    
+            return { weightData, timeIntervals };
         }
-
+    
         // Function to generate the chart
-        function generateResultChart(weightData, numberOfPoints) {
+        function generateResultChart(weightData, timeIntervals) {
             // Set wrapper-canvas display to block if it isn't already
             const wrapperCanvas = document.querySelector('.wrapper-canvas');
             if (wrapperCanvas && getComputedStyle(wrapperCanvas).display !== 'block') {
                 wrapperCanvas.style.display = 'block';
             }
-
+    
             const chartCanvas = document.getElementById('resultChart');
             const ctx = chartCanvas.getContext('2d');
-
+    
             if (chartInstance) {
                 chartInstance.destroy(); // Destroy old chart instance if it exists
             }
-
+    
             const gradientFill = ctx.createLinearGradient(0, 0, 0, chartCanvas.height);
             gradientFill.addColorStop(0, 'rgba(233, 62, 45, 0.3)');
             gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');
-
-            const dates = generateKeyDates(numberOfPoints); // Generate dates based on number of data points
+    
+            const dates = generateKeyDates(timeIntervals); // Generate dates based on time intervals
             const pointColors = weightData.map((_, index) => index === 0 ? 'rgba(233, 62, 45, 1)' : 'rgba(26, 183, 0, 1)');
             const pointSizes = Array(weightData.length).fill(6); // Consistent point size
-
+    
             setTimeout(() => {
                 chartInstance = new Chart(ctx, {
                     type: 'line',
@@ -940,6 +943,7 @@ window.onload = function() {
                             pointHoverBackgroundColor: 'rgba(0, 150, 0, 1)',
                             pointRadius: pointSizes,
                             pointHitRadius: 10,
+                            lineTension: 0.3, // For a smooth curve
                         }]
                     },
                     options: {
@@ -969,33 +973,36 @@ window.onload = function() {
                                     callback: function(value, index) {
                                         return index === 0 ? 'Heute' : dates[index];
                                     },
-                                    color: '#333'
+                                    color: '#333',
+                                    maxRotation: 45,
+                                    minRotation: 45,
+                                    autoSkip: true,
+                                    maxTicksLimit: 10,
                                 },
                                 grid: { display: false }
                             }
                         }
                     }
                 });
-
+    
                 console.log("Final Chart Data: ", chartInstance.data.datasets[0].data); // Debugging log
             }, 100);
         }
-
+    
         // Helper function to generate dates for the chart
-        function generateKeyDates(numberOfPoints) {
+        function generateKeyDates(timeIntervals) {
             const dates = [];
             let currentDate = new Date();
-
-            const intervalDays = 7 * (numberOfPoints / (numberOfPoints)); // Evenly distribute over weeks
-
-            for (let i = 0; i <= numberOfPoints; i++) {
-                dates.push(currentDate.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
-                currentDate.setDate(currentDate.getDate() + intervalDays);
+    
+            for (let i = 0; i < timeIntervals.length; i++) {
+                let date = new Date(currentDate.getTime());
+                date.setDate(currentDate.getDate() + Math.round(timeIntervals[i] * 7)); // Convert weeks to days
+                dates.push(date.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
             }
-
+    
             return dates;
         }
-
+    
         // Helper function to reset results when inputs are invalid
         function resetResults() {
             if (defizitElement) defizitElement.textContent = '0';
@@ -1006,14 +1013,14 @@ window.onload = function() {
             if (zielKcalElement) zielKcalElement.textContent = '0';
             if (zielKalorienElement) zielKalorienElement.textContent = '0';
             if (warningMessageElement) warningMessageElement.style.display = 'none';
-
+    
             // Destroy the chart if it exists
             if (chartInstance) {
                 chartInstance.destroy();
                 chartInstance = null;
             }
         }
-
+    
         initializeListeners();
     }, 2); // 2 milliseconds delay
 };
