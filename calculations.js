@@ -1104,16 +1104,30 @@ wunschgewichtInput.addEventListener('input', function() {
 };
 
 document.addEventListener('DOMContentLoaded', function () {
-    // Function to check if all values are greater than 1
+    // Function to calculate weight loss based on current weight and goal weight
+    function calculateWeightLoss() {
+        // Get the current weight from the KFA input or another source
+        const currentWeight = parseInt(document.querySelector('#weight-3-kfa').value); // Example: current weight
+        // Get the goal weight (this value should come from another input or handle)
+        const goalWeight = parseInt(document.querySelector('.target-weight').textContent); // Example: goal weight
+
+        // Calculate weight loss: current weight - goal weight
+        const weightLoss = currentWeight - goalWeight;
+
+        return weightLoss > 0 ? weightLoss : 0; // Ensure the value is non-negative
+    }
+
+    // Function to display the correct block based on the weight loss and gender
     function checkValuesAndDisplay() {
         const zielKcal = parseInt(document.querySelector('.ziel-kcal').textContent);
         const weeks = parseInt(document.querySelector('.weeks').textContent);
         const months = parseInt(document.querySelector('.months').textContent);
-        const targetWeight = parseInt(document.querySelector('.target-weight').textContent);
-        const weightLoss = parseInt(document.getElementById('weight-2').value);
+
+        // Calculate weight loss
+        const weightLoss = calculateWeightLoss();
 
         // Proceed only if all values are greater than 1
-        if (zielKcal > 1 && weeks > 1 && months > 1 && targetWeight > 1 && weightLoss > 1) {
+        if (zielKcal > 1 && weeks > 1 && months > 1 && weightLoss > 1) {
             // Check selected gender
             let gender = null;
             const radioButtons = document.querySelectorAll('input[name="geschlecht"]');
@@ -1158,8 +1172,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const targetElements = [
             document.querySelector('.ziel-kcal'),
             document.querySelector('.weeks'),
-            document.querySelector('.months'),
-            document.querySelector('.target-weight')
+            document.querySelector('.months')
         ];
 
         const observer = new MutationObserver(() => {
@@ -1171,9 +1184,9 @@ document.addEventListener('DOMContentLoaded', function () {
             observer.observe(el, { childList: true, subtree: true });
         });
 
-        // Also observe the input field for weight
-        const weightInput = document.getElementById('weight-2');
-        weightInput.addEventListener('input', checkValuesAndDisplay);
+        // Also observe the input field for current weight (KFA)
+        const currentWeightInput = document.getElementById('weight-3-kfa');
+        currentWeightInput.addEventListener('input', checkValuesAndDisplay);
 
         // Ensure it works with the gender radio buttons as well
         document.querySelectorAll('input[name="geschlecht"]').forEach(radio => {
