@@ -1105,7 +1105,7 @@ wunschgewichtInput.addEventListener('input', function() {
 
 document.addEventListener('DOMContentLoaded', function() {
     // Function to handle button click
-    document.getElementById('calculate-button').addEventListener('click', function(event) {
+    document.getElementById('check-inputs').addEventListener('click', function(event) {
       event.preventDefault(); // Prevent form submission if inside a form
   
       // Clear previous error messages
