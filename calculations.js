@@ -1120,7 +1120,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Function to calculate weight loss based on current weight and goal weight
     function calculateWeightLoss() {
         // Get the current weight from either the slider or input
-        const currentWeight = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+        const currentWeight = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
         console.log('Current weight:', currentWeight); // Debugging current weight
 
         // Get the goal weight (this value should come from another input or handle)
@@ -1212,7 +1212,7 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         // Also observe the input field for current weight (KFA)
-        const currentWeightInput = document.getElementById('weight-3-kfa');
+        const currentWeightInput = document.getElementById('weight-2');
         currentWeightInput.addEventListener('input', checkValuesAndDisplay);
 
         // Ensure it works with the gender radio buttons as well
