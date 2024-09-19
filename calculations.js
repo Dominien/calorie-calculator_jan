@@ -592,6 +592,7 @@ window.onload = function() {
         attachValidation('kfa-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]');
 
         // Function to validate inputs and show warnings if any are missing or invalid
+// Function to validate inputs and show warnings if any are missing or invalid
 function validateInputs() {
     var isValid = true;
 
@@ -774,6 +775,7 @@ function validateInputs() {
 
     return isValid;
 }
+
 
 
 
