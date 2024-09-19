@@ -784,6 +784,19 @@ function validateInputs() {
     return isValid;
 }
 
+// Add event listeners for gender selection
+var genderRadios = document.querySelectorAll('input[name="geschlecht"]');
+genderRadios.forEach(function(radio) {
+    radio.addEventListener('change', function() {
+        validateInputs(); // Revalidate when gender is selected
+    });
+});
+
+// Add event listener for wunschgewicht input
+wunschgewichtInput.addEventListener('input', function() {
+    validateInputs(); // Revalidate when wunschgewicht is provided
+});
+
 
         // Function to initialize event listeners and updates
         function initializeListeners() {
