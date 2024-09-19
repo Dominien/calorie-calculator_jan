@@ -611,21 +611,14 @@ function validateInputs() {
 
     // Validate Gender
     if (!selectedGender && !hasActiveClass) {
-        if (genderWarning) {
-            genderWarning.style.display = 'block'; // Show gender warning
-            genderWarning.textContent = 'Bitte wähle oben dein Geschlecht aus.'; // Ensure the gender warning has the correct message
-        }
-        isValid = false;
         isGenderMissing = true; // Set flag indicating gender is missing
-    } else {
-        if (genderWarning) {
-            genderWarning.style.display = 'none'; // Hide gender warning if gender is selected or has active class
-        }
+        isValid = false;
     }
 
     var calculationMethod = getSelectedCalculationMethod();
     // Additional input validation logic for miflin and kfa
     if (calculationMethod === 'miflin') {
+        // Validate Age
         var ageInput = document.getElementById('age-2');
         var ageWarning = null;
         if (ageInput) {
@@ -646,6 +639,7 @@ function validateInputs() {
             }
         }
 
+        // Validate Height
         var heightInput = document.getElementById('height-2');
         var heightWarning = null;
         if (heightInput) {
@@ -666,6 +660,7 @@ function validateInputs() {
             }
         }
 
+        // Validate Weight (Miflin)
         var weightWarning = null;
         if (weightInputElementMiflin) {
             var weightClosestWrapper = weightInputElementMiflin.closest('.input-wrapper-calc');
@@ -685,6 +680,7 @@ function validateInputs() {
             }
         }
     } else if (calculationMethod === 'kfa') {
+        // Validate Weight (KFA)
         var weightWarningKfa = null;
         if (weightInputElementKfa) {
             var weightClosestWrapperKfa = weightInputElementKfa.closest('.input-wrapper-calc');
@@ -704,6 +700,7 @@ function validateInputs() {
             }
         }
 
+        // Validate KFA
         var kfaInput = document.getElementById('kfa-2');
         var kfaWarning = null;
         if (kfaInput) {
@@ -727,27 +724,39 @@ function validateInputs() {
 
     // Validate Wunschgewicht
     if (!wunschgewichtInput || wunschgewichtInput.value.trim() === '' || parseFloat(wunschgewichtInput.value) <= 0) {
-        isValid = false;
         isWunschgewichtMissing = true; // Set flag indicating wunschgewicht is missing
+        isValid = false;
     }
 
-    // Set the wunschgewichtWarning message based on missing inputs
+    // Set the warning messages based on missing inputs
     if (wunschgewichtWarning) {
         if (isGenderMissing && isWunschgewichtMissing) {
             // Both gender and wunschgewicht are missing
             wunschgewichtWarning.textContent = 'Bitte wähle oben dein Geschlecht aus und gib dein Wunschgewicht ein.';
             wunschgewichtWarning.style.display = 'block';
+            if (genderWarning) {
+                genderWarning.style.display = 'none'; // Hide gender warning when combined message is shown
+            }
         } else if (isGenderMissing) {
             // Only gender is missing
-            wunschgewichtWarning.textContent = 'Bitte wähle oben dein Geschlecht aus.';
-            wunschgewichtWarning.style.display = 'block';
+            if (genderWarning) {
+                genderWarning.textContent = 'Bitte wähle oben dein Geschlecht aus.';
+                genderWarning.style.display = 'block';
+            }
+            wunschgewichtWarning.style.display = 'none';
         } else if (isWunschgewichtMissing) {
             // Only wunschgewicht is missing
             wunschgewichtWarning.textContent = 'Bitte gib dein Wunschgewicht ein.';
             wunschgewichtWarning.style.display = 'block';
+            if (genderWarning) {
+                genderWarning.style.display = 'none'; // Hide gender warning
+            }
         } else {
             // Neither is missing
             wunschgewichtWarning.style.display = 'none';
+            if (genderWarning) {
+                genderWarning.style.display = 'none';
+            }
         }
     }
 
@@ -774,7 +783,6 @@ function validateInputs() {
 
     return isValid;
 }
-
 
 
         // Function to initialize event listeners and updates
