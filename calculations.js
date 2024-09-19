@@ -1169,30 +1169,55 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (weightLoss >= 1 && weightLoss <= 15) {
                         const element = document.querySelector('._1-15.woman');
                         if (element) {
-                            console.log('Showing 1-15kg weight loss div');
+                            console.log('Showing 1-15kg weight loss div for woman');
                             element.style.display = 'block';
                         }
                     } else if (weightLoss >= 16 && weightLoss <= 25) {
                         const element = document.querySelector('._16-25.woman');
                         if (element) {
-                            console.log('Showing 16-25kg weight loss div');
+                            console.log('Showing 16-25kg weight loss div for woman');
                             element.style.display = 'block';
                         }
                     } else if (weightLoss >= 26 && weightLoss <= 35) {
                         const element = document.querySelector('._26-35.woman');
                         if (element) {
-                            console.log('Showing 26-35kg weight loss div');
+                            console.log('Showing 26-35kg weight loss div for woman');
                             element.style.display = 'block';
                         }
                     } else if (weightLoss > 35) {
                         const element = document.querySelector('._36-more.woman');
                         if (element) {
-                            console.log('Showing >35kg weight loss div');
+                            console.log('Showing >35kg weight loss div for woman');
+                            element.style.display = 'block';
+                        }
+                    }
+                } else if (gender === 'mann') {
+                    if (weightLoss >= 1 && weightLoss <= 15) {
+                        const element = document.querySelector('._1-15.man');
+                        if (element) {
+                            console.log('Showing 1-15kg weight loss div for man');
+                            element.style.display = 'block';
+                        }
+                    } else if (weightLoss >= 16 && weightLoss <= 25) {
+                        const element = document.querySelector('._16-25.man');
+                        if (element) {
+                            console.log('Showing 16-25kg weight loss div for man');
+                            element.style.display = 'block';
+                        }
+                    } else if (weightLoss >= 26 && weightLoss <= 35) {
+                        const element = document.querySelector('._26-35.man');
+                        if (element) {
+                            console.log('Showing 26-35kg weight loss div for man');
+                            element.style.display = 'block';
+                        }
+                    } else if (weightLoss > 35) {
+                        const element = document.querySelector('._36-more.man');
+                        if (element) {
+                            console.log('Showing >35kg weight loss div for man');
                             element.style.display = 'block';
                         }
                     }
                 }
-                // Add similar logic for "Mann" here if needed
             }
         }
     }
