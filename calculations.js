@@ -1103,48 +1103,75 @@ wunschgewichtInput.addEventListener('input', function() {
     }, 2); // 2 milliseconds delay
 };
 
-document.getElementById('check-inputs').addEventListener('click', function() {
-    // Get values from span elements
-    const zielKcal = parseInt(document.querySelector('.ziel-kcal').textContent);
-    const weeks = parseInt(document.querySelector('.weeks').textContent);
-    const months = parseInt(document.querySelector('.months').textContent);
-    const targetWeight = parseInt(document.querySelector('.target-weight').textContent);
-    const weightLoss = parseInt(document.getElementById('weight-2').value);
+window.onload = function() {
+    // Function to check if all values are greater than 1
+    function checkValuesAndDisplay() {
+        const zielKcal = parseInt(document.querySelector('.ziel-kcal').textContent);
+        const weeks = parseInt(document.querySelector('.weeks').textContent);
+        const months = parseInt(document.querySelector('.months').textContent);
+        const targetWeight = parseInt(document.querySelector('.target-weight').textContent);
+        const weightLoss = parseInt(document.getElementById('weight-2').value);
 
-    // Check if values are above 0
-    if (zielKcal > 0 && weeks > 0 && months > 0 && targetWeight > 0 && weightLoss > 0) {
-        // Check selected gender
-        let gender = null;
-        const radioButtons = document.querySelectorAll('input[name="geschlecht"]');
-        radioButtons.forEach(radio => {
-            if (radio.checked) {
-                gender = radio.value;
-            }
-        });
-
-        // Proceed only if gender is selected
-        if (gender) {
-            // Function to safely display an element
-            function displayElement(selector) {
-                const element = document.querySelector(selector);
-                if (element) {
-                    element.style.display = 'block';
+        // Proceed only if all values are greater than 1
+        if (zielKcal > 1 && weeks > 1 && months > 1 && targetWeight > 1 && weightLoss > 1) {
+            // Check selected gender
+            let gender = null;
+            const radioButtons = document.querySelectorAll('input[name="geschlecht"]');
+            radioButtons.forEach(radio => {
+                if (radio.checked) {
+                    gender = radio.value;
                 }
-            }
+            });
 
-            // Show the appropriate div based on weight loss and gender
-            if (gender === 'frau') {
-                if (weightLoss >= 1 && weightLoss <= 15) {
-                    displayElement('._1-15.woman');
-                } else if (weightLoss >= 16 && weightLoss <= 25) {
-                    displayElement('._16-25.woman');
-                } else if (weightLoss >= 26 && weightLoss <= 35) {
-                    displayElement('._26-35.woman');
-                } else if (weightLoss > 35) {
-                    displayElement('._36-more.woman');
+            if (gender) {
+                // Hide all .cta_card-wrapper.cta-calculator elements first
+                document.querySelectorAll('.cta_card-wrapper.cta-calculator').forEach(el => el.style.display = 'none');
+
+                // Show the correct div based on weight loss and gender
+                if (gender === 'frau') {
+                    if (weightLoss >= 1 && weightLoss <= 15) {
+                        document.querySelector('._1-15.woman').style.display = 'block';
+                    } else if (weightLoss >= 16 && weightLoss <= 25) {
+                        document.querySelector('._16-25.woman').style.display = 'block';
+                    } else if (weightLoss >= 26 && weightLoss <= 35) {
+                        document.querySelector('._26-35.woman').style.display = 'block';
+                    } else if (weightLoss > 35) {
+                        document.querySelector('._36-more.woman').style.display = 'block';
+                    }
                 }
+                // You can implement the same logic for "Mann" here
             }
-            // Add similar logic for "Mann" if needed
         }
     }
-});
+
+    // Function to set up the MutationObserver
+    function observeValueChanges() {
+        const targetElements = [
+            document.querySelector('.ziel-kcal'),
+            document.querySelector('.weeks'),
+            document.querySelector('.months'),
+            document.querySelector('.target-weight')
+        ];
+
+        const observer = new MutationObserver(() => {
+            checkValuesAndDisplay();
+        });
+
+        // Observe changes to text content of target elements
+        targetElements.forEach(el => {
+            observer.observe(el, { childList: true, subtree: true });
+        });
+
+        // Also observe the input field for weight
+        const weightInput = document.getElementById('weight-2');
+        weightInput.addEventListener('input', checkValuesAndDisplay);
+
+        // Ensure it works with the gender radio buttons as well
+        document.querySelectorAll('input[name="geschlecht"]').forEach(radio => {
+            radio.addEventListener('change', checkValuesAndDisplay);
+        });
+    }
+
+    // Call the function to start observing when the window loads
+    observeValueChanges();
+};
