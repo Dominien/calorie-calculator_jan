@@ -592,8 +592,11 @@ window.onload = function() {
         attachValidation('kfa-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]');
 
   // Function to validate inputs and show warnings if any are missing or invalid
+  var isBerechnenClicked = false;
 function validateInputs() {
     var isValid = true;
+    if (!isBerechnenClicked) return; // Only validate if "Berechnen" button has been clicked
+
 
     // Validate gender selection or check if one of the buttons has the 'active' class
     var selectedGender = document.querySelector('input[name="geschlecht"]:checked');
@@ -831,6 +834,7 @@ wunschgewichtInput.addEventListener('input', function() {
             if (berechnenButton) {
                 berechnenButton.addEventListener('click', function (event) {
                     event.preventDefault();
+                    isBerechnenClicked = true; // Mark that the button has been clicked
                     if (validateInputs()) {
                         updateResults();
                     }
