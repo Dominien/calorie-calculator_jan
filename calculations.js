@@ -1102,3 +1102,105 @@ wunschgewichtInput.addEventListener('input', function() {
         initializeListeners();
     }, 2); // 2 milliseconds delay
 };
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Function to handle button click
+    document.getElementById('calculate-button').addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent form submission if inside a form
+  
+      // Clear previous error messages
+      document.querySelector('.text-warning').style.display = 'none';
+      document.querySelector('.weight-warning').style.display = 'none';
+      document.querySelector('.general-error').style.display = 'none';
+      document.querySelector('.general-error').textContent = '';
+  
+      // Retrieve and parse result values
+      const zielKcal = parseFloat(document.querySelector('.span-result.ziel-kcal').textContent);
+      const weeks = parseFloat(document.querySelector('.span-result.weeks').textContent);
+      const targetWeight = parseFloat(document.querySelector('.span-result.target-weight').textContent);
+      const months = parseFloat(document.querySelector('.span-result.months').textContent);
+      
+      // Validate that all values are above 0
+      if (zielKcal > 0 && weeks > 0 && targetWeight > 0 && months > 0) {
+        
+        // Determine selected gender
+        const genderRadios = document.getElementsByName('geschlecht');
+        let selectedGenderValue = null;
+        for (let i = 0; i < genderRadios.length; i++) {
+          if (genderRadios[i].checked) {
+            selectedGenderValue = genderRadios[i].value;
+            break;
+          }
+        }
+        
+        if (!selectedGenderValue) {
+          // If no gender is selected, display warning and exit
+          document.querySelector('.text-warning').style.display = 'block';
+          return;
+        }
+        
+        // Map gender value to class name
+        let selectedGenderClass = '';
+        if (selectedGenderValue.toLowerCase() === 'frau') {
+          selectedGenderClass = 'woman';
+        } else if (selectedGenderValue.toLowerCase() === 'mann') {
+          selectedGenderClass = 'man';
+        } else {
+          // Handle unknown gender
+          document.querySelector('.general-error').textContent = 'Unbekanntes Geschlecht ausgewählt.';
+          document.querySelector('.general-error').style.display = 'block';
+          return;
+        }
+        
+        // Retrieve weight loss value
+        const weightInput = document.getElementById('weight-2').value.trim();
+        const weightLoss = parseFloat(weightInput);
+        
+        if (isNaN(weightLoss) || weightLoss <= 0) {
+          document.querySelector('.weight-warning').style.display = 'block';
+          return;
+        }
+        
+        // Determine weight loss range
+        let weightRange = '';
+        if (weightLoss >= 1 && weightLoss <= 15) {
+          weightRange = '_1-15';
+        } else if (weightLoss >= 16 && weightLoss <= 25) {
+          weightRange = '_16-25';
+        } else if (weightLoss >= 26 && weightLoss <= 35) {
+          weightRange = '_26-35';
+        } else if (weightLoss >= 36) {
+          weightRange = '_36-more';
+        } else {
+          document.querySelector('.general-error').textContent = 'Bitte geben Sie einen gültigen Gewichtsverlust ein.';
+          document.querySelector('.general-error').style.display = 'block';
+          return;
+        }
+        
+        // Hide all result divs first
+        const allResultDivs = document.querySelectorAll('.cta_card-wrapper.cta-calculator');
+        allResultDivs.forEach(function(div) {
+          div.style.display = 'none';
+        });
+        
+        // Construct the selector for the target div
+        const targetDivSelector = `.cta-calculator.${weightRange}.${selectedGenderClass}`;
+        const targetDiv = document.querySelector(targetDivSelector);
+        
+        if (targetDiv) {
+          targetDiv.style.display = 'block';
+          // Optionally, scroll to the result div for better user experience
+          targetDiv.scrollIntoView({ behavior: 'smooth' });
+        } else {
+          document.querySelector('.general-error').textContent = 'Keine passende Ergebnisanzeige gefunden.';
+          document.querySelector('.general-error').style.display = 'block';
+        }
+        
+      } else {
+        // If any of the result values are not above 0, display a general error
+        document.querySelector('.general-error').textContent = 'Bitte stellen Sie sicher, dass alle Werte über 0 sind.';
+        document.querySelector('.general-error').style.display = 'block';
+      }
+    });
+  });
+  
