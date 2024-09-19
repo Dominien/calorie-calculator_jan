@@ -1103,7 +1103,7 @@ wunschgewichtInput.addEventListener('input', function() {
     }, 2); // 2 milliseconds delay
 };
 
-document.getElementById('check-inputs').addEventListener('click', function() {
+document.getElementById('calculate-button').addEventListener('click', function() {
     // Get values from span elements
     const zielKcal = parseInt(document.querySelector('.ziel-kcal').textContent);
     const weeks = parseInt(document.querySelector('.weeks').textContent);
@@ -1124,21 +1124,27 @@ document.getElementById('check-inputs').addEventListener('click', function() {
 
         // Proceed only if gender is selected
         if (gender) {
+            // Function to safely display an element
+            function displayElement(selector) {
+                const element = document.querySelector(selector);
+                if (element) {
+                    element.style.display = 'block';
+                }
+            }
+
             // Show the appropriate div based on weight loss and gender
             if (gender === 'frau') {
                 if (weightLoss >= 1 && weightLoss <= 15) {
-                    document.querySelector('._1-15.woman').style.display = 'block';
+                    displayElement('._1-15.woman');
                 } else if (weightLoss >= 16 && weightLoss <= 25) {
-                    document.querySelector('._16-25.woman').style.display = 'block';
+                    displayElement('._16-25.woman');
                 } else if (weightLoss >= 26 && weightLoss <= 35) {
-                    document.querySelector('._26-35.woman').style.display = 'block';
+                    displayElement('._26-35.woman');
                 } else if (weightLoss > 35) {
-                    document.querySelector('._36-more.woman').style.display = 'block';
+                    displayElement('._36-more.woman');
                 }
             }
-            // Man logic will follow a similar pattern
+            // Add similar logic for "Mann" if needed
         }
     }
 });
-
-  
