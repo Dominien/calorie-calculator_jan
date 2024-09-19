@@ -1192,29 +1192,38 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                     }
                 } else if (gender === 'mann') {
+                    // Adding more debugging to confirm element selection and visibility
                     if (weightLoss >= 1 && weightLoss <= 15) {
                         const element = document.querySelector('._1-15.man');
                         if (element) {
-                            console.log('Showing 1-15kg weight loss div for man');
+                            console.log('Showing 1-15kg weight loss div for man', element);
                             element.style.display = 'block';
+                        } else {
+                            console.log('Could not find ._1-15.man');
                         }
                     } else if (weightLoss >= 16 && weightLoss <= 25) {
                         const element = document.querySelector('._16-25.man');
                         if (element) {
-                            console.log('Showing 16-25kg weight loss div for man');
+                            console.log('Showing 16-25kg weight loss div for man', element);
                             element.style.display = 'block';
+                        } else {
+                            console.log('Could not find ._16-25.man');
                         }
                     } else if (weightLoss >= 26 && weightLoss <= 35) {
                         const element = document.querySelector('._26-35.man');
                         if (element) {
-                            console.log('Showing 26-35kg weight loss div for man');
+                            console.log('Showing 26-35kg weight loss div for man', element);
                             element.style.display = 'block';
+                        } else {
+                            console.log('Could not find ._26-35.man');
                         }
                     } else if (weightLoss > 35) {
                         const element = document.querySelector('._36-more.man');
                         if (element) {
-                            console.log('Showing >35kg weight loss div for man');
+                            console.log('Showing >35kg weight loss div for man', element);
                             element.style.display = 'block';
+                        } else {
+                            console.log('Could not find ._36-more.man');
                         }
                     }
                 }
