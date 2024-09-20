@@ -925,7 +925,7 @@ wunschgewichtInput.addEventListener('input', function() {
                     warningMessageElement.style.display = 'flex';
                     var warningMessage = warningMessageElement.querySelector('.warning-message');
                     if (warningMessage) {
-                        warningMessage.textContent = 'Warnhinweis: Nicht weniger als ' + grundUmsatzValue + ' kcal essen, da dies dein Grundumsatz ist.';
+                        warningMessage.textContent = 'Warnhinweis: Du solltest nicht weniger als  ' + grundUmsatzValue + ' kcal essen, um deine Gesundheit nicht zu gefährden.';
                     }
                 } else {
                     warningMessageElement.style.display = 'none';
