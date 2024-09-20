@@ -472,3 +472,16 @@ function setRadio(wrapper, isChecked) {
         });
     }
 }
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Select all elements with the class 'woman-button'
+    const womanButtons = document.querySelectorAll('.woman-button');
+
+    // Iterate over each element and apply the inline style for the pointer cursor
+    womanButtons.forEach(button => {
+        button.style.cursor = 'pointer';
+    });
+
+    console.log('Pointer cursor added to woman buttons.');
+});
