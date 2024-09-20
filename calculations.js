@@ -1142,11 +1142,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to calculate weight loss based on current weight and goal weight
     function calculateWeightLoss() {
-        // Get current weight from either the input or slider handle
-        const currentWeight = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
-        const goalWeight = parseInt(document.querySelector('.target-weight').textContent) || 0;
+        // Determine calculation type (Miflin or KFA)
+        const calcType = document.querySelector('input[name="kfa-or-miflin"]:checked').value;
 
+        // Fetch current weight depending on the calculation type
+        const currentWeight = calcType === 'miflin'
+            ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2')
+            : getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+
+        const goalWeight = parseInt(document.querySelector('.target-weight').textContent) || 0;
         const weightLoss = currentWeight - goalWeight;
+
         return weightLoss > 0 ? weightLoss : 0;
     }
 
@@ -1227,9 +1233,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Add input listener for weight and gender
         const currentWeightInput = document.getElementById('weight-2');
+        const weightKfaInput = document.getElementById('weight-3-kfa');
+
         currentWeightInput.addEventListener('input', checkValuesAndDisplay);
+        weightKfaInput.addEventListener('input', checkValuesAndDisplay);
 
         document.querySelectorAll('input[name="geschlecht"]').forEach(radio => {
+            radio.addEventListener('change', checkValuesAndDisplay);
+        });
+
+        document.querySelectorAll('input[name="kfa-or-miflin"]').forEach(radio => {
             radio.addEventListener('change', checkValuesAndDisplay);
         });
     }
@@ -1237,3 +1250,4 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM fully loaded. Starting observation.');
     observeValueChanges();
 });
+
