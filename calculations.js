@@ -906,7 +906,7 @@ wunschgewichtInput.addEventListener('input', function() {
         
             // Calculate weeks to reach the goal using compound weight loss
             var weeksToReachGoal = calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPercentage);
-            var monthsToReachGoal = (weeksToReachGoal / 4.345).toFixed(1); // Convert weeks to months
+            var monthsToReachGoal = Math.round(weeksToReachGoal / 4.345); // Convert weeks to months and round to nearest whole number
         
             if (weeksElement) weeksElement.textContent = weeksToReachGoal.toString();
             if (monthsElement) {
