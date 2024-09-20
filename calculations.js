@@ -985,6 +985,11 @@ wunschgewichtInput.addEventListener('input', function() {
             if (wrapperCanvas && getComputedStyle(wrapperCanvas).display !== 'block') {
                 wrapperCanvas.style.display = 'block';
             }
+
+             // Show the text under the canvas
+             if (textUnderCanvas && getComputedStyle(textUnderCanvas).display !== 'block') {
+                textUnderCanvas.style.display = 'block';
+            }
     
             const chartCanvas = document.getElementById('resultChart');
             const ctx = chartCanvas.getContext('2d');
@@ -1089,6 +1094,13 @@ wunschgewichtInput.addEventListener('input', function() {
             if (zielKalorienElement) zielKalorienElement.textContent = '0';
             if (warningMessageElement) warningMessageElement.style.display = 'none';
     
+            
+             // Hide the text-under_canvas when resetting results
+             const textUnderCanvas = document.querySelector('.text-under_canvas');
+             if (textUnderCanvas && getComputedStyle(textUnderCanvas).display !== 'none') {
+                 textUnderCanvas.style.display = 'none';
+             }
+            
             // Destroy the chart if it exists
             if (chartInstance) {
                 chartInstance.destroy();
