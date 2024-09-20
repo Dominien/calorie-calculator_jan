@@ -888,7 +888,7 @@ wunschgewichtInput.addEventListener('input', function() {
                 !selectedValue
             ) {
                 resetResults(); // Reset if inputs are invalid
-                wrapperCanvas.style.display = 'none';
+                wrapperCanvas && (wrapperCanvas.style.display = 'none'); // Inline display logic
                 return;
             }
 
