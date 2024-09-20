@@ -982,6 +982,8 @@ wunschgewichtInput.addEventListener('input', function() {
         function generateResultChart(weightData, timeIntervals) {
             // Set wrapper-canvas display to block if it isn't already
             const wrapperCanvas = document.querySelector('.wrapper-canvas');
+            const textUnderCanvas = document.querySelector('.text-under_canvas'); // Select the text element
+
             if (wrapperCanvas && getComputedStyle(wrapperCanvas).display !== 'block') {
                 wrapperCanvas.style.display = 'block';
             }
