@@ -1,28 +1,48 @@
 document.addEventListener('DOMContentLoaded', function() {
     const numericInputs = document.querySelectorAll('.input-calculator');
 
-    // Restrict input to only numeric values, but exclude 'wunschgewicht' field
-    numericInputs.forEach(input => {
-        if (input.id !== 'wunschgewicht') { // Exclude the 'wunschgewicht' field
-            input.addEventListener('input', () => {
-                input.value = input.value.replace(/[^0-9]/g, ''); // Allow only numbers
-            });
+    // List of input IDs that should allow commas
+    const allowCommaFields = ['wunschgewicht', 'weight-2', 'weight-3-kfa'];
 
-            input.addEventListener('keydown', (event) => {
-                // Allow certain keys such as backspace, delete, tab, etc.
-                if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'].includes(event.key) ||
-                    (event.key === 'a' && (event.ctrlKey || event.metaKey)) || 
-                    (event.key === 'c' && (event.ctrlKey || event.metaKey)) || 
-                    (event.key === 'v' && (event.ctrlKey || event.metaKey)) || 
-                    (event.key === 'x' && (event.ctrlKey || event.metaKey))) {
-                    return;
-                }
-                // Ensure numeric input
-                if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && (event.keyCode < 96 || event.keyCode > 105)) {
-                    event.preventDefault();
-                }
+    // Restrict input based on whether commas are allowed
+    numericInputs.forEach(input => {
+        if (allowCommaFields.includes(input.id)) {
+            // Allow numbers, commas, and periods for specific fields
+            input.addEventListener('input', () => {
+                input.value = input.value.replace(/[^0-9,\.]/g, ''); 
+            });
+        } else {
+            // Allow only numbers for other fields
+            input.addEventListener('input', () => {
+                input.value = input.value.replace(/[^0-9]/g, ''); 
             });
         }
+
+        input.addEventListener('keydown', (event) => {
+            // Allow certain keys such as backspace, delete, tab, etc.
+            if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'].includes(event.key) ||
+                (event.key === 'a' && (event.ctrlKey || event.metaKey)) || 
+                (event.key === 'c' && (event.ctrlKey || event.metaKey)) || 
+                (event.key === 'v' && (event.ctrlKey || event.metaKey)) || 
+                (event.key === 'x' && (event.ctrlKey || event.metaKey))) {
+                return;
+            }
+
+            // Apply different rules for fields that allow commas
+            if (allowCommaFields.includes(input.id)) {
+                // Ensure numeric input with commas or periods
+                if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && 
+                    (event.keyCode < 96 || event.keyCode > 105) && event.key !== ',' && event.key !== '.') {
+                    event.preventDefault();
+                }
+            } else {
+                // Ensure numeric input only for other fields
+                if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && 
+                    (event.keyCode < 96 || event.keyCode > 105)) {
+                    event.preventDefault();
+                }
+            }
+        });
     });
 
     // Function to update range slider position and value for weight and KFA
@@ -156,6 +176,7 @@ document.addEventListener('DOMContentLoaded', function() {
     observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
     observeChanges('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // New steps slider
 });
+
 
 document.addEventListener("DOMContentLoaded", function() {
     // Function to look for elements until they are found
