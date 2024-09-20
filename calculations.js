@@ -1224,6 +1224,13 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // Function to handle calculation type change and recheck inputs
+    function onCalculationTypeChange() {
+        console.log('Calculation type changed, checking relevant inputs.');
+        // When switching between KFA and Miflin, recheck the inputs
+        checkValuesAndDisplay();
+    }
+
     // Function to set up the MutationObserver
     function observeValueChanges() {
         const targetElements = [
@@ -1252,7 +1259,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         document.querySelectorAll('input[name="kfa-or-miflin"]').forEach(radio => {
-            radio.addEventListener('change', checkValuesAndDisplay);
+            radio.addEventListener('change', () => {
+                onCalculationTypeChange(); // Call this when the calculation type changes
+            });
         });
     }
 
