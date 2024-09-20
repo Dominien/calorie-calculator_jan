@@ -397,16 +397,17 @@ document.addEventListener('DOMContentLoaded', function () {
         // If Grundumsatz is available, use it; otherwise, use fallback (1280 kcal)
         const baseCalories = grundumsatz || fallbackCalories;
 
-        const totalCalories = baseCalories + alltagsbewegung + aktivesTraining;
-        totalCaloriesElement.textContent = `${totalCalories}`;
+        // Calculate the total calories (excluding Nahrungsburn)
+        let totalCalories = baseCalories + alltagsbewegung + aktivesTraining;
 
-        // After total calories are updated, calculate nahrungsburn
-        calculateNahrungsverbrennung(totalCalories);
-    }
+        // After total calories are calculated, calculate nahrungsburn (8% of total calories)
+        const nahrungsverbrennung = totalCalories * 0.08;
 
-    // Function to calculate Nahrungsverbrennung
-    function calculateNahrungsverbrennung(totalCalories) {
-        const nahrungsverbrennung = totalCalories * 0.08; // 8% of total calories
+        // Add nahrungsburn to the total calories
+        totalCalories += nahrungsverbrennung;
+
+        // Update the totalCaloriesElement and nahrungsburn elements
+        totalCaloriesElement.textContent = `${Math.round(totalCalories)} kcal`;
         nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)} kcal`;
     }
 
@@ -418,6 +419,9 @@ document.addEventListener('DOMContentLoaded', function () {
         const observer = new MutationObserver(updateActualCalories);
         observer.observe(element, { childList: true, subtree: true }); // Observe changes to the text content
     });
+
+    // Trigger the update on page load
+    updateActualCalories();
 });
 
 
