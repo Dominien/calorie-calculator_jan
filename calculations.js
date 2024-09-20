@@ -407,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function () {
         totalCalories += nahrungsverbrennung;
 
         // Update the totalCaloriesElement and nahrungsburn elements
-        totalCaloriesElement.textContent = `${Math.round(totalCalories)} kcal`;
+        totalCaloriesElement.textContent = `${Math.round(totalCalories)}`;
         nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)} kcal`;
     }
 
