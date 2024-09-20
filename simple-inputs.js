@@ -1,77 +1,77 @@
 document.addEventListener('DOMContentLoaded', function() {
     const numericInputs = document.querySelectorAll('.input-calculator');
 
-// List of input IDs that should allow commas
-const allowCommaFields = ['wunschgewicht', 'weight-2', 'weight-3-kfa'];
+    // List of input IDs that should allow commas
+    const allowCommaFields = ['wunschgewicht', 'weight-2', 'weight-3-kfa'];
 
-// Restrict input based on whether commas are allowed
-numericInputs.forEach(input => {
-    console.log(`Checking input field with ID: ${input.id}`);
-    
-    if (allowCommaFields.includes(input.id)) {
-        console.log(`Allowing comma input for field: ${input.id}`);
+    // Restrict input based on whether commas are allowed
+    numericInputs.forEach(input => {
+        console.log(`Checking input field with ID: ${input.id}`);
         
-        // Allow numbers, commas, and periods for specific fields
-        input.addEventListener('input', () => {
-            console.log(`Input event triggered for field: ${input.id}, value before: ${input.value}`);
-            input.value = input.value.replace(/[^0-9,\.]/g, ''); 
-            console.log(`Updated value for field: ${input.id}, value after: ${input.value}`);
-        });
+        if (allowCommaFields.includes(input.id)) {
+            console.log(`Allowing comma input for field: ${input.id}`);
+            
+            // Allow numbers, commas, and periods for specific fields
+            input.addEventListener('input', () => {
+                console.log(`Input event triggered for field: ${input.id}, value before: ${input.value}`);
+                input.value = input.value.replace(/[^0-9,\.]/g, ''); 
+                console.log(`Updated value for field: ${input.id}, value after: ${input.value}`);
+            });
 
-        input.addEventListener('keydown', (event) => {
-            console.log(`Keydown event on field: ${input.id}, key: ${event.key}`);
-            // Allow certain keys such as backspace, delete, tab, etc.
-            if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'].includes(event.key) ||
-                (event.key === 'a' && (event.ctrlKey || event.metaKey)) || 
-                (event.key === 'c' && (event.ctrlKey || event.metaKey)) || 
-                (event.key === 'v' && (event.ctrlKey || event.metaKey)) || 
-                (event.key === 'x' && (event.ctrlKey || event.metaKey))) {
-                console.log(`Allowed special key: ${event.key}`);
-                return;
-            }
+            input.addEventListener('keydown', (event) => {
+                console.log(`Keydown event on field: ${input.id}, key: ${event.key}`);
+                // Allow certain keys such as backspace, delete, tab, etc.
+                if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'].includes(event.key) ||
+                    (event.key === 'a' && (event.ctrlKey || event.metaKey)) || 
+                    (event.key === 'c' && (event.ctrlKey || event.metaKey)) || 
+                    (event.key === 'v' && (event.ctrlKey || event.metaKey)) || 
+                    (event.key === 'x' && (event.ctrlKey || event.metaKey))) {
+                    console.log(`Allowed special key: ${event.key}`);
+                    return;
+                }
 
-            // Ensure numeric input with commas or periods
-            if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && 
-                (event.keyCode < 96 || event.keyCode > 105) && event.key !== ',' && event.key !== '.') {
-                console.log(`Prevented key: ${event.key}`);
-                event.preventDefault();
-            } else {
-                console.log(`Allowed key: ${event.key}`);
-            }
-        });
-    } else {
-        console.log(`Restricting input to numbers for field: ${input.id}`);
-        
-        // Allow only numbers for other fields
-        input.addEventListener('input', () => {
-            console.log(`Input event triggered for numeric-only field: ${input.id}, value before: ${input.value}`);
-            input.value = input.value.replace(/[^0-9]/g, ''); 
-            console.log(`Updated value for numeric-only field: ${input.id}, value after: ${input.value}`);
-        });
+                // Ensure numeric input with commas or periods
+                if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && 
+                    (event.keyCode < 96 || event.keyCode > 105) && event.key !== ',' && event.key !== '.') {
+                    console.log(`Prevented key: ${event.key}`);
+                    event.preventDefault();
+                } else {
+                    console.log(`Allowed key: ${event.key}`);
+                }
+            });
+        } else {
+            console.log(`Restricting input to numbers for field: ${input.id}`);
+            
+            // Allow only numbers for other fields
+            input.addEventListener('input', () => {
+                console.log(`Input event triggered for numeric-only field: ${input.id}, value before: ${input.value}`);
+                input.value = input.value.replace(/[^0-9]/g, ''); 
+                console.log(`Updated value for numeric-only field: ${input.id}, value after: ${input.value}`);
+            });
 
-        input.addEventListener('keydown', (event) => {
-            console.log(`Keydown event on numeric-only field: ${input.id}, key: ${event.key}`);
-            // Allow certain keys such as backspace, delete, tab, etc.
-            if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'].includes(event.key) ||
-                (event.key === 'a' && (event.ctrlKey || event.metaKey)) || 
-                (event.key === 'c' && (event.ctrlKey || event.metaKey)) || 
-                (event.key === 'v' && (event.ctrlKey || event.metaKey)) || 
-                (event.key === 'x' && (event.ctrlKey || event.metaKey))) {
-                console.log(`Allowed special key: ${event.key}`);
-                return;
-            }
+            input.addEventListener('keydown', (event) => {
+                console.log(`Keydown event on numeric-only field: ${input.id}, key: ${event.key}`);
+                // Allow certain keys such as backspace, delete, tab, etc.
+                if (['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'].includes(event.key) ||
+                    (event.key === 'a' && (event.ctrlKey || event.metaKey)) || 
+                    (event.key === 'c' && (event.ctrlKey || event.metaKey)) || 
+                    (event.key === 'v' && (event.ctrlKey || event.metaKey)) || 
+                    (event.key === 'x' && (event.ctrlKey || event.metaKey))) {
+                    console.log(`Allowed special key: ${event.key}`);
+                    return;
+                }
 
-            // Ensure numeric input only for other fields
-            if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && 
-                (event.keyCode < 96 || event.keyCode > 105)) {
-                console.log(`Prevented key: ${event.key}`);
-                event.preventDefault();
-            } else {
-                console.log(`Allowed key: ${event.key}`);
-            }
-        });
-    }
-});
+                // Ensure numeric input only for other fields
+                if ((event.shiftKey || (event.keyCode < 48 || event.keyCode > 57)) && 
+                    (event.keyCode < 96 || event.keyCode > 105)) {
+                    console.log(`Prevented key: ${event.key}`);
+                    event.preventDefault();
+                } else {
+                    console.log(`Allowed key: ${event.key}`);
+                }
+            });
+        }
+    });
 
 
     // Function to update range slider position and value for weight and KFA
@@ -82,6 +82,8 @@ numericInputs.forEach(input => {
 
         const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
         const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
+
+        console.log(`Slider range: min=${min}, max=${max}, current value=${value}`);
 
         // Ensure the value stays within the range
         value = Math.max(min, Math.min(value, max));
@@ -96,11 +98,14 @@ numericInputs.forEach(input => {
         // Set handle and fill to a max of 100% and a min of 0%
         handle.style.left = `${Math.min(Math.max(percentage, 0), 100)}%`;
         fill.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
+
+        console.log(`Updated slider position: ${percentage}%`);
     }
 
     // Sync input field value with slider handle text for weight and KFA
     function setInputValue(rangeSliderWrapperClass, inputId) {
         const handleText = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`).textContent;
+        console.log(`Slider Handle Value: ${handleText}, Input Value: ${document.getElementById(inputId).value}`);
         document.getElementById(inputId).value = handleText;
         handleInputChange();
     }
@@ -109,6 +114,7 @@ numericInputs.forEach(input => {
     function setHandleText(rangeSliderWrapperClass, inputId) {
         const inputValue = document.getElementById(inputId).value;
         const handleText = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
+        console.log(`Setting handle text. Input ID: ${inputId}, Input Value: ${inputValue}`);
         handleText.textContent = inputValue;
         updateRangeSliderPosition(rangeSliderWrapperClass, inputValue, true);
         handleInputChange();
@@ -119,28 +125,7 @@ numericInputs.forEach(input => {
         // Get the input values from the sliders
         const weight = document.getElementById("weight-3-kfa").value;
         const kfa = document.getElementById("kfa-2").value;
-    }
-
-    // Function to handle input changes and slider sync for weight and KFA
-    function observeChanges(rangeSliderWrapperClass, inputId) {
-        const handleTextElement = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
-        const inputElement = document.getElementById(inputId);
-
-        const observer = new MutationObserver(() => {
-            if (inputElement.value !== handleTextElement.textContent) {
-                inputElement.value = handleTextElement.textContent;
-                handleInputChange();
-            }
-        });
-
-        observer.observe(handleTextElement, { childList: true });
-
-        inputElement.addEventListener('input', () => {
-            if (inputElement.value !== handleTextElement.textContent) {
-                handleTextElement.textContent = inputElement.value;
-                updateRangeSliderPosition(rangeSliderWrapperClass, inputElement.value, true);
-            }
-        });
+        console.log(`Weight: ${weight}, KFA: ${kfa}`);
     }
 
     // Add listeners for slider handle movement for weight and KFA
@@ -162,8 +147,16 @@ numericInputs.forEach(input => {
             const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
             const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
             const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
-            const value = Math.round(min + (percentage / 100) * (max - min));
+            
+            // For fields that allow commas, avoid rounding the value
+            let value;
+            if (allowCommaFields.includes(inputId)) {
+                value = (min + (percentage / 100) * (max - min)).toFixed(1); // Allow decimal place
+            } else {
+                value = Math.round(min + (percentage / 100) * (max - min)); // Round for other fields
+            }
 
+            console.log(`Slider clicked. Calculated value: ${value}`);
             document.getElementById(inputId).value = value;
             setHandleText(rangeSliderWrapperClass, inputId);
         });
