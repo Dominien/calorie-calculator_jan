@@ -888,21 +888,10 @@ wunschgewichtInput.addEventListener('input', function() {
                 !selectedValue
             ) {
                 resetResults(); // Reset if inputs are invalid
+                wrapperCanvas.style.display = 'none';
                 return;
             }
 
-             // Show or hide the canvas based on the weight value
-    const wrapperCanvas = document.querySelector('.wrapper-canvas');
-    const textUnderCanvas = document.querySelector('.text-under_canvas');
-    if (currentWeight <= 0) {
-        if (wrapperCanvas) wrapperCanvas.style.display = 'none';
-        if (textUnderCanvas) textUnderCanvas.style.display = 'none';
-        return;
-    } else {
-        if (wrapperCanvas) wrapperCanvas.style.display = 'block';
-        if (textUnderCanvas) textUnderCanvas.style.display = 'block';
-    }
-        
             // Set the weekly weight loss percentage based on selected value
             var weeklyWeightLossPercentage = 0;
             if (selectedValue === 'Langsames Abnehmen') {
