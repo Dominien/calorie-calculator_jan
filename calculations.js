@@ -888,7 +888,6 @@ wunschgewichtInput.addEventListener('input', function() {
                 !selectedValue
             ) {
                 resetResults(); // Reset if inputs are invalid
-                wrapperCanvas && (wrapperCanvas.style.display = 'none'); // Inline display logic
                 return;
             }
 
@@ -1096,13 +1095,18 @@ wunschgewichtInput.addEventListener('input', function() {
             if (zielKcalElement) zielKcalElement.textContent = '0';
             if (zielKalorienElement) zielKalorienElement.textContent = '0';
             if (warningMessageElement) warningMessageElement.style.display = 'none';
-    
-            
-             // Hide the text-under_canvas when resetting results
-             const textUnderCanvas = document.querySelector('.text-under_canvas');
-             if (textUnderCanvas && getComputedStyle(textUnderCanvas).display !== 'none') {
-                 textUnderCanvas.style.display = 'none';
-             }
+        
+            // Hide the text-under_canvas when resetting results
+            const textUnderCanvas = document.querySelector('.text-under_canvas');
+            if (textUnderCanvas && getComputedStyle(textUnderCanvas).display !== 'none') {
+                textUnderCanvas.style.display = 'none';
+            }
+        
+            // Hide the canvas when resetting results
+            const wrapperCanvas = document.querySelector('.wrapper-canvas');
+            if (wrapperCanvas && getComputedStyle(wrapperCanvas).display !== 'none') {
+                wrapperCanvas.style.display = 'none';
+            }
             
             // Destroy the chart if it exists
             if (chartInstance) {
@@ -1110,6 +1114,7 @@ wunschgewichtInput.addEventListener('input', function() {
                 chartInstance = null;
             }
         }
+        
     
         initializeListeners();
     }, 2); // 2 milliseconds delay
