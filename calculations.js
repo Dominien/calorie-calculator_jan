@@ -1200,6 +1200,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const weightLoss = calculateWeightLoss();
 
+        // Hide CTA if weight is 0 or below
+        const currentWeightMiflin = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
+        const currentWeightKfa = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
+
+        if (currentWeightMiflin <= 0 && currentWeightKfa <= 0) {
+            hideAllCTAs();
+            return;
+        }
+
         if (zielKcal > 1 && weeks > 1 && months > 1 && weightLoss > 1) {
             let gender = null;
             const radioButtons = document.querySelectorAll('input[name="geschlecht"]');
