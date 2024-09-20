@@ -1136,16 +1136,17 @@ document.addEventListener('DOMContentLoaded', function () {
         const valueFromHandle = handleText ? parseInt(handleText.textContent, 10) : 0;
         const valueFromInput = inputElement ? parseInt(inputElement.value, 10) || 0 : 0;
 
-        return valueFromHandle || valueFromInput;
+        // Prioritize value from input field, otherwise use the slider handle value
+        return valueFromInput || valueFromHandle;
     }
 
     // Function to calculate weight loss based on current weight and goal weight
     function calculateWeightLoss() {
+        // Get current weight from either the input or slider handle
         const currentWeight = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
         const goalWeight = parseInt(document.querySelector('.target-weight').textContent) || 0;
+
         const weightLoss = currentWeight - goalWeight;
-
-
         return weightLoss > 0 ? weightLoss : 0;
     }
 
@@ -1191,7 +1192,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const weeks = parseInt(document.querySelector('.weeks').textContent);
         const months = parseInt(document.querySelector('.months').textContent);
 
-
         const weightLoss = calculateWeightLoss();
 
         if (zielKcal > 1 && weeks > 1 && months > 1 && weightLoss > 1) {
@@ -1205,9 +1205,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (gender) {
                 showCTA(gender, weightLoss);
-            } else {
             }
-        } else {
         }
     }
 
@@ -1227,6 +1225,7 @@ document.addEventListener('DOMContentLoaded', function () {
             observer.observe(el, { childList: true, subtree: true });
         });
 
+        // Add input listener for weight and gender
         const currentWeightInput = document.getElementById('weight-2');
         currentWeightInput.addEventListener('input', checkValuesAndDisplay);
 
