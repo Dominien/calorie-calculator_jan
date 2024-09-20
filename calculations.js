@@ -1198,16 +1198,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const weeks = parseInt(document.querySelector('.weeks').textContent);
         const months = parseInt(document.querySelector('.months').textContent);
 
-        const weightLoss = calculateWeightLoss();
+        // Check for current weight based on the selected calculation type
+        const calcType = document.querySelector('input[name="kfa-or-miflin"]:checked').value;
+        const currentWeight = calcType === 'miflin'
+            ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2')
+            : getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
 
-        // Hide CTA if weight is 0 or below
-        const currentWeightMiflin = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
-        const currentWeightKfa = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
-
-        if (currentWeightMiflin <= 0 && currentWeightKfa <= 0) {
-            hideAllCTAs();
+        if (currentWeight <= 0) {
+            hideAllCTAs(); // Hide CTA if weight is 0
             return;
         }
+
+        const weightLoss = calculateWeightLoss();
 
         if (zielKcal > 1 && weeks > 1 && months > 1 && weightLoss > 1) {
             let gender = null;
@@ -1221,6 +1223,8 @@ document.addEventListener('DOMContentLoaded', function () {
             if (gender) {
                 showCTA(gender, weightLoss);
             }
+        } else {
+            hideAllCTAs(); // Hide CTA if any of the key values are missing or invalid
         }
     }
 
@@ -1268,4 +1272,3 @@ document.addEventListener('DOMContentLoaded', function () {
     console.log('DOM fully loaded. Starting observation.');
     observeValueChanges();
 });
-
