@@ -112,7 +112,7 @@ document.addEventListener('DOMContentLoaded', function () {
         } else if (calcType === 'kfa') {
             // Calculate BMR with KFA (only using weight and body fat percentage)
             if (weight > 0 && kfa > 0) {
-                result = 370 + 21.6 * (weight * (1 - kfa / 100)); // KFA formula
+                result = 864 + 13.8 * (weight * (1 - kfa / 100)); // KFA formula
             }
         }
     
