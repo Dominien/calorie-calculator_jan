@@ -476,7 +476,7 @@ function setRadio(wrapper, isChecked) {
 
 document.addEventListener('DOMContentLoaded', function () {
     // Select all elements with the class 'woman-button'
-    const womanButtons = document.querySelectorAll('.woman-button');
+    const womanButtons = document.querySelectorAll('.radio-button-man');
 
     // Iterate over each element and apply the inline style for the pointer cursor
     womanButtons.forEach(button => {
