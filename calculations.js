@@ -400,6 +400,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const totalCalories = baseCalories + alltagsbewegung + aktivesTraining;
         totalCaloriesElement.textContent = `${totalCalories}`;
 
+        // After total calories are updated, calculate nahrungsburn
         calculateNahrungsverbrennung(totalCalories);
     }
 
@@ -417,8 +418,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const observer = new MutationObserver(updateActualCalories);
         observer.observe(element, { childList: true, subtree: true }); // Observe changes to the text content
     });
-
 });
+
 
 
 // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D
