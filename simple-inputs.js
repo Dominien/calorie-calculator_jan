@@ -58,24 +58,28 @@ document.addEventListener('DOMContentLoaded', function() {
         const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
         const handle = wrapper.querySelector(".range-slider_handle");
         const fill = wrapper.querySelector(".range-slider_fill");
-
+    
         const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
         const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
-
+    
+        // Remove commas for numerical processing
+        const numericValue = parseFloat(value.replace(/,/g, '.')); // Replace commas with periods if needed
+    
         // Ensure the value stays within the range
-        value = Math.max(min, Math.min(value, max));
-
+        const adjustedValue = Math.max(min, Math.min(numericValue, max));
+    
         // Calculate percentage relative to the slider's range
-        const percentage = ((value - min) / (max - min)) * 100;
-
+        const percentage = ((adjustedValue - min) / (max - min)) * 100;
+    
         // Apply transition if needed
         handle.style.transition = withTransition ? 'left 0.3s ease' : 'none';
         fill.style.transition = withTransition ? 'width 0.3s ease' : 'none';
-
+    
         // Set handle and fill to a max of 100% and a min of 0%
         handle.style.left = `${Math.min(Math.max(percentage, 0), 100)}%`;
         fill.style.width = `${Math.min(Math.max(percentage, 0), 100)}%`;
     }
+    
 
     // Sync input field value with slider handle text for weight and KFA
     function setInputValue(rangeSliderWrapperClass, inputId) {
