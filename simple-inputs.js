@@ -7,30 +7,25 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Initializing input restrictions...');
     console.log('Allow Comma Fields:', allowCommaFields);
 
-    // Map to track programmatic changes for each input
-    const programmaticChangeFlags = new Map();
-
-    // Initialize the map with false for each input
-    numericInputs.forEach(input => {
-        programmaticChangeFlags.set(input.id, false);
-    });
-
     // Restrict input based on whether commas are allowed
     numericInputs.forEach(input => {
+        // Initialize the flag to prevent recursive input events
+        input.isProgrammaticChange = false;
+
         console.log(`Setting up input restrictions for: ${input.id}`);
         if (allowCommaFields.includes(input.id)) {
             console.log(`${input.id} is allowed to have commas and periods.`);
 
             // Allow numbers, commas, and periods for specific fields
             input.addEventListener('input', () => {
-                const isProgrammaticChange = programmaticChangeFlags.get(input.id);
-                if (isProgrammaticChange) {
+                if (input.isProgrammaticChange) {
                     console.log(`Programmatic change detected on ${input.id}. Skipping input event.`);
                     return;
                 }
 
                 console.log(`Input event triggered on ${input.id}. Current value: "${input.value}"`);
                 const originalValue = input.value;
+                
                 // Replace any character that is not a digit, comma, or period
                 let sanitizedValue = input.value.replace(/[^0-9,\.]/g, '')
                                                .replace(/,{2,}/g, ',') // Replace multiple commas with single comma
@@ -38,15 +33,18 @@ document.addEventListener('DOMContentLoaded', function() {
                                                .replace(/,\./g, '.') // Replace comma followed by period with period
                                                .replace(/\.,/g, ','); // Replace period followed by comma with comma
 
-                // Optional: Remove trailing comma or period for better consistency
-                sanitizedValue = sanitizedValue.replace(/^[,\.]+|[,\.]+$/g, '');
+                // Remove only leading commas or periods
+                sanitizedValue = sanitizedValue.replace(/^[,\.]+/g, '');
+
+                // Optionally, remove trailing comma or period, but for this case, we keep it
+                // sanitizedValue = sanitizedValue.replace(/[,\.]+$/g, '');
 
                 if (originalValue !== sanitizedValue) {
                     console.log(`Sanitized value for ${input.id}: "${sanitizedValue}"`);
                     // Update the flag to indicate a programmatic change
-                    programmaticChangeFlags.set(input.id, true);
+                    input.isProgrammaticChange = true;
                     input.value = sanitizedValue;
-                    programmaticChangeFlags.set(input.id, false);
+                    input.isProgrammaticChange = false;
                 }
             });
 
@@ -89,8 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Allow only numbers for other fields
             input.addEventListener('input', () => {
-                const isProgrammaticChange = programmaticChangeFlags.get(input.id);
-                if (isProgrammaticChange) {
+                if (input.isProgrammaticChange) {
                     console.log(`Programmatic change detected on ${input.id}. Skipping input event.`);
                     return;
                 }
@@ -102,9 +99,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (originalValue !== sanitizedValue) {
                     console.log(`Sanitized value for ${input.id}: "${sanitizedValue}"`);
                     // Update the flag to indicate a programmatic change
-                    programmaticChangeFlags.set(input.id, true);
+                    input.isProgrammaticChange = true;
                     input.value = sanitizedValue;
-                    programmaticChangeFlags.set(input.id, false);
+                    input.isProgrammaticChange = false;
                 }
             });
 
@@ -199,10 +196,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Use the flag to prevent the 'input' event listener from modifying the value
-        programmaticChangeFlags.set(inputId, true);
+        inputElement.isProgrammaticChange = true;
         inputElement.value = handleText.textContent;
         console.log(`Updated input "${inputId}" value to "${handleText.textContent}"`);
-        programmaticChangeFlags.set(inputId, false);
+        inputElement.isProgrammaticChange = false;
         handleInputChange();
     }
 
@@ -252,9 +249,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`MutationObserver detected a change in "${rangeSliderWrapperClass}".`);
             if (inputElement.value !== handleTextElement.textContent) {
                 console.log(`Updating input "${inputId}" value from "${inputElement.value}" to "${handleTextElement.textContent}"`);
-                programmaticChangeFlags.set(inputId, true);
+                inputElement.isProgrammaticChange = true;
                 inputElement.value = handleTextElement.textContent;
-                programmaticChangeFlags.set(inputId, false);
+                inputElement.isProgrammaticChange = false;
                 handleInputChange();
             }
         });
@@ -262,8 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(handleTextElement, { childList: true });
 
         inputElement.addEventListener('input', () => {
-            const isProgrammaticChange = programmaticChangeFlags.get(inputId);
-            if (isProgrammaticChange) {
+            if (inputElement.isProgrammaticChange) {
                 console.log(`Programmatic change detected on "${inputId}". Skipping input event.`);
                 return;
             }
@@ -272,9 +268,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (inputElement.value !== handleTextElement.textContent) {
                 console.log(`Updating handle text for "${rangeSliderWrapperClass}" to "${inputElement.value}"`);
                 // Use the flag to prevent recursive input event triggering
-                programmaticChangeFlags.set(inputId, true);
+                inputElement.isProgrammaticChange = true;
                 handleTextElement.textContent = inputElement.value;
-                programmaticChangeFlags.set(inputId, false);
+                inputElement.isProgrammaticChange = false;
                 updateRangeSliderPosition(rangeSliderWrapperClass, inputElement.value, true);
             }
         });
@@ -317,9 +313,9 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log(`Calculated value from click: ${value}`);
             const inputElement = document.getElementById(inputId);
             if (inputElement) {
-                programmaticChangeFlags.set(inputId, true);
+                inputElement.isProgrammaticChange = true;
                 inputElement.value = value;
-                programmaticChangeFlags.set(inputId, false);
+                inputElement.isProgrammaticChange = false;
                 console.log(`Updated input "${inputId}" value to "${value}" from slider click.`);
                 setHandleText(rangeSliderWrapperClass, inputId);
             } else {
