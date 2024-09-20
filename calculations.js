@@ -597,6 +597,18 @@ window.onload = function() {
     var isValid = true;
     if (!isBerechnenClicked) return; // Only validate if "Berechnen" button has been clicked
 
+    // Helper function to scroll smoothly with an offset
+    function smoothScrollWithOffset(id, offset) {
+        const element = document.getElementById(id);
+        const yOffset = offset || 0;
+        const y = element.getBoundingClientRect().top + window.pageYOffset - yOffset;
+
+        window.scrollTo({
+            top: y,
+            behavior: 'smooth'
+        });
+    }
+
     // Validate gender selection or check if one of the buttons has the 'active' class
     var selectedGender = document.querySelector('input[name="geschlecht"]:checked');
     var hasActiveClass = womanButton && womanButton.classList.contains('active') || manButton && manButton.classList.contains('active');
@@ -609,7 +621,7 @@ window.onload = function() {
     if (!selectedGender && !hasActiveClass) {
         isGenderMissing = true;
         isValid = false;
-        document.getElementById('scroll-if-gender-missing').scrollIntoView(); // Scroll to the element if gender is missing
+        smoothScrollWithOffset('scroll-if-gender-missing', 64); // 4rem = 64px offset for navbar
         if (genderWarning) {
             genderWarning.textContent = 'Bitte wähle oben dein Geschlecht aus.';
             genderWarning.style.display = 'block';
@@ -764,6 +776,7 @@ window.onload = function() {
 
     return isValid;
 }
+
 
 
 // Add event listeners for gender selection
