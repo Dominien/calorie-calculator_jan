@@ -1119,7 +1119,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const valueFromHandle = handleText ? parseInt(handleText.textContent, 10) : 0;
         const valueFromInput = inputElement ? parseInt(inputElement.value, 10) || 0 : 0;
 
-        console.log(`Slider Handle Value: ${valueFromHandle}, Input Value: ${valueFromInput}`);
         return valueFromHandle || valueFromInput;
     }
 
@@ -1129,9 +1128,6 @@ document.addEventListener('DOMContentLoaded', function () {
         const goalWeight = parseInt(document.querySelector('.target-weight').textContent) || 0;
         const weightLoss = currentWeight - goalWeight;
 
-        console.log('Current weight:', currentWeight);
-        console.log('Goal weight:', goalWeight);
-        console.log('Weight loss:', weightLoss);
 
         return weightLoss > 0 ? weightLoss : 0;
     }
@@ -1166,7 +1162,6 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         if (element) {
-            console.log(`Showing correct CTA for ${gender} with weight loss: ${weightLoss}`);
             element.style.display = 'block';
         } else {
             console.log(`No matching CTA found for ${gender} with weight loss: ${weightLoss}`);
@@ -1179,12 +1174,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const weeks = parseInt(document.querySelector('.weeks').textContent);
         const months = parseInt(document.querySelector('.months').textContent);
 
-        console.log('Ziel kcal:', zielKcal);
-        console.log('Weeks:', weeks);
-        console.log('Months:', months);
 
         const weightLoss = calculateWeightLoss();
-        console.log('Final weight loss:', weightLoss);
 
         if (zielKcal > 1 && weeks > 1 && months > 1 && weightLoss > 1) {
             let gender = null;
@@ -1194,15 +1185,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     gender = radio.value.toLowerCase();
                 }
             });
-            console.log('Selected gender:', gender);
 
             if (gender) {
                 showCTA(gender, weightLoss);
             } else {
-                console.log('No gender selected');
             }
         } else {
-            console.log('One or more values are less than or equal to 1');
         }
     }
 
