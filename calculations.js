@@ -441,6 +441,12 @@ window.onload = function() {
             };
         }
 
+        // Function to parse and validate user input, allowing commas as decimal separators
+        function parseAndValidateInput(inputValue) {
+            const parsedValue = inputValue.replace(',', '.');
+            return isNaN(parseFloat(parsedValue)) ? 0 : parseFloat(parsedValue);
+        }
+
         // Select necessary DOM elements
         var totalCaloriesElement = document.querySelector('.result-tats-chlich'); 
         var weightInputElementMiflin = document.getElementById('weight-2'); 
@@ -492,7 +498,7 @@ window.onload = function() {
         function hideWarningOnInput(inputElement, warningElement) {
             if (!inputElement || !warningElement) return;
             var handler = function() {
-                if (inputElement.value.trim() !== '' && parseFloat(inputElement.value) > 0) {
+                if (inputElement.value.trim() !== '' && parseAndValidateInput(inputElement.value) > 0) {
                     warningElement.style.display = 'none'; // Hide the warning if the input is valid
                 }
             };
@@ -506,7 +512,7 @@ window.onload = function() {
             var handleTextElement = sliderElement.querySelector('.inside-handle-text');
             if (handleTextElement) {
                 var observer = new MutationObserver(debounce(function() {
-                    var sliderValue = parseFloat(handleTextElement.textContent) || 0;
+                    var sliderValue = parseAndValidateInput(handleTextElement.textContent) || 0;
                     inputElement.value = sliderValue;
                     if (sliderValue > 0) {
                         warningElement.style.display = 'none'; 
@@ -548,7 +554,7 @@ window.onload = function() {
 
         if (ageHandleTextElement && ageInputElement) {
             var observer = new MutationObserver(debounce(function() {
-                var sliderValue = parseFloat(ageHandleTextElement.textContent) || 0;
+                var sliderValue = parseAndValidateInput(ageHandleTextElement.textContent) || 0;
                 ageInputElement.value = sliderValue;
 
                 // Hide the warning if the input is valid
@@ -581,207 +587,204 @@ window.onload = function() {
         attachValidation('weight-3-kfa', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]');
         attachValidation('kfa-2', '.wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]');
 
-  // Function to validate inputs and show warnings if any are missing or invalid
-  var isBerechnenClicked = false;
-  function validateInputs() {
-    var isValid = true;
-    if (!isBerechnenClicked) return; // Only validate if "Berechnen" button has been clicked
+        // Function to validate inputs and show warnings if any are missing or invalid
+        var isBerechnenClicked = false;
+        function validateInputs() {
+            var isValid = true;
+            if (!isBerechnenClicked) return; // Only validate if "Berechnen" button has been clicked
 
-    // Helper function to scroll smoothly with an offset
-    function smoothScrollWithOffset(id, offset) {
-        const element = document.getElementById(id);
-        const yOffset = offset || 0;
-        const y = element.getBoundingClientRect().top + window.pageYOffset - yOffset;
+            // Helper function to scroll smoothly with an offset
+            function smoothScrollWithOffset(id, offset) {
+                const element = document.getElementById(id);
+                const yOffset = offset || 0;
+                const y = element.getBoundingClientRect().top + window.pageYOffset - yOffset;
 
-        window.scrollTo({
-            top: y,
-            behavior: 'smooth'
+                window.scrollTo({
+                    top: y,
+                    behavior: 'smooth'
+                });
+            }
+
+            // Validate gender selection or check if one of the buttons has the 'active' class
+            var selectedGender = document.querySelector('input[name="geschlecht"]:checked');
+            var hasActiveClass = womanButton && womanButton.classList.contains('active') || manButton && manButton.classList.contains('active');
+
+            // Flags to track missing inputs
+            var isGenderMissing = false;
+            var isWunschgewichtMissing = false;
+
+            // Validate Gender
+            if (!selectedGender && !hasActiveClass) {
+                isGenderMissing = true;
+                isValid = false;
+                smoothScrollWithOffset('scroll-if-gender-missing', 64); // 4rem = 64px offset for navbar
+                if (genderWarning) {
+                    genderWarning.textContent = 'Bitte wähle oben dein Geschlecht aus.';
+                    genderWarning.style.display = 'block';
+                }
+            } else {
+                if (genderWarning) {
+                    genderWarning.style.display = 'none';
+                }
+            }
+
+            var calculationMethod = getSelectedCalculationMethod();
+            // Additional input validation logic for miflin and kfa
+            if (calculationMethod === 'miflin') {
+                // Validate Age
+                var ageInput = document.getElementById('age-2');
+                var ageWarning = null;
+                if (ageInput) {
+                    var ageClosestWrapper = ageInput.closest('.input-wrapper-calc');
+                    if (ageClosestWrapper) {
+                        ageWarning = ageClosestWrapper.querySelector('.text-warning');
+                    }
+                }
+                if (!ageInput || ageInput.value.trim() === '' || parseAndValidateInput(ageInput.value) <= 0) {
+                    if (ageWarning) {
+                        ageWarning.style.display = 'block';
+                        ageWarning.textContent = 'Bitte gib dein Alter ein.';
+                    }
+                    isValid = false;
+                } else {
+                    if (ageWarning) {
+                        ageWarning.style.display = 'none';
+                    }
+                }
+
+                // Validate Height
+                var heightInput = document.getElementById('height-2');
+                var heightWarning = null;
+                if (heightInput) {
+                    var heightClosestWrapper = heightInput.closest('.input-wrapper-calc');
+                    if (heightClosestWrapper) {
+                        heightWarning = heightClosestWrapper.querySelector('.text-warning');
+                    }
+                }
+                if (!heightInput || heightInput.value.trim() === '' || parseAndValidateInput(heightInput.value) <= 0) {
+                    if (heightWarning) {
+                        heightWarning.style.display = 'block';
+                        heightWarning.textContent = 'Bitte gib deine Größe ein.';
+                    }
+                    isValid = false;
+                } else {
+                    if (heightWarning) {
+                        heightWarning.style.display = 'none';
+                    }
+                }
+
+                // Validate Weight (Miflin)
+                var weightWarning = null;
+                if (weightInputElementMiflin) {
+                    var weightClosestWrapper = weightInputElementMiflin.closest('.input-wrapper-calc');
+                    if (weightClosestWrapper) {
+                        weightWarning = weightClosestWrapper.querySelector('.text-warning');
+                    }
+                }
+                if (!weightInputElementMiflin || weightInputElementMiflin.value.trim() === '' || parseAndValidateInput(weightInputElementMiflin.value) <= 0) {
+                    if (weightWarning) {
+                        weightWarning.style.display = 'block';
+                        weightWarning.textContent = 'Bitte gib dein Gewicht ein.';
+                    }
+                    isValid = false;
+                } else {
+                    if (weightWarning) {
+                        weightWarning.style.display = 'none';
+                    }
+                }
+            } else if (calculationMethod === 'kfa') {
+                // Validate Weight (KFA)
+                var weightWarningKfa = null;
+                if (weightInputElementKfa) {
+                    var weightClosestWrapperKfa = weightInputElementKfa.closest('.input-wrapper-calc');
+                    if (weightClosestWrapperKfa) {
+                        weightWarningKfa = weightClosestWrapperKfa.querySelector('.text-warning');
+                    }
+                }
+                if (!weightInputElementKfa || weightInputElementKfa.value.trim() === '' || parseAndValidateInput(weightInputElementKfa.value) <= 0) {
+                    if (weightWarningKfa) {
+                        weightWarningKfa.style.display = 'block';
+                        weightWarningKfa.textContent = 'Bitte gib dein Gewicht ein.';
+                    }
+                    isValid = false;
+                } else {
+                    if (weightWarningKfa) {
+                        weightWarningKfa.style.display = 'none';
+                    }
+                }
+
+                // Validate KFA
+                var kfaInput = document.getElementById('kfa-2');
+                var kfaWarning = null;
+                if (kfaInput) {
+                    var kfaClosestWrapper = kfaInput.closest('.input-wrapper-calc');
+                    if (kfaClosestWrapper) {
+                        kfaWarning = kfaClosestWrapper.querySelector('.text-warning');
+                    }
+                }
+                if (!kfaInput || kfaInput.value.trim() === '' || parseAndValidateInput(kfaInput.value) <= 0) {
+                    if (kfaWarning) {
+                        kfaWarning.style.display = 'block';
+                        kfaWarning.textContent = 'Bitte gib deinen KFA-Wert ein.';
+                    }
+                    isValid = false;
+                } else {
+                    if (kfaWarning) {
+                        kfaWarning.style.display = 'none';
+                    }
+                }
+            }
+
+            // Validate Wunschgewicht
+            if (!wunschgewichtInput || wunschgewichtInput.value.trim() === '' || parseAndValidateInput(wunschgewichtInput.value) <= 0) {
+                isWunschgewichtMissing = true;
+                isValid = false;
+                if (wunschgewichtWarning) {
+                    wunschgewichtWarning.textContent = 'Bitte gib dein Wunschgewicht ein.';
+                    wunschgewichtWarning.style.display = 'block';
+                }
+            } else {
+                if (wunschgewichtWarning) {
+                    wunschgewichtWarning.style.display = 'none';
+                }
+            }
+
+            // Validate weight loss goal selection (Abnehmziel)
+            var selectedValue = null;
+            for (var i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    selectedValue = radios[i].value;
+                    break;
+                }
+            }
+            var abnehmzielWarning = document.querySelector('.wrapper-abnehmziel .text-warning.here');
+            if (!selectedValue) {
+                isValid = false;
+                if (abnehmzielWarning) {
+                    abnehmzielWarning.style.display = 'block';
+                    abnehmzielWarning.textContent = 'Bitte wähle dein Abnehmziel aus.';
+                }
+            } else {
+                if (abnehmzielWarning) {
+                    abnehmzielWarning.style.display = 'none';
+                }
+            }
+
+            return isValid;
+        }
+
+        // Add event listeners for gender selection
+        var genderRadios = document.querySelectorAll('input[name="geschlecht"]');
+        genderRadios.forEach(function(radio) {
+            radio.addEventListener('change', function() {
+                validateInputs(); // Revalidate when gender is selected
+            });
         });
-    }
 
-    // Validate gender selection or check if one of the buttons has the 'active' class
-    var selectedGender = document.querySelector('input[name="geschlecht"]:checked');
-    var hasActiveClass = womanButton && womanButton.classList.contains('active') || manButton && manButton.classList.contains('active');
-
-    // Flags to track missing inputs
-    var isGenderMissing = false;
-    var isWunschgewichtMissing = false;
-
-    // Validate Gender
-    if (!selectedGender && !hasActiveClass) {
-        isGenderMissing = true;
-        isValid = false;
-        smoothScrollWithOffset('scroll-if-gender-missing', 64); // 4rem = 64px offset for navbar
-        if (genderWarning) {
-            genderWarning.textContent = 'Bitte wähle oben dein Geschlecht aus.';
-            genderWarning.style.display = 'block';
-        }
-    } else {
-        if (genderWarning) {
-            genderWarning.style.display = 'none';
-        }
-    }
-
-    var calculationMethod = getSelectedCalculationMethod();
-    // Additional input validation logic for miflin and kfa
-    if (calculationMethod === 'miflin') {
-        // Validate Age
-        var ageInput = document.getElementById('age-2');
-        var ageWarning = null;
-        if (ageInput) {
-            var ageClosestWrapper = ageInput.closest('.input-wrapper-calc');
-            if (ageClosestWrapper) {
-                ageWarning = ageClosestWrapper.querySelector('.text-warning');
-            }
-        }
-        if (!ageInput || ageInput.value.trim() === '' || parseFloat(ageInput.value) <= 0) {
-            if (ageWarning) {
-                ageWarning.style.display = 'block';
-                ageWarning.textContent = 'Bitte gib dein Alter ein.';
-            }
-            isValid = false;
-        } else {
-            if (ageWarning) {
-                ageWarning.style.display = 'none';
-            }
-        }
-
-        // Validate Height
-        var heightInput = document.getElementById('height-2');
-        var heightWarning = null;
-        if (heightInput) {
-            var heightClosestWrapper = heightInput.closest('.input-wrapper-calc');
-            if (heightClosestWrapper) {
-                heightWarning = heightClosestWrapper.querySelector('.text-warning');
-            }
-        }
-        if (!heightInput || heightInput.value.trim() === '' || parseFloat(heightInput.value) <= 0) {
-            if (heightWarning) {
-                heightWarning.style.display = 'block';
-                heightWarning.textContent = 'Bitte gib deine Größe ein.';
-            }
-            isValid = false;
-        } else {
-            if (heightWarning) {
-                heightWarning.style.display = 'none';
-            }
-        }
-
-        // Validate Weight (Miflin)
-        var weightWarning = null;
-        if (weightInputElementMiflin) {
-            var weightClosestWrapper = weightInputElementMiflin.closest('.input-wrapper-calc');
-            if (weightClosestWrapper) {
-                weightWarning = weightClosestWrapper.querySelector('.text-warning');
-            }
-        }
-        if (!weightInputElementMiflin || weightInputElementMiflin.value.trim() === '' || parseFloat(weightInputElementMiflin.value) <= 0) {
-            if (weightWarning) {
-                weightWarning.style.display = 'block';
-                weightWarning.textContent = 'Bitte gib dein Gewicht ein.';
-            }
-            isValid = false;
-        } else {
-            if (weightWarning) {
-                weightWarning.style.display = 'none';
-            }
-        }
-    } else if (calculationMethod === 'kfa') {
-        // Validate Weight (KFA)
-        var weightWarningKfa = null;
-        if (weightInputElementKfa) {
-            var weightClosestWrapperKfa = weightInputElementKfa.closest('.input-wrapper-calc');
-            if (weightClosestWrapperKfa) {
-                weightWarningKfa = weightClosestWrapperKfa.querySelector('.text-warning');
-            }
-        }
-        if (!weightInputElementKfa || weightInputElementKfa.value.trim() === '' || parseFloat(weightInputElementKfa.value) <= 0) {
-            if (weightWarningKfa) {
-                weightWarningKfa.style.display = 'block';
-                weightWarningKfa.textContent = 'Bitte gib dein Gewicht ein.';
-            }
-            isValid = false;
-        } else {
-            if (weightWarningKfa) {
-                weightWarningKfa.style.display = 'none';
-            }
-        }
-
-        // Validate KFA
-        var kfaInput = document.getElementById('kfa-2');
-        var kfaWarning = null;
-        if (kfaInput) {
-            var kfaClosestWrapper = kfaInput.closest('.input-wrapper-calc');
-            if (kfaClosestWrapper) {
-                kfaWarning = kfaClosestWrapper.querySelector('.text-warning');
-            }
-        }
-        if (!kfaInput || kfaInput.value.trim() === '' || parseFloat(kfaInput.value) <= 0) {
-            if (kfaWarning) {
-                kfaWarning.style.display = 'block';
-                kfaWarning.textContent = 'Bitte gib deinen KFA-Wert ein.';
-            }
-            isValid = false;
-        } else {
-            if (kfaWarning) {
-                kfaWarning.style.display = 'none';
-            }
-        }
-    }
-
-    // Validate Wunschgewicht
-    if (!wunschgewichtInput || wunschgewichtInput.value.trim() === '' || parseFloat(wunschgewichtInput.value) <= 0) {
-        isWunschgewichtMissing = true;
-        isValid = false;
-        if (wunschgewichtWarning) {
-            wunschgewichtWarning.textContent = 'Bitte gib dein Wunschgewicht ein.';
-            wunschgewichtWarning.style.display = 'block';
-        }
-    } else {
-        if (wunschgewichtWarning) {
-            wunschgewichtWarning.style.display = 'none';
-        }
-    }
-
-    // Validate weight loss goal selection (Abnehmziel)
-    var selectedValue = null;
-    for (var i = 0; i < radios.length; i++) {
-        if (radios[i].checked) {
-            selectedValue = radios[i].value;
-            break;
-        }
-    }
-    var abnehmzielWarning = document.querySelector('.wrapper-abnehmziel .text-warning.here');
-    if (!selectedValue) {
-        isValid = false;
-        if (abnehmzielWarning) {
-            abnehmzielWarning.style.display = 'block';
-            abnehmzielWarning.textContent = 'Bitte wähle dein Abnehmziel aus.';
-        }
-    } else {
-        if (abnehmzielWarning) {
-            abnehmzielWarning.style.display = 'none';
-        }
-    }
-
-    return isValid;
-}
-
-
-
-// Add event listeners for gender selection
-var genderRadios = document.querySelectorAll('input[name="geschlecht"]');
-genderRadios.forEach(function(radio) {
-    radio.addEventListener('change', function() {
-        validateInputs(); // Revalidate when gender is selected
-    });
-});
-
-// Add event listener for wunschgewicht input
-wunschgewichtInput.addEventListener('input', function() {
-    validateInputs(); // Revalidate when wunschgewicht is provided
-});
-
+        // Add event listener for wunschgewicht input
+        wunschgewichtInput.addEventListener('input', function() {
+            validateInputs(); // Revalidate when wunschgewicht is provided
+        });
 
         // Function to initialize event listeners and updates
         function initializeListeners() {
@@ -845,17 +848,17 @@ wunschgewichtInput.addEventListener('input', function() {
             
             var currentWeight = 0;
             if (calculationMethod === 'miflin') {
-                currentWeight = parseFloat(weightInputElementMiflin && weightInputElementMiflin.value) || 0;
+                currentWeight = parseAndValidateInput(weightInputElementMiflin && weightInputElementMiflin.value) || 0;
             } else if (calculationMethod === 'kfa') {
-                currentWeight = parseFloat(weightInputElementKfa && weightInputElementKfa.value) || 0;
+                currentWeight = parseAndValidateInput(weightInputElementKfa && weightInputElementKfa.value) || 0;
             }
         
-            var targetWeight = parseFloat(targetWeightElement && targetWeightElement.value) || 0;
+            var targetWeight = parseAndValidateInput(targetWeightElement && targetWeightElement.value) || 0;
             var totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
-            var totalCaloriesValue = parseFloat(totalCalories.replace(/\D/g, '')) || 0;
+            var totalCaloriesValue = parseAndValidateInput(totalCalories.replace(/\D/g, '')) || 0;
         
             var grundUmsatzText = grundUmsatzElement ? grundUmsatzElement.textContent : '';
-            var grundUmsatzValue = parseFloat(grundUmsatzText.replace(/\D/g, '')) || 0;
+            var grundUmsatzValue = parseAndValidateInput(grundUmsatzText.replace(/\D/g, '')) || 0;
         
             var selectedValue = null;
             for (var i = 0; i < radios.length; i++) {
@@ -1100,10 +1103,10 @@ wunschgewichtInput.addEventListener('input', function() {
             }
         }
         
-    
         initializeListeners();
     }, 2); // 2 milliseconds delay
 };
+
 
 document.addEventListener('DOMContentLoaded', function () {
     // Function to hide all CTAs
