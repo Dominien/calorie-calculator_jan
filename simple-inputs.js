@@ -135,51 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Function to update range slider position and value for weight and KFA
-    function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransition) {
-        console.log(`Updating range slider position for "${rangeSliderWrapperClass}" with value: ${value}, transition: ${withTransition}`);
-        const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
-        if (!wrapper) {
-            console.log(`Wrapper with class "${rangeSliderWrapperClass}" not found.`);
-            return;
-        }
-
-        const handle = wrapper.querySelector(".range-slider_handle");
-        const fill = wrapper.querySelector(".range-slider_fill");
-
-        const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
-        const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
-
-        console.log(`Range slider min: ${min}, max: ${max}`);
-
-        // Remove commas and periods for numerical processing
-        const numericValue = parseFloat(value.replace(/,/g, '.'));
-        console.log(`Parsed numeric value: ${numericValue}`);
-
-        if (isNaN(numericValue)) {
-            console.log(`Invalid numeric value for "${rangeSliderWrapperClass}": "${value}"`);
-            return;
-        }
-
-        // Ensure the value stays within the range
-        const adjustedValue = Math.max(min, Math.min(numericValue, max));
-        console.log(`Adjusted value within range: ${adjustedValue}`);
-
-        // Calculate percentage relative to the slider's range
-        const percentage = ((adjustedValue - min) / (max - min)) * 100;
-        console.log(`Calculated percentage: ${percentage}%`);
-
-        // Apply transition if needed
-        handle.style.transition = withTransition ? 'left 0.3s ease' : 'none';
-        fill.style.transition = withTransition ? 'width 0.3s ease' : 'none';
-
-        // Set handle and fill to a max of 100% and a min of 0%
-        const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
-        handle.style.left = `${clampedPercentage}%`;
-        fill.style.width = `${clampedPercentage}%`;
-
-        console.log(`Set handle left to ${handle.style.left} and fill width to ${fill.style.width}`);
-    }
+    
 
 
     // Sync input field value with slider handle text for weight and KFA
