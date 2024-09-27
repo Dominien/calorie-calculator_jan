@@ -197,38 +197,39 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // Steps slider
     }
 
-    // Function to observe slider changes
     function observeSliderChange(wrapperClass, inputId) {
         const handleTextElement = document.querySelector(`.${wrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
-
-
+    
         // Observe changes in slider handle text
         const observer = new MutationObserver(() => {
             const value = handleTextElement.textContent;
-            inputElement.value = value;
-
+            if (document.activeElement !== inputElement) {
+                inputElement.value = value;
+            }
+    
             if (inputId === 'steps-4') {
-                dailySteps = parseFloat(value, 10);
+                dailySteps = parseFloat(value.replace(',', '.')) || 0;
                 calculateStepsCalories();
             } else {
                 calculateResult(); // Trigger result calculation when the slider handle moves
             }
         });
-
+    
         observer.observe(handleTextElement, { childList: true });
-
+    
         // Also listen to direct input changes
         inputElement.addEventListener('input', () => {
             handleTextElement.textContent = inputElement.value;
             if (inputId === 'steps-4') {
-                dailySteps = parseFloat(inputElement.value, 10);
+                dailySteps = parseFloat(inputElement.value.replace(',', '.')) || 0;
                 calculateStepsCalories();
             } else {
                 calculateResult();
             }
         });
     }
+    
 
     // Initial setup
     toggleCalcType();
