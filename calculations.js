@@ -1130,12 +1130,12 @@ document.addEventListener('DOMContentLoaded', function () {
     function getSliderValue(wrapperClass, inputId) {
         const handleText = document.querySelector(`.${wrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
-        const valueFromHandle = handleText ? parseFloat(handleText.textContent, 10) : 0;
-        const valueFromInput = inputElement ? parseFloat(inputElement.value, 10) || 0 : 0;
+         // Use the handle text value if available, else fall back to the input value
+    const valueFromHandle = handleText ? parseFloat(handleText.textContent.replace(',', '.')) || 0 : 0;
+    const valueFromInput = parseFloat(inputElement.value.replace(',', '.')) || 0;
 
-        // Prioritize value from input field, otherwise use the slider handle value
-        return valueFromInput || valueFromHandle;
-    }
+    return valueFromHandle || valueFromInput;
+}
 
     // Function to calculate weight loss based on current weight and goal weight
     function calculateWeightLoss() {
