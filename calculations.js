@@ -378,6 +378,51 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+document.addEventListener('DOMContentLoaded', function () {
+    // Select necessary DOM elements
+    const grundumsatzElement = document.getElementById('grund-right');
+    const alltagsbewegungElement = document.getElementById('altag-right');
+    const aktivesTrainingElement = document.getElementById('active-right');
+    const totalCaloriesElement = document.querySelector('.result-tats-chlich');
+    const nahrungsverbrennungElement = document.getElementById('nahrungsburn');
+
+    const fallbackCalories = 1280; // Fallback if no Grundumsatz is provided yet
+
+    // Function to update the total actual calorie burn
+    function updateActualCalories() {
+        const grundumsatz = parseInt(grundumsatzElement.textContent, 10) || 0;
+        const alltagsbewegung = parseInt(alltagsbewegungElement.textContent, 10) || 0;
+        const aktivesTraining = parseInt(aktivesTrainingElement.textContent, 10) || 0;
+
+        // If Grundumsatz is available, use it; otherwise, use fallback (1280 kcal)
+        const baseCalories = grundumsatz || fallbackCalories;
+
+        // Calculate the total calories (excluding Nahrungsburn)
+        let totalCalories = baseCalories + alltagsbewegung + aktivesTraining;
+
+        // After total calories are calculated, calculate nahrungsburn (8% of total calories)
+        const nahrungsverbrennung = totalCalories * 0.08;
+
+        // Add nahrungsburn to the total calories
+        totalCalories += nahrungsverbrennung;
+
+        // Update the totalCaloriesElement and nahrungsburn elements
+        totalCaloriesElement.textContent = `${Math.round(totalCalories)}`;
+        nahrungsverbrennungElement.textContent = `${Math.round(nahrungsverbrennung)} kcal`;
+    }
+
+    // Set initial value of totalCaloriesElement to the fallback value (1280 kcal) on page load
+    totalCaloriesElement.textContent = `${fallbackCalories}`;
+
+    // Add listeners to the text fields for changes
+    [grundumsatzElement, alltagsbewegungElement, aktivesTrainingElement].forEach(element => {
+        const observer = new MutationObserver(updateActualCalories);
+        observer.observe(element, { childList: true, subtree: true }); // Observe changes to the text content
+    });
+
+    // Trigger the update on page load
+    updateActualCalories();
+});
 
 
 //Stelle für Änderung
