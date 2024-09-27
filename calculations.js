@@ -455,7 +455,6 @@ window.onload = function() {
         var totalCaloriesElement = document.querySelector('.result-tats-chlich'); 
         var weightInputElementMiflin = document.getElementById('weight-2'); 
         var weightInputElementKfa = document.getElementById('weight-3-kfa'); 
-        var grundUmsatzElement = document.getElementById('grund-right'); 
         var warningMessageElement = document.querySelector('.warning-message_wrapper'); 
         var zielKalorienElement = document.querySelector('.result_zielkalorien'); 
         var zielKcalElement = document.querySelector('.span-result.ziel-kcal'); 
@@ -861,8 +860,29 @@ window.onload = function() {
             var totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
             var totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0;
         
-            var grundUmsatzText = grundUmsatzElement ? grundUmsatzElement.textContent : '';
-            var grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0;
+            // Calculate grundUmsatzValue based on the selected method
+            var grundUmsatzValue = 0;
+            var heightInput = document.getElementById('height-2');
+            var height = parseFloat(heightInput && heightInput.value) || 0;
+            // Get selected gender
+            var selectedGender = document.querySelector('input[name="geschlecht"]:checked');
+
+            if (calculationMethod === 'miflin') {
+                var idealWeight = 0;
+                if (selectedGender && selectedGender.value === 'male') {
+                    idealWeight = height - 100;
+                } else if (selectedGender && selectedGender.value === 'female') {
+                    idealWeight = height - 110;
+                } else {
+                    // Default to female if gender not selected
+                    idealWeight = height - 110;
+                }
+                idealWeight = Math.max(0, idealWeight);
+                grundUmsatzValue = idealWeight * 24;
+            } else if (calculationMethod === 'kfa') {
+                var LBM = currentWeight * 0.85; // Assuming 15% body fat
+                grundUmsatzValue = 370 + (21.6 * LBM);
+            }
         
             var selectedValue = null;
             for (var i = 0; i < radios.length; i++) {
@@ -912,22 +932,26 @@ window.onload = function() {
             // Calculate the calorie deficit based on the last week's weight loss
             var lastWeekWeightLossKg = currentWeight * weeklyWeightLossPercentage;
             var calorieDeficitPerDay = Math.round((lastWeekWeightLossKg * 7700) / 7);
-            var targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay);
-        
-            if (zielKalorienElement) zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : '0';
-            if (zielKcalElement) zielKcalElement.textContent = targetCalories > 0 ? targetCalories : '0';
-        
-            if (warningMessageElement) {
-                if (targetCalories < grundUmsatzValue) {
+            var targetCalories = totalCaloriesValue - calorieDeficitPerDay;
+
+            // Cap targetCalories at grundUmsatzValue if it falls below
+            if (targetCalories < grundUmsatzValue) {
+                targetCalories = grundUmsatzValue;
+                if (warningMessageElement) {
                     warningMessageElement.style.display = 'flex';
                     var warningMessage = warningMessageElement.querySelector('.warning-message');
                     if (warningMessage) {
-                        warningMessage.textContent = 'Warnhinweis: Du solltest nicht weniger als  ' + grundUmsatzValue + ' kcal essen, um deine Gesundheit nicht zu gefährden.';
+                        warningMessage.textContent = 'Warnhinweis: Du solltest nicht weniger als ' + Math.round(grundUmsatzValue) + ' kcal essen, um deine Gesundheit nicht zu gefährden.';
                     }
-                } else {
+                }
+            } else {
+                if (warningMessageElement) {
                     warningMessageElement.style.display = 'none';
                 }
             }
+        
+            if (zielKalorienElement) zielKalorienElement.textContent = targetCalories > 0 ? targetCalories : '0';
+            if (zielKcalElement) zielKcalElement.textContent = targetCalories > 0 ? targetCalories : '0';
         
             if (fettAbnahmeElement) fettAbnahmeElement.textContent = lastWeekWeightLossKg.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
             if (defizitElement) defizitElement.textContent = calorieDeficitPerDay.toString();
@@ -944,32 +968,32 @@ window.onload = function() {
             const weightData = [];
             const timeIntervals = [];
             const numberOfPoints = 10; // Number of data points (dots)
-    
+
             // Calculate evenly spaced time intervals
             for (let i = 0; i <= numberOfPoints; i++) {
                 let t = (totalWeeks / numberOfPoints) * i;
                 timeIntervals.push(t);
             }
-    
+
             // Generate weight data using compound weight loss formula
             for (let i = 0; i <= numberOfPoints; i++) {
                 let weeksPassed = timeIntervals[i];
-    
+
                 // Using compound interest formula for weight loss
                 // weight = initialWeight * (1 - weeklyWeightLossPercentage)^(weeksPassed)
                 let weight = currentWeight * Math.pow(1 - weeklyWeightLossPercentage, weeksPassed);
-    
+
                 // Ensure the last weight is exactly the target weight
                 if (i === numberOfPoints) {
                     weight = targetWeight;
                 }
-    
+
                 weightData.push(weight.toFixed(1));
             }
-    
+
             return { weightData, timeIntervals };
         }
-    
+
         // Function to generate the chart
         function generateResultChart(weightData, timeIntervals) {
             // Set wrapper-canvas display to block if it isn't already
@@ -984,22 +1008,22 @@ window.onload = function() {
              if (textUnderCanvas && getComputedStyle(textUnderCanvas).display !== 'block') {
                 textUnderCanvas.style.display = 'block';
             }
-    
+
             const chartCanvas = document.getElementById('resultChart');
             const ctx = chartCanvas.getContext('2d');
-    
+
             if (chartInstance) {
                 chartInstance.destroy(); // Destroy old chart instance if it exists
             }
-    
+
             const gradientFill = ctx.createLinearGradient(0, 0, 0, chartCanvas.height);
             gradientFill.addColorStop(0, 'rgba(233, 62, 45, 0.3)');
             gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');
-    
+
             const dates = generateKeyDates(timeIntervals); // Generate dates based on time intervals
             const pointColors = weightData.map((_, index) => index === 0 ? 'rgba(233, 62, 45, 1)' : 'rgba(26, 183, 0, 1)');
             const pointSizes = Array(weightData.length).fill(6); // Consistent point size
-    
+
             setTimeout(() => {
                 chartInstance = new Chart(ctx, {
                     type: 'line',
@@ -1058,25 +1082,25 @@ window.onload = function() {
                         }
                     }
                 });
-    
+
                 console.log("Final Chart Data: ", chartInstance.data.datasets[0].data); // Debugging log
             }, 100);
         }
-    
+
         // Helper function to generate dates for the chart
         function generateKeyDates(timeIntervals) {
             const dates = [];
             let currentDate = new Date();
-    
+
             for (let i = 0; i < timeIntervals.length; i++) {
                 let date = new Date(currentDate.getTime());
                 date.setDate(currentDate.getDate() + Math.round(timeIntervals[i] * 7)); // Convert weeks to days
                 dates.push(date.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
             }
-    
+
             return dates;
         }
-    
+
         // Helper function to reset results when inputs are invalid
         function resetResults() {
             if (defizitElement) defizitElement.textContent = '0';
@@ -1107,10 +1131,11 @@ window.onload = function() {
             }
         }
         
-    
+
         initializeListeners();
     }, 2); // 2 milliseconds delay
 };
+
 
 
 document.addEventListener('DOMContentLoaded', function () {
