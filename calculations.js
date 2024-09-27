@@ -861,51 +861,25 @@ window.onload = function() {
             var totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0;
         
             // Calculate grundUmsatzValue based on the selected method
-var grundUmsatzValue = 0;
-
-if (calculationMethod === 'miflin') {
-    var heightInput = document.getElementById('height-2');
-    var height = parseFloat(heightInput && heightInput.value) || 0;
-
-    var ageInput = document.getElementById('age');
-    var age = parseInt(ageInput && ageInput.value) || 0;
-
-    var genderInput = document.getElementById('gender');
-    var gender = genderInput && genderInput.value || 'male'; // default to male
-
-    // Calculate optimal weight
-    var optimalWeight = height - 110;
-
-    // Calculate Grundumsatz using Mifflin-St Jeor equation
-    if (gender === 'male') {
-        grundUmsatzValue = (10 * optimalWeight) + (6.25 * height) - (5 * age) + 5;
-    } else if (gender === 'female') {
-        grundUmsatzValue = (10 * optimalWeight) + (6.25 * height) - (5 * age) - 161;
-    }
-} else if (calculationMethod === 'kfa') {
-    // Calculate Grundumsatz with 15% body fat
-    var LBM = currentWeight * (1 - 0.15);
-    grundUmsatzValue = 370 + (21.6 * LBM);
-}
-
-grundUmsatzValue = Math.round(grundUmsatzValue);
-
-// Assuming zielkalorien is calculated elsewhere in your code
-// Check if Zielkalorien is less than Grundumsatz
-if (zielkalorien < grundUmsatzValue) {
-    zielkalorien = grundUmsatzValue;
-    alert('Achtung: Die Zielkalorien dürfen den Grundumsatz nicht unterschreiten. Die Zielkalorien wurden auf den Grundumsatz gesetzt.');
-}
-
-// Retrieve the selected radio button value
-var selectedValue = null;
-for (var i = 0; i < radios.length; i++) {
-    if (radios[i].checked) {
-        selectedValue = radios[i].value;
-        break;
-    }
-}
-
+            var grundUmsatzValue = 0;
+            if (calculationMethod === 'miflin') {
+                var heightInput = document.getElementById('height-2');
+                var height = parseFloat(heightInput && heightInput.value) || 0;
+                grundUmsatzValue = height - 110;
+            } else if (calculationMethod === 'kfa') {
+                // Calculate Grundumsatz with 15% body fat
+                var LBM = currentWeight * (1 - 0.15);
+                grundUmsatzValue = 370 + (21.6 * LBM);
+            }
+            grundUmsatzValue = Math.round(grundUmsatzValue);
+        
+            var selectedValue = null;
+            for (var i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    selectedValue = radios[i].value;
+                    break;
+                }
+            }
         
             if (
                 isNaN(totalCaloriesValue) || totalCaloriesValue <= 0 ||
