@@ -46,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Convert commas to periods for processing by the slider
                 const valueForSlider = sanitizedValue.replace(/,/g, '.');
-                updateRangeSliderPosition(`wrapper-step-range_slider[fs-rangeslider-element="${input.id}"]`, valueForSlider, true);
+                updateRangeSliderPosition(input.id, valueForSlider, true);
             });
 
             input.addEventListener('keydown', (event) => {
@@ -138,9 +138,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to update range slider position and value for weight and KFA
     function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransition) {
         console.log(`Updating range slider position for "${rangeSliderWrapperClass}" with value: ${value}, transition: ${withTransition}`);
-        const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
+        const wrapper = document.querySelector(`[fs-rangeslider-element="${rangeSliderWrapperClass}"]`);
         if (!wrapper) {
-            console.log(`Wrapper with class "${rangeSliderWrapperClass}" not found.`);
+            console.log(`Wrapper with fs-rangeslider-element="${rangeSliderWrapperClass}" not found.`);
             return;
         }
 
@@ -181,11 +181,10 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log(`Set handle left to ${handle.style.left} and fill width to ${fill.style.width}`);
     }
 
-
     // Sync input field value with slider handle text for weight and KFA
     function setInputValue(rangeSliderWrapperClass, inputId) {
         console.log(`Setting input value for "${inputId}" based on slider "${rangeSliderWrapperClass}"`);
-        const handleText = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
+        const handleText = document.querySelector(`[fs-rangeslider-element="${rangeSliderWrapperClass}"] .inside-handle-text`);
         if (!handleText) {
             console.log(`Handle text element not found for "${rangeSliderWrapperClass}".`);
             return;
@@ -215,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         const inputValue = inputElement.value;
-        const handleText = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
+        const handleText = document.querySelector(`[fs-rangeslider-element="${rangeSliderWrapperClass}"] .inside-handle-text`);
         if (!handleText) {
             console.log(`Handle text element not found for "${rangeSliderWrapperClass}".`);
             return;
@@ -239,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Function to handle input changes and slider sync for weight and KFA
     function observeChanges(rangeSliderWrapperClass, inputId) {
         console.log(`Setting up MutationObserver for "${inputId}" with slider "${rangeSliderWrapperClass}"`);
-        const handleTextElement = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
+        const handleTextElement = document.querySelector(`[fs-rangeslider-element="${rangeSliderWrapperClass}"] .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
 
         if (!handleTextElement || !inputElement) {
@@ -281,8 +280,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Add listeners for slider handle movement for weight and KFA
     function addHandleMovementListener(rangeSliderWrapperClass, inputId) {
         console.log(`Adding handle movement listeners for "${rangeSliderWrapperClass}" and input "${inputId}"`);
-        const handle = document.querySelector(`.${rangeSliderWrapperClass} .range-slider_handle`);
-        const slider = document.querySelector(`.${rangeSliderWrapperClass} .track-range-slider`);
+        const handle = document.querySelector(`[fs-rangeslider-element="${rangeSliderWrapperClass}"] .range-slider_handle`);
+        const slider = document.querySelector(`[fs-rangeslider-element="${rangeSliderWrapperClass}"] .track-range-slider`);
 
         if (!handle || !slider) {
             console.log(`Handle or slider element not found for "${rangeSliderWrapperClass}".`);
@@ -307,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const offsetX = event.clientX - rect.left;
             const percentage = (offsetX / slider.clientWidth) * 100;
 
-            const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
+            const wrapper = document.querySelector(`[fs-rangeslider-element="${rangeSliderWrapperClass}"]`);
             const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
             const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
             const value = Math.round(min + (percentage / 100) * (max - min));
@@ -474,7 +473,6 @@ function setRadio(wrapper, isChecked) {
         });
     }
 }
-
 
 document.addEventListener('DOMContentLoaded', function () {
     // Select all elements with the class 'woman-button'
