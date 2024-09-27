@@ -1110,7 +1110,7 @@ window.onload = function() {
                 // **Added smooth scroll functionality here**
                 // Scroll to the chart element only on desktop devices
                 if (window.innerWidth >= 1024) { // Adjust the breakpoint as needed
-                    smoothScrollWithOffset('resultChart', 64); // 64px offset for navbar
+                    smoothScrollWithOffset('scroll-if-gender-missing', 64); // 64px offset for navbar
                 }
             }, 100);
         }
