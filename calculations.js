@@ -356,7 +356,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-
 document.addEventListener('DOMContentLoaded', function () {
     // Select necessary DOM elements
     const grundumsatzElement = document.getElementById('grund-right');
