@@ -920,7 +920,7 @@ window.onload = function() {
             var calorieDeficitPerDay = Math.round((lastWeekWeightLossKg * 7700) / 7);
             var targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay);
         
-            // Cap targetCalories to be at least grundUmsatzValue
+            // Cap targetCalories to grundUmsatzValue only if it falls below it
             if (targetCalories < grundUmsatzValue) {
                 targetCalories = grundUmsatzValue;
                 // Recalculate calorieDeficitPerDay based on capped targetCalories
@@ -1144,6 +1144,7 @@ window.onload = function() {
         initializeListeners();
     }, 2); // 2 milliseconds delay
 };
+
 
 
 
