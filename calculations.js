@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () { 
     // Select necessary DOM elements
 
     const genderInputs = document.querySelectorAll('input[name="geschlecht"]');
@@ -425,10 +425,7 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
-
-// We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D // We ADD Always here PLS :D
-// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D
-// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D// We ADD Always here PLS :D
+//Stelle für Änderung
 let chartInstance = null; // Declare chartInstance globally
 window.onload = function() {
     // Delay the script execution by 2 milliseconds

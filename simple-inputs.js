@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 console.log(`Input event triggered on ${input.id}. Current value: "${input.value}"`);
                 const originalValue = input.value;
-                
+
                 // Replace any character that is not a digit, comma, or period
                 let sanitizedValue = input.value.replace(/[^0-9,\.]/g, '')
                                                .replace(/,{2,}/g, ',') // Replace multiple commas with single comma
@@ -36,9 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Remove only leading commas or periods
                 sanitizedValue = sanitizedValue.replace(/^[,\.]+/g, '');
 
-                // Optionally, remove trailing comma or period, but for this case, we keep it
-                // sanitizedValue = sanitizedValue.replace(/[,\.]+$/g, '');
-
                 if (originalValue !== sanitizedValue) {
                     console.log(`Sanitized value for ${input.id}: "${sanitizedValue}"`);
                     // Update the flag to indicate a programmatic change
@@ -46,6 +43,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     input.value = sanitizedValue;
                     input.isProgrammaticChange = false;
                 }
+
+                // Convert commas to periods for processing by the slider
+                const valueForSlider = sanitizedValue.replace(/,/g, '.');
+                updateRangeSliderPosition(`wrapper-step-range_slider[fs-rangeslider-element="${input.id}"]`, valueForSlider, true);
             });
 
             input.addEventListener('keydown', (event) => {
@@ -179,6 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         console.log(`Set handle left to ${handle.style.left} and fill width to ${fill.style.width}`);
     }
+
 
     // Sync input field value with slider handle text for weight and KFA
     function setInputValue(rangeSliderWrapperClass, inputId) {
