@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function () { //Stelle für Änderung
+document.addEventListener('DOMContentLoaded', function () {
     // Select necessary DOM elements
 
     const genderInputs = document.querySelectorAll('input[name="geschlecht"]');
@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
     genderInputs.forEach(input => {
         input.addEventListener('change', () => {
             gender = input.value;
-
             calculateResult();
         });
     });
@@ -38,7 +37,6 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
     calcTypeInputs.forEach(input => {
         input.addEventListener('change', () => {
             calcType = input.value;
-
             toggleCalcType();
             calculateResult();
         });
@@ -46,35 +44,34 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
 
     // Input change listeners for Miflin inputs
     ageInput.addEventListener('input', () => {
-        age = parseFloat(ageInput.value, 10) || 0;
-
+        age = parseAndValidateInput(ageInput.value);
         calculateResult();
     });
 
     heightInput.addEventListener('input', () => {
-        height = parseFloat(heightInput.value, 10) || 0;
+        height = parseAndValidateInput(heightInput.value);
         calculateResult();
     });
 
     weightInput.addEventListener('input', () => {
-        weight = parseFloat(weightInput.value.replace(',', '.')) || 0;
+        weight = parseAndValidateInput(weightInput.value);
         calculateResult();
     });
 
     // Input change listeners for KFA inputs
     weightKfaInput.addEventListener('input', () => {
-        weight = parseFloat(weightKfaInput.value.replace(',', '.')) || 0;
+        weight = parseAndValidateInput(weightKfaInput.value);
         calculateResult();
     });
 
     kfaInput.addEventListener('input', () => {
-        kfa = parseFloat(kfaInput.value, 10) || 0;
+        kfa = parseAndValidateInput(kfaInput.value);
         calculateResult();
     });
 
     // Input change listener for Steps input
     stepsInput.addEventListener('input', () => {
-        dailySteps = parseFloat(stepsInput.value.replace(/\./g, ''), 10) || 0; // Removing periods and converting to integer
+        dailySteps = parseFloat(stepsInput.value.replace(/\./g, '')) || 0; // Removing periods and converting to integer
         calculateStepsCalories();
     });
 
@@ -91,6 +88,13 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
         }
     }
 
+    // Function to parse and validate user input, allowing commas as decimal separators
+    function parseAndValidateInput(inputValue) {
+        const parsedValue = inputValue.replace(',', '.');
+        // Validate the parsed value - ensure that it's a valid float or return 0
+        return isNaN(parseFloat(parsedValue)) ? 0 : parseFloat(parsedValue);
+    }
+
     // Calculation function for BMR
     function calculateResult() {
         // Fetch values from sliders' handle text if available
@@ -99,25 +103,20 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
         weight = calcType === 'miflin' ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2') : getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
         kfa = calcType === 'kfa' ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2') : 0;
     
-    
         let result = 0;
     
         if (calcType === 'miflin') {
-            // Miflin St. Jeor formula (using height, weight, age)
             if (gender === 'Mann') {
                 result = 10 * weight + 6.25 * height - 5 * age + 5; // For males
             } else if (gender === 'frau') {
                 result = 10 * weight + 6.25 * height - 5 * age - 161; // For females
             }
         } else if (calcType === 'kfa') {
-            // Calculate BMR with KFA (only using weight and body fat percentage)
             if (weight > 0 && kfa > 0) {
                 result = 864 + 13.8 * (weight * (1 - kfa / 100)); // KFA formula
             }
         }
     
-    
-        // Select the wrapper for Grundumsatz result
         const grundumsatzWrapper = document.querySelector('.wrapper-result_grundumsatz');
     
         // Update both elements with the calculated Grundumsatz
@@ -127,42 +126,32 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
             // Update the Grundumsatz element in the first section
             grundumsatzElement.textContent = `${roundedResult} kcal`;
     
-            // Update the other element with the Grundumsatz result
             const grundumsatzResultElement = document.querySelector('.wrapper-result_grundumsatz .steps_result-text');
             if (grundumsatzResultElement) {
                 grundumsatzResultElement.textContent = `${roundedResult} kcal`;
             }
     
-            // Set wrapper display to flex if result is greater than 0
             if (roundedResult > 0 && grundumsatzWrapper) {
                 grundumsatzWrapper.style.display = 'flex';
             }
     
         } else {
-            // Reset both elements to 0 kcal if inputs are incomplete
             grundumsatzElement.textContent = '0 kcal';
-    
             const grundumsatzResultElement = document.querySelector('.wrapper-result_grundumsatz .steps_result-text');
             if (grundumsatzResultElement) {
                 grundumsatzResultElement.textContent = '0 kcal';
             }
     
-            // Set wrapper display to none if result is 0
             if (grundumsatzWrapper) {
                 grundumsatzWrapper.style.display = 'none';
             }
-    
         }
     }
     
-    
-
     // New function to calculate calories burned from daily steps
     function calculateStepsCalories() {
         const stepsCalories = dailySteps * 0.04; // On average, walking burns 0.04 kcal per step
-
-
-        // Only show the result if the value is greater than 0
+    
         if (dailySteps > 0) {
             stepsWrapperResult.style.display = 'flex';
             stepsResultElement.textContent = `${Math.round(stepsCalories)} kcal`;
@@ -178,23 +167,20 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
         const handleText = document.querySelector(`.${wrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
 
-        // Use the handle text value if available, else fall back to the input value
-        const valueFromHandle = handleText ? parseFloat(handleText.textContent, 10) || 0 : 0;
-        const valueFromInput = parseFloat(inputElement.value, 10) || 0;
-
+        const valueFromHandle = handleText ? parseAndValidateInput(handleText.textContent) : 0;
+        const valueFromInput = parseAndValidateInput(inputElement.value);
 
         return valueFromHandle || valueFromInput;
     }
 
     // Add listeners for custom sliders
     function addSliderListeners() {
-        // Observe age, height, weight, weight-KFA, and KFA sliders
         observeSliderChange('wrapper-step-range_slider', 'age-2');
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2');
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
-        observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // Steps slider
+        observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4');
     }
 
     // Function to observe slider changes
@@ -202,27 +188,24 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
         const handleTextElement = document.querySelector(`.${wrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
 
-
-        // Observe changes in slider handle text
         const observer = new MutationObserver(() => {
             const value = handleTextElement.textContent;
             inputElement.value = value;
 
             if (inputId === 'steps-4') {
-                dailySteps = parseFloat(value, 10);
+                dailySteps = parseAndValidateInput(value);
                 calculateStepsCalories();
             } else {
-                calculateResult(); // Trigger result calculation when the slider handle moves
+                calculateResult();
             }
         });
 
         observer.observe(handleTextElement, { childList: true });
 
-        // Also listen to direct input changes
         inputElement.addEventListener('input', () => {
             handleTextElement.textContent = inputElement.value;
             if (inputId === 'steps-4') {
-                dailySteps = parseFloat(inputElement.value, 10);
+                dailySteps = parseAndValidateInput(inputElement.value);
                 calculateStepsCalories();
             } else {
                 calculateResult();
@@ -230,10 +213,10 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
         });
     }
 
-    // Initial setup
     toggleCalcType();
-    addSliderListeners(); // Attach slider listeners
+    addSliderListeners();
 });
+
 
 document.addEventListener('DOMContentLoaded', function () {
     const MET_VALUES = {
