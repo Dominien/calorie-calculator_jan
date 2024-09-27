@@ -46,35 +46,35 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
 
     // Input change listeners for Miflin inputs
     ageInput.addEventListener('input', () => {
-        age = parseInt(ageInput.value, 10) || 0;
+        age = parseFloat(ageInput.value, 10) || 0;
 
         calculateResult();
     });
 
     heightInput.addEventListener('input', () => {
-        height = parseInt(heightInput.value, 10) || 0;
+        height = parseFloat(heightInput.value, 10) || 0;
         calculateResult();
     });
 
     weightInput.addEventListener('input', () => {
-        weight = parseInt(weightInput.value, 10) || 0;
+        weight = parseFloat(weightInput.value, 10) || 0;
         calculateResult();
     });
 
     // Input change listeners for KFA inputs
     weightKfaInput.addEventListener('input', () => {
-        weight = parseInt(weightKfaInput.value, 10) || 0;
+        weight = parseFloat(weightKfaInput.value, 10) || 0;
         calculateResult();
     });
 
     kfaInput.addEventListener('input', () => {
-        kfa = parseInt(kfaInput.value, 10) || 0;
+        kfa = parseFloat(kfaInput.value, 10) || 0;
         calculateResult();
     });
 
     // Input change listener for Steps input
     stepsInput.addEventListener('input', () => {
-        dailySteps = parseInt(stepsInput.value.replace(/\./g, ''), 10) || 0; // Removing periods and converting to integer
+        dailySteps = parseFloat(stepsInput.value.replace(/\./g, ''), 10) || 0; // Removing periods and converting to integer
         calculateStepsCalories();
     });
 
@@ -179,8 +179,8 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
         const inputElement = document.getElementById(inputId);
 
         // Use the handle text value if available, else fall back to the input value
-        const valueFromHandle = handleText ? parseInt(handleText.textContent, 10) || 0 : 0;
-        const valueFromInput = parseInt(inputElement.value, 10) || 0;
+        const valueFromHandle = handleText ? parseFloat(handleText.textContent, 10) || 0 : 0;
+        const valueFromInput = parseFloat(inputElement.value, 10) || 0;
 
 
         return valueFromHandle || valueFromInput;
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
             inputElement.value = value;
 
             if (inputId === 'steps-4') {
-                dailySteps = parseInt(value, 10);
+                dailySteps = parseFloat(value, 10);
                 calculateStepsCalories();
             } else {
                 calculateResult(); // Trigger result calculation when the slider handle moves
@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
         inputElement.addEventListener('input', () => {
             handleTextElement.textContent = inputElement.value;
             if (inputId === 'steps-4') {
-                dailySteps = parseInt(inputElement.value, 10);
+                dailySteps = parseFloat(inputElement.value, 10);
                 calculateStepsCalories();
             } else {
                 calculateResult();
@@ -248,9 +248,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function getWeightFromGrundumsatz() {
         const calcType = document.querySelector('input[name="kfa-or-miflin"]:checked').value;
         if (calcType === 'miflin') {
-            weight = parseInt(document.getElementById('weight-2').value, 10) || 0;
+            weight = parseFloat(document.getElementById('weight-2').value, 10) || 0;
         } else {
-            weight = parseInt(document.getElementById('weight-3-kfa').value, 10) || 0;
+            weight = parseFloat(document.getElementById('weight-3-kfa').value, 10) || 0;
         }
     }
 
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Observe changes in slider handle text
         if (handleTextElement) {
             const observer = new MutationObserver(() => {
-                const value = parseInt(handleTextElement.textContent, 10) || 0;
+                const value = parseFloat(handleTextElement.textContent, 10) || 0;
                 inputElement.value = value;
                 getWeightFromGrundumsatz(); // Trigger weight fetch
                 updateTotalCalories(); // Update total calories after weight change
@@ -282,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Add input event listener to handle manual input changes
         inputElement.addEventListener('input', () => {
-            const value = parseInt(inputElement.value, 10) || 0;
+            const value = parseFloat(inputElement.value, 10) || 0;
             handleTextElement.textContent = value;
             getWeightFromGrundumsatz();
             updateTotalCalories();
@@ -298,8 +298,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsInput = document.getElementById(sessionsInputId);
 
-        let minutes = parseInt(minutesInput.value, 10) || 0;
-        let sessions = parseInt(sessionsInput.value, 10) || 0;
+        let minutes = parseFloat(minutesInput.value, 10) || 0;
+        let sessions = parseFloat(sessionsInput.value, 10) || 0;
 
 
         let MET = MET_VALUES[activityType] || 0;
@@ -390,9 +390,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to update the total actual calorie burn
     function updateActualCalories() {
-        const grundumsatz = parseInt(grundumsatzElement.textContent, 10) || 0;
-        const alltagsbewegung = parseInt(alltagsbewegungElement.textContent, 10) || 0;
-        const aktivesTraining = parseInt(aktivesTrainingElement.textContent, 10) || 0;
+        const grundumsatz = parseFloat(grundumsatzElement.textContent, 10) || 0;
+        const alltagsbewegung = parseFloat(alltagsbewegungElement.textContent, 10) || 0;
+        const aktivesTraining = parseFloat(aktivesTrainingElement.textContent, 10) || 0;
 
         // If Grundumsatz is available, use it; otherwise, use fallback (1280 kcal)
         const baseCalories = grundumsatz || fallbackCalories;
@@ -864,10 +864,10 @@ wunschgewichtInput.addEventListener('input', function() {
         
             var targetWeight = parseFloat(targetWeightElement && targetWeightElement.value) || 0;
             var totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
-            var totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0;
+            var totalCaloriesValue = parseFloat(totalCalories.replace(/\D/g, '')) || 0;
         
             var grundUmsatzText = grundUmsatzElement ? grundUmsatzElement.textContent : '';
-            var grundUmsatzValue = parseInt(grundUmsatzText.replace(/\D/g, '')) || 0;
+            var grundUmsatzValue = parseFloat(grundUmsatzText.replace(/\D/g, '')) || 0;
         
             var selectedValue = null;
             for (var i = 0; i < radios.length; i++) {
@@ -1130,8 +1130,8 @@ document.addEventListener('DOMContentLoaded', function () {
     function getSliderValue(wrapperClass, inputId) {
         const handleText = document.querySelector(`.${wrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
-        const valueFromHandle = handleText ? parseInt(handleText.textContent, 10) : 0;
-        const valueFromInput = inputElement ? parseInt(inputElement.value, 10) || 0 : 0;
+        const valueFromHandle = handleText ? parseFloat(handleText.textContent, 10) : 0;
+        const valueFromInput = inputElement ? parseFloat(inputElement.value, 10) || 0 : 0;
 
         // Prioritize value from input field, otherwise use the slider handle value
         return valueFromInput || valueFromHandle;
@@ -1147,7 +1147,7 @@ document.addEventListener('DOMContentLoaded', function () {
             ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2')
             : getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
 
-        const goalWeight = parseInt(document.querySelector('.target-weight').textContent) || 0;
+        const goalWeight = parseFloat(document.querySelector('.target-weight').textContent) || 0;
         const weightLoss = currentWeight - goalWeight;
 
         return weightLoss > 0 ? weightLoss : 0;
@@ -1191,9 +1191,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Function to display the correct CTA based on weight loss and gender
     function checkValuesAndDisplay() {
-        const zielKcal = parseInt(document.querySelector('.ziel-kcal').textContent);
-        const weeks = parseInt(document.querySelector('.weeks').textContent);
-        const months = parseInt(document.querySelector('.months').textContent);
+        const zielKcal = parseFloat(document.querySelector('.ziel-kcal').textContent);
+        const weeks = parseFloat(document.querySelector('.weeks').textContent);
+        const months = parseFloat(document.querySelector('.months').textContent);
 
         // Check for current weight based on the selected calculation type
         const calcType = document.querySelector('input[name="kfa-or-miflin"]:checked').value;
