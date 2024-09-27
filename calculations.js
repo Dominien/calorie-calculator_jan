@@ -1,6 +1,4 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Select necessary DOM elements
-
     const genderInputs = document.querySelectorAll('input[name="geschlecht"]');
     const calcTypeInputs = document.querySelectorAll('input[name="kfa-or-miflin"]');
     const ageInput = document.getElementById('age-2');
@@ -97,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Calculation function for BMR
     function calculateResult() {
-        // Fetch values from sliders' handle text if available
         age = getSliderValue('wrapper-step-range_slider', 'age-2');
         height = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
         weight = calcType === 'miflin' ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2') : getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
@@ -119,11 +116,9 @@ document.addEventListener('DOMContentLoaded', function () {
     
         const grundumsatzWrapper = document.querySelector('.wrapper-result_grundumsatz');
     
-        // Update both elements with the calculated Grundumsatz
         if ((calcType === 'miflin' && weight && height && age && gender) || (calcType === 'kfa' && weight && kfa && gender)) {
             const roundedResult = Math.round(result);
     
-            // Update the Grundumsatz element in the first section
             grundumsatzElement.textContent = `${roundedResult} kcal`;
     
             const grundumsatzResultElement = document.querySelector('.wrapper-result_grundumsatz .steps_result-text');
@@ -148,21 +143,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
     
-    // New function to calculate calories burned from daily steps
     function calculateStepsCalories() {
-        const stepsCalories = dailySteps * 0.04; // On average, walking burns 0.04 kcal per step
+        const stepsCalories = dailySteps * 0.04;
     
         if (dailySteps > 0) {
             stepsWrapperResult.style.display = 'flex';
             stepsResultElement.textContent = `${Math.round(stepsCalories)} kcal`;
-            altagElement.textContent = `${Math.round(stepsCalories)} kcal`; // Update Alltagsbewegung
+            altagElement.textContent = `${Math.round(stepsCalories)} kcal`;
         } else {
-            stepsWrapperResult.style.display = 'none'; // Hide if steps are 0
-            altagElement.textContent = '0 kcal'; // Reset Alltagsbewegung if steps are 0
+            stepsWrapperResult.style.display = 'none';
+            altagElement.textContent = '0 kcal';
         }
     }
 
-    // Get the value from the slider handle or the input field
     function getSliderValue(wrapperClass, inputId) {
         const handleText = document.querySelector(`.${wrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
@@ -173,7 +166,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return valueFromHandle || valueFromInput;
     }
 
-    // Add listeners for custom sliders
     function addSliderListeners() {
         observeSliderChange('wrapper-step-range_slider', 'age-2');
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
@@ -183,7 +175,6 @@ document.addEventListener('DOMContentLoaded', function () {
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4');
     }
 
-    // Function to observe slider changes
     function observeSliderChange(wrapperClass, inputId) {
         const handleTextElement = document.querySelector(`.${wrapperClass} .inside-handle-text`);
         const inputElement = document.getElementById(inputId);
