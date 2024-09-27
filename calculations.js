@@ -865,13 +865,26 @@ window.onload = function() {
             if (calculationMethod === 'miflin') {
                 var heightInput = document.getElementById('height-2');
                 var height = parseFloat(heightInput && heightInput.value) || 0;
-                grundUmsatzValue = height - 110;
+
+                var optimalWeight = height - 110;
+
+                // Get age and gender
+                var ageInput = document.getElementById('age-2');
+                var age = parseFloat(ageInput && ageInput.value) || 0;
+
+                var gender = document.querySelector('input[name="geschlecht"]:checked')?.value;
+                var genderFactor = (gender === 'man') ? 5 : -161;
+
+                // Calculate Grundumsatz using Mifflin-St Jeor equation with optimal weight
+                grundUmsatzValue = 10 * optimalWeight + 6.25 * height - 5 * age + genderFactor;
+                grundUmsatzValue = Math.round(grundUmsatzValue);
+
             } else if (calculationMethod === 'kfa') {
                 // Calculate Grundumsatz with 15% body fat
                 var LBM = currentWeight * (1 - 0.15);
                 grundUmsatzValue = 370 + (21.6 * LBM);
+                grundUmsatzValue = Math.round(grundUmsatzValue);
             }
-            grundUmsatzValue = Math.round(grundUmsatzValue);
         
             var selectedValue = null;
             for (var i = 0; i < radios.length; i++) {
@@ -948,8 +961,9 @@ window.onload = function() {
                 }
             }
         
-            if (fettAbnahmeElement) fettAbnahmeElement.textContent = lastWeekWeightLossKg.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            // Update defizit and fettAbnahme with rounded values
             if (defizitElement) defizitElement.textContent = Math.round(calorieDeficitPerDay).toString();
+            if (fettAbnahmeElement) fettAbnahmeElement.textContent = lastWeekWeightLossKg.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
         
             // Generate weight data points based on calculated weeks and weight loss percentage
             const { weightData, timeIntervals } = calculateWeightDataPoints(currentWeight, targetWeight, weeksToReachGoal, weeklyWeightLossPercentage);
@@ -963,62 +977,62 @@ window.onload = function() {
             const weightData = [];
             const timeIntervals = [];
             const numberOfPoints = 10; // Number of data points (dots)
-    
+
             // Calculate evenly spaced time intervals
             for (let i = 0; i <= numberOfPoints; i++) {
                 let t = (totalWeeks / numberOfPoints) * i;
                 timeIntervals.push(t);
             }
-    
+
             // Generate weight data using compound weight loss formula
             for (let i = 0; i <= numberOfPoints; i++) {
                 let weeksPassed = timeIntervals[i];
-    
+
                 // Using compound interest formula for weight loss
                 // weight = initialWeight * (1 - weeklyWeightLossPercentage)^(weeksPassed)
                 let weight = currentWeight * Math.pow(1 - weeklyWeightLossPercentage, weeksPassed);
-    
+
                 // Ensure the last weight is exactly the target weight
                 if (i === numberOfPoints) {
                     weight = targetWeight;
                 }
-    
+
                 weightData.push(parseFloat(weight.toFixed(1)));
             }
-    
+
             return { weightData, timeIntervals };
         }
-    
+
         // Function to generate the chart
         function generateResultChart(weightData, timeIntervals) {
             // Set wrapper-canvas display to block if it isn't already
             const wrapperCanvas = document.querySelector('.wrapper-canvas');
             const textUnderCanvas = document.querySelector('.text-under_canvas'); // Select the text element
-    
+
             if (wrapperCanvas && getComputedStyle(wrapperCanvas).display !== 'block') {
                 wrapperCanvas.style.display = 'block';
             }
-    
+
              // Show the text under the canvas
              if (textUnderCanvas && getComputedStyle(textUnderCanvas).display !== 'block') {
                 textUnderCanvas.style.display = 'block';
             }
-    
+
             const chartCanvas = document.getElementById('resultChart');
             const ctx = chartCanvas.getContext('2d');
-    
+
             if (chartInstance) {
                 chartInstance.destroy(); // Destroy old chart instance if it exists
             }
-    
+
             const gradientFill = ctx.createLinearGradient(0, 0, 0, chartCanvas.height);
             gradientFill.addColorStop(0, 'rgba(233, 62, 45, 0.3)');
             gradientFill.addColorStop(1, 'rgba(26, 183, 0, 0.3)');
-    
+
             const dates = generateKeyDates(timeIntervals); // Generate dates based on time intervals
             const pointColors = weightData.map((_, index) => index === 0 ? 'rgba(233, 62, 45, 1)' : 'rgba(26, 183, 0, 1)');
             const pointSizes = Array(weightData.length).fill(6); // Consistent point size
-    
+
             setTimeout(() => {
                 chartInstance = new Chart(ctx, {
                     type: 'line',
@@ -1077,25 +1091,25 @@ window.onload = function() {
                         }
                     }
                 });
-    
+
                 console.log("Final Chart Data: ", chartInstance.data.datasets[0].data); // Debugging log
             }, 100);
         }
-    
+
         // Helper function to generate dates for the chart
         function generateKeyDates(timeIntervals) {
             const dates = [];
             let currentDate = new Date();
-    
+
             for (let i = 0; i < timeIntervals.length; i++) {
                 let date = new Date(currentDate.getTime());
                 date.setDate(currentDate.getDate() + Math.round(timeIntervals[i] * 7)); // Convert weeks to days
                 dates.push(date.toLocaleDateString('de-DE', { year: 'numeric', month: '2-digit', day: '2-digit' }));
             }
-    
+
             return dates;
         }
-    
+
         // Helper function to reset results when inputs are invalid
         function resetResults() {
             if (defizitElement) defizitElement.textContent = '0';
@@ -1126,7 +1140,7 @@ window.onload = function() {
             }
         }
         
-    
+
         initializeListeners();
     }, 2); // 2 milliseconds delay
 };
