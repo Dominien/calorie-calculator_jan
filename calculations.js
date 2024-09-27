@@ -231,9 +231,9 @@ document.addEventListener('DOMContentLoaded', function () {
     function getWeightFromGrundumsatz() {
         const calcType = document.querySelector('input[name="kfa-or-miflin"]:checked').value;
         if (calcType === 'miflin') {
-            weight = parseFloat(document.getElementById('weight-2').value.replace(',', '.'), 10) || 0;
+            weight = parseAndValidateInput(document.getElementById('weight-2').value);
         } else {
-            weight = parseFloat(document.getElementById('weight-3-kfa').value.replace(',', '.'), 10) || 0;
+            weight = parseAndValidateInput(document.getElementById('weight-3-kfa').value);
         }
     }
 
@@ -246,6 +246,12 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Function to parse and validate user input, allowing commas as decimal separators
+    function parseAndValidateInput(inputValue) {
+        const parsedValue = inputValue.replace(',', '.');
+        return isNaN(parseFloat(parsedValue)) ? 0 : parseFloat(parsedValue);
+    }
+
     // Function to observe changes in sliders and input fields
     function observeWeightInputChange(wrapperClass, inputId) {
         const handleTextElement = document.querySelector(`.${wrapperClass} .inside-handle-text`);
@@ -254,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Observe changes in slider handle text
         if (handleTextElement) {
             const observer = new MutationObserver(() => {
-                const value = parseFloat(handleTextElement.textContent.replace(',', '.'), 10) || 0;
+                const value = parseAndValidateInput(handleTextElement.textContent);
                 inputElement.value = value;
                 getWeightFromGrundumsatz(); // Trigger weight fetch
                 updateTotalCalories(); // Update total calories after weight change
@@ -265,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Add input event listener to handle manual input changes
         inputElement.addEventListener('input', () => {
-            const value = parseFloat(inputElement.value.replace(',', '.'), 10) || 0;
+            const value = parseAndValidateInput(inputElement.value);
             handleTextElement.textContent = value;
             getWeightFromGrundumsatz();
             updateTotalCalories();
@@ -281,8 +287,8 @@ document.addEventListener('DOMContentLoaded', function () {
         const minutesInput = document.getElementById(minutesInputId);
         const sessionsInput = document.getElementById(sessionsInputId);
 
-        let minutes = parseFloat(minutesInput.value.replace(',', '.'), 10) || 0;
-        let sessions = parseFloat(sessionsInput.value.replace(',', '.'), 10) || 0;
+        let minutes = parseAndValidateInput(minutesInput.value);
+        let sessions = parseAndValidateInput(sessionsInput.value);
 
         let MET = MET_VALUES[activityType] || 0;
         if (!activityType || minutes === 0 || sessions === 0 || weight === 0 || MET === 0) {
@@ -320,7 +326,6 @@ document.addEventListener('DOMContentLoaded', function () {
             activeCaloriesElement.textContent = '0 kcal'; // Reset active calories if total is 0
         }
     }
-    
 
     // Function to set up training sessions
     function setupTrainingSession(dropdownId, minutesInputId, sessionsInputId) {
@@ -336,7 +341,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const selectedActivity = $(this).val();  // Capture the value on change
             if (selectedActivity) {  // Check if the selected activity is valid
                 updateTotalCalories();  // Update total calories for all sessions
-            } else {
             }
         });
 
@@ -358,6 +362,7 @@ document.addEventListener('DOMContentLoaded', function () {
         setupTrainingSession('drop-down-3', 'training-minuten-3', 'training-woche-3');
     });
 });
+
 
 
 
