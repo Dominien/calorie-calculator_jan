@@ -425,7 +425,20 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 
+// Helper function to scroll smoothly with an offset
+function smoothScrollWithOffset(id, offset) {
+    const element = document.getElementById(id);
+    const yOffset = offset || 0;
+    const y = element.getBoundingClientRect().top + window.pageYOffset - yOffset;
+
+    window.scrollTo({
+        top: y,
+        behavior: 'smooth'
+    });
+}
+
 let chartInstance = null; // Declare chartInstance globally
+
 window.onload = function() {
     setTimeout(function() {
         // Cross-browser event creation function
@@ -620,7 +633,7 @@ window.onload = function() {
             if (!selectedGender && !hasActiveClass) {
                 isGenderMissing = true;
                 isValid = false;
-                smoothScrollWithOffset('scroll-if-gender-missing', 64); // 4rem = 64px offset for navbar
+                smoothScrollWithOffset('scroll-if-gender-missing', 64); // 64px offset for navbar
                 if (genderWarning) {
                     genderWarning.textContent = 'Bitte wähle oben dein Geschlecht aus.';
                     genderWarning.style.display = 'block';
@@ -1013,8 +1026,8 @@ window.onload = function() {
                 wrapperCanvas.style.display = 'block';
             }
 
-             // Show the text under the canvas
-             if (textUnderCanvas && getComputedStyle(textUnderCanvas).display !== 'block') {
+            // Show the text under the canvas
+            if (textUnderCanvas && getComputedStyle(textUnderCanvas).display !== 'block') {
                 textUnderCanvas.style.display = 'block';
             }
 
@@ -1093,6 +1106,12 @@ window.onload = function() {
                 });
 
                 console.log("Final Chart Data: ", chartInstance.data.datasets[0].data); // Debugging log
+
+                // **Added smooth scroll functionality here**
+                // Scroll to the chart element only on desktop devices
+                if (window.innerWidth >= 1024) { // Adjust the breakpoint as needed
+                    smoothScrollWithOffset('resultChart', 64); // 64px offset for navbar
+                }
             }, 100);
         }
 
