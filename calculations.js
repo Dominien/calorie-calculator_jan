@@ -881,6 +881,8 @@ window.onload = function() {
         
             // Calculate grundUmsatzValue based on the selected method
             var grundUmsatzValue = 0;
+            var grundUmsatzCap = 0; // Cap using optimal weight logic for both methods
+        
             if (calculationMethod === 'miflin') {
                 var heightInput = document.getElementById('height-2');
                 var height = parseFloat(heightInput && heightInput.value) || 0;
@@ -908,12 +910,12 @@ window.onload = function() {
                 // Step 2: Calculate optimal weight assuming 15% body fat
                 var optimalWeight = LBM / 0.85; // Example: 79.2kg / 0.85 = 93.18kg
                 
-                // Step 3: Calculate Grundumsatz with optimal weight and actual KFA
-                grundUmsatzValue = 864 + 13.8 * LBM; // Original KFA formula for user's current body composition
+                // Step 3: Use the optimal weight for Grundumsatz calculation
+                grundUmsatzCap = 864 + 13.8 * optimalWeight; // Cap based on optimal weight with 15% body fat assumption
                 
-                // Step 4: Calculate Grundumsatz cap using optimal weight and assuming 15% body fat
-                var grundUmsatzCap = 864 + 13.8 * optimalWeight; // Grundumsatz cap with optimal weight
-                
+                // Step 4: Use the actual KFA percentage entered by the user for Grundumsatz calculation
+                grundUmsatzValue = 864 + 13.8 * (optimalWeight * (1 - kfa)); // Actual Grundumsatz based on user's KFA
+        
                 grundUmsatzValue = Math.round(grundUmsatzValue);
                 grundUmsatzCap = Math.round(grundUmsatzCap);
             }
@@ -1006,7 +1008,6 @@ window.onload = function() {
             // Generate the chart with calculated weight data and time intervals
             generateResultChart(weightData, timeIntervals);
         }
-        
         
 
         
