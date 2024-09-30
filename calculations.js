@@ -862,8 +862,6 @@ window.onload = function() {
             return weeks;
         }
 
-        // Unified function to handle total calorie updates and weight loss results
-        // Unified function to handle total calorie updates and weight loss results
         function updateResults() {
             var calculationMethod = getSelectedCalculationMethod();
             
@@ -951,7 +949,7 @@ window.onload = function() {
         
             // Cap targetCalories to grundUmsatzValue only if it falls below it
             if (targetCalories < grundUmsatzValue) {
-                targetCalories = grundUmsatzValue;
+                targetCalories = grundUmsatzValue; // Apply capping here
                 // Recalculate calorieDeficitPerDay based on capped targetCalories
                 calorieDeficitPerDay = totalCaloriesValue - targetCalories;
                 // Recalculate lastWeekWeightLossKg based on new calorieDeficitPerDay
@@ -975,9 +973,11 @@ window.onload = function() {
         
             if (targetWeightResultElement) targetWeightResultElement.textContent = targetWeight.toString();
         
+            // Update the target calories element
             if (zielKalorienElement) zielKalorienElement.textContent = targetCalories > 0 ? Math.round(targetCalories) : '0';
             if (zielKcalElement) zielKcalElement.textContent = targetCalories > 0 ? Math.round(targetCalories) : '0';
         
+            // Handle warnings if target calories fall below Grundumsatz
             if (warningMessageElement) {
                 if (targetCalories <= grundUmsatzValue) {
                     warningMessageElement.style.display = 'flex';
@@ -1000,6 +1000,7 @@ window.onload = function() {
             // Generate the chart with calculated weight data and time intervals
             generateResultChart(weightData, timeIntervals);
         }
+        
         
 
         
