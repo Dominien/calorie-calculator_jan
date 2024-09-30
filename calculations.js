@@ -899,10 +899,29 @@ window.onload = function() {
                 grundUmsatzValue = Math.round(grundUmsatzValue);
 
             } else if (calculationMethod === 'kfa') {
-                // Calculate Grundumsatz with 15% body fat
-                var LBM = currentWeight * (1 - 0.15);
-                grundUmsatzValue = 864 + (13.8 * LBM);
-                grundUmsatzValue = Math.round(grundUmsatzValue);
+                var kfaInput = document.getElementById('kfa-2'); // User's body fat percentage input
+                var kfa = parseFloat(kfaInput && kfaInput.value) / 100 || 0; // Convert percentage input to decimal (e.g., 40% = 0.40)
+            
+                var LBM = 0; // Initialize lean body mass
+                var optimalWeight = 0; // Initialize optimal weight for KFA calculation
+            
+                if (kfa > 0.15) { 
+                    // Calculate the lean body mass (LBM) based on the user's actual body fat percentage
+                    LBM = currentWeight * (1 - kfa); // Example: 132kg * (1 - 0.40) = 79.2kg
+            
+                    // Adjust the weight to reflect what it would be if the user had 15% body fat
+                    optimalWeight = LBM / 0.85; // Example: 79.2kg / 0.85 = 93.18kg
+            
+                    // Calculate Grundumsatz using Mifflin-St Jeor equation with the adjusted optimal weight
+                    grundUmsatzValue = 10 * optimalWeight + 6.25 * height - 5 * age + genderFactor;
+            
+                } else {
+                    // If body fat percentage is 15% or below, use the actual body fat percentage input by the user
+                    LBM = currentWeight * (1 - kfa); // Use the actual user input (e.g., 132kg * (1 - 0.12) for 12% body fat)
+                    grundUmsatzValue = 864 + (13.8 * LBM); // Original KFA formula with user's actual body fat percentage
+                }
+            
+                grundUmsatzValue = Math.round(grundUmsatzValue); // Round the result
             }
         
             var selectedValue = null;
