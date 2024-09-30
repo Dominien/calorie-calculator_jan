@@ -866,6 +866,7 @@ window.onload = function() {
         function updateResults() {
             var calculationMethod = getSelectedCalculationMethod();
             
+            // Get the current weight based on the selected calculation method
             var currentWeight = 0;
             if (calculationMethod === 'miflin') {
                 currentWeight = parseFloat(weightInputElementMiflin && weightInputElementMiflin.value) || 0;
@@ -876,7 +877,7 @@ window.onload = function() {
             var targetWeight = parseFloat(targetWeightElement && targetWeightElement.value) || 0;
             var totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
             var totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0;
-
+        
             if (startWeightElement) startWeightElement.textContent = currentWeight.toString();
         
             // Calculate grundUmsatzValue based on the selected method
@@ -884,25 +885,44 @@ window.onload = function() {
             if (calculationMethod === 'miflin') {
                 var heightInput = document.getElementById('height-2');
                 var height = parseFloat(heightInput && heightInput.value) || 0;
-
+        
                 var optimalWeight = height - 100;
-
+        
                 // Get age and gender
                 var ageInput = document.getElementById('age-2');
                 var age = parseFloat(ageInput && ageInput.value) || 0;
-
+        
                 var gender = document.querySelector('input[name="geschlecht"]:checked')?.value;
                 var genderFactor = (gender === 'man') ? 5 : -161;
-
+        
                 // Calculate Grundumsatz using Mifflin-St Jeor equation with optimal weight
                 grundUmsatzValue = 10 * optimalWeight + 6.25 * height - 5 * age + genderFactor;
                 grundUmsatzValue = Math.round(grundUmsatzValue);
-
+        
             } else if (calculationMethod === 'kfa') {
-                // Calculate Grundumsatz with 15% body fat
-                var LBM = currentWeight * (1 - 0.15);
-                grundUmsatzValue = 864 + (13.8 * LBM);
-                grundUmsatzValue = Math.round(grundUmsatzValue);
+                var kfaInput = document.getElementById('kfa-2'); // User's body fat percentage input
+                var kfa = parseFloat(kfaInput && kfaInput.value) / 100 || 0; // Convert percentage input to decimal (e.g., 40% = 0.40)
+        
+                var LBM = 0; // Initialize lean body mass
+                var optimalWeight = 0; // Initialize optimal weight for KFA calculation
+        
+                if (kfa > 0.15) { 
+                    // Calculate the lean body mass (LBM) based on the user's actual body fat percentage
+                    LBM = currentWeight * (1 - kfa); // Example: 132kg * (1 - 0.40) = 79.2kg
+        
+                    // Adjust the weight to reflect what it would be if the user had 15% body fat
+                    optimalWeight = LBM / 0.85; // Example: 79.2kg / 0.85 = 93.18kg
+        
+                    // Calculate Grundumsatz using Mifflin-St Jeor equation with the adjusted optimal weight
+                    grundUmsatzValue = 10 * optimalWeight + 6.25 * height - 5 * age + genderFactor;
+        
+                } else {
+                    // If body fat percentage is 15% or below, use the actual body fat percentage input by the user
+                    LBM = currentWeight * (1 - kfa); // Use the actual user input (e.g., 132kg * (1 - 0.12) for 12% body fat)
+                    grundUmsatzValue = 864 + (13.8 * LBM); // Original KFA formula with user's actual body fat percentage
+                }
+        
+                grundUmsatzValue = Math.round(grundUmsatzValue); // Round the result
             }
         
             var selectedValue = null;
@@ -913,6 +933,7 @@ window.onload = function() {
                 }
             }
         
+            // Check for invalid inputs
             if (
                 isNaN(totalCaloriesValue) || totalCaloriesValue <= 0 ||
                 isNaN(currentWeight) || currentWeight <= 0 ||
@@ -990,6 +1011,7 @@ window.onload = function() {
             // Generate the chart with calculated weight data and time intervals
             generateResultChart(weightData, timeIntervals);
         }
+        
         
         // Function to calculate weight data points (for the chart)
         function calculateWeightDataPoints(currentWeight, targetWeight, totalWeeks, weeklyWeightLossPercentage) {
