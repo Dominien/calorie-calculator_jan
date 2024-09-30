@@ -879,7 +879,7 @@ window.onload = function() {
                 var heightInput = document.getElementById('height-2');
                 var height = parseFloat(heightInput && heightInput.value) || 0;
 
-                var optimalWeight = height - 110;
+                var optimalWeight = height - 100;
 
                 // Get age and gender
                 var ageInput = document.getElementById('age-2');
@@ -895,7 +895,7 @@ window.onload = function() {
             } else if (calculationMethod === 'kfa') {
                 // Calculate Grundumsatz with 15% body fat
                 var LBM = currentWeight * (1 - 0.15);
-                grundUmsatzValue = 370 + (21.6 * LBM);
+                grundUmsatzValue = 864 + (13.8 * LBM);
                 grundUmsatzValue = Math.round(grundUmsatzValue);
             }
         
