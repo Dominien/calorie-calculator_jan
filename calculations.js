@@ -16,11 +16,11 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
 
     let gender = '';
     let calcType = 'miflin'; // Default to Miflin
-    let age = 0;
-    let height = 0;
-    let weight = 0;
-    let kfa = 0; // Body Fat Percentage for KFA calculation
-    let dailySteps = 0;
+    let age = null;
+    let height = null;
+    let weight = null;
+    let kfa = null; // Body Fat Percentage for KFA calculation
+    let dailySteps = null;
 
     // Hide steps result by default if value is 0
     stepsWrapperResult.style.display = 'none';
