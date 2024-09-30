@@ -471,6 +471,7 @@ window.onload = function() {
         var warningMessageElement = document.querySelector('.warning-message_wrapper'); 
         var zielKalorienElement = document.querySelector('.result_zielkalorien'); 
         var zielKcalElement = document.querySelector('.span-result.ziel-kcal'); 
+        var startWeightElement = document.querySelector('.span-result.start-weight');
         var radios = document.getElementsByName('Gewichtverlust'); 
         var targetWeightElement = document.getElementById('wunschgewicht'); 
         var weeksElement = document.querySelector('.span-result.weeks'); 
@@ -875,6 +876,8 @@ window.onload = function() {
             var targetWeight = parseFloat(targetWeightElement && targetWeightElement.value) || 0;
             var totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
             var totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0;
+
+            if (startWeightElement) startWeightElement.textContent = currentWeight.toString();
         
             // Calculate grundUmsatzValue based on the selected method
             var grundUmsatzValue = 0;
