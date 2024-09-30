@@ -838,6 +838,9 @@ window.onload = function() {
                     isBerechnenClicked = true; // Mark that the button has been clicked
                     if (validateInputs()) {
                         updateResults();
+                        if (window.innerWidth >= 1024) { // Adjust the breakpoint as needed
+                            smoothScrollWithOffset('scroll-if-gender-missing', 64); // 64px offset for navbar
+                        }
                     }
                 });
             }
@@ -1109,9 +1112,7 @@ window.onload = function() {
 
                 // **Added smooth scroll functionality here**
                 // Scroll to the chart element only on desktop devices
-                if (window.innerWidth >= 1024) { // Adjust the breakpoint as needed
-                    smoothScrollWithOffset('scroll-if-gender-missing', 64); // 64px offset for navbar
-                }
+              
             }, 100);
         }
 
