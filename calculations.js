@@ -904,20 +904,16 @@ window.onload = function() {
                 var kfaInput = document.getElementById('kfa-2'); // User's body fat percentage input
                 var kfa = parseFloat(kfaInput && kfaInput.value) / 100 || 0; // Convert percentage input to decimal (e.g., 40% = 0.40)
         
-                // Step 1: Calculate lean body mass (LBM) based on user's actual KFA
+                // Step 1: Calculate lean body mass (LBM) based on the user's current weight and actual KFA
                 var LBM = currentWeight * (1 - kfa); // Example: 132kg * (1 - 0.40) = 79.2kg
                 
                 // Step 2: Calculate optimal weight assuming 15% body fat
                 var optimalWeight = LBM / 0.85; // Example: 79.2kg / 0.85 = 93.18kg
                 
-                // Step 3: Use the optimal weight for Grundumsatz calculation
-                grundUmsatzCap = 864 + 13.8 * optimalWeight; // Cap based on optimal weight with 15% body fat assumption
+                // Step 3: Now calculate Grundumsatz using the new **optimal weight** but with the user's **actual KFA** input.
+                grundUmsatzValue = 864 + 13.8 * (optimalWeight * (1 - kfa)); // Using optimal weight with actual KFA
                 
-                // Step 4: Use the actual KFA percentage entered by the user for Grundumsatz calculation
-                grundUmsatzValue = 864 + 13.8 * (optimalWeight * (1 - kfa)); // Actual Grundumsatz based on user's KFA
-        
                 grundUmsatzValue = Math.round(grundUmsatzValue);
-                grundUmsatzCap = Math.round(grundUmsatzCap);
             }
         
             var selectedValue = null;
@@ -955,9 +951,9 @@ window.onload = function() {
             var calorieDeficitPerDay = Math.round((lastWeekWeightLossKg * 7700) / 7);
             var targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay);
         
-            // Cap targetCalories to grundUmsatzCap only if it falls below the optimal weight-based cap
-            if (targetCalories < grundUmsatzCap) {
-                targetCalories = grundUmsatzCap; // Apply capping here
+            // Cap targetCalories to grundUmsatzValue only if it falls below the calculated Grundumsatz
+            if (targetCalories < grundUmsatzValue) {
+                targetCalories = grundUmsatzValue; // Apply capping here
                 // Recalculate calorieDeficitPerDay based on capped targetCalories
                 calorieDeficitPerDay = totalCaloriesValue - targetCalories;
                 // Recalculate lastWeekWeightLossKg based on new calorieDeficitPerDay
