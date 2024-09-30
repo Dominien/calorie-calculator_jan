@@ -864,152 +864,143 @@ window.onload = function() {
 
         // Unified function to handle total calorie updates and weight loss results
         // Unified function to handle total calorie updates and weight loss results
-function updateResults() {
-    var calculationMethod = getSelectedCalculationMethod();
-    
-    // Get the current weight based on the selected calculation method
-    var currentWeight = 0;
-    if (calculationMethod === 'miflin') {
-        currentWeight = parseFloat(weightInputElementMiflin && weightInputElementMiflin.value) || 0;
-    } else if (calculationMethod === 'kfa') {
-        currentWeight = parseFloat(weightInputElementKfa && weightInputElementKfa.value) || 0;
-    }
-
-    var targetWeight = parseFloat(targetWeightElement && targetWeightElement.value) || 0;
-    var totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
-    var totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0;
-
-    if (startWeightElement) startWeightElement.textContent = currentWeight.toString();
-
-    // Calculate grundUmsatzValue based on the selected method
-    var grundUmsatzValue = 0;
-    if (calculationMethod === 'miflin') {
-        var heightInput = document.getElementById('height-2');
-        var height = parseFloat(heightInput && heightInput.value) || 0;
-
-        var optimalWeight = height - 100;
-
-        // Get age and gender
-        var ageInput = document.getElementById('age-2');
-        var age = parseFloat(ageInput && ageInput.value) || 0;
-
-        var gender = document.querySelector('input[name="geschlecht"]:checked')?.value;
-        var genderFactor = (gender === 'man') ? 5 : -161;
-
-        // Calculate Grundumsatz using Mifflin-St Jeor equation with optimal weight
-        grundUmsatzValue = 10 * optimalWeight + 6.25 * height - 5 * age + genderFactor;
-        grundUmsatzValue = Math.round(grundUmsatzValue);
-
-    } else if (calculationMethod === 'kfa') {
-        var kfaInput = document.getElementById('kfa-2'); // User's body fat percentage input
-        var kfa = parseFloat(kfaInput && kfaInput.value) / 100 || 0; // Convert percentage input to decimal (e.g., 40% = 0.40)
-
-        var LBM = 0; // Initialize lean body mass
-        var optimalWeight = 0; // Initialize optimal weight for KFA calculation
-
-        // Always calculate the lean body mass (LBM) based on the user's actual body fat percentage
-        LBM = currentWeight * (1 - kfa); // Example: 132kg * (1 - 0.40) = 79.2kg
-        
-        if (kfa > 0.15) {
-            // If KFA > 15%, adjust the weight to reflect what it would be with 15% body fat
-            optimalWeight = LBM / 0.85; // Example: 79.2kg / 0.85 = 93.18kg
-
-            // Calculate Grundumsatz using Mifflin-St Jeor equation with the adjusted optimal weight
-            grundUmsatzValue = 10 * optimalWeight + 6.25 * height - 5 * age + genderFactor;
-        } else {
-            // If body fat percentage is 15% or below, use the actual LBM without adjustment
-            grundUmsatzValue = 864 + (13.8 * LBM); // Original KFA formula with user's actual body fat percentage
-        }
-
-        grundUmsatzValue = Math.round(grundUmsatzValue); // Round the result
-    }
-
-    var selectedValue = null;
-    for (var i = 0; i < radios.length; i++) {
-        if (radios[i].checked) {
-            selectedValue = radios[i].value;
-            break;
-        }
-    }
-
-    // Check for invalid inputs
-    if (
-        isNaN(totalCaloriesValue) || totalCaloriesValue <= 0 ||
-        isNaN(currentWeight) || currentWeight <= 0 ||
-        isNaN(grundUmsatzValue) || grundUmsatzValue <= 0 ||
-        isNaN(targetWeight) || targetWeight <= 0 ||
-        !selectedValue
-    ) {
-        resetResults(); // Reset if inputs are invalid
-        return;
-    }
-
-    // Set the weekly weight loss percentage based on selected value
-    var weeklyWeightLossPercentage = 0;
-    if (selectedValue === 'Langsames Abnehmen') {
-        weeklyWeightLossPercentage = 0.005;
-    } else if (selectedValue === 'Moderates Abnehmen') {
-        weeklyWeightLossPercentage = 0.0075;
-    } else if (selectedValue === 'Schnelles Abnehmen') {
-        weeklyWeightLossPercentage = 0.01;
-    }
-
-    // Calculate the calorie deficit based on the last week's weight loss
-    var lastWeekWeightLossKg = currentWeight * weeklyWeightLossPercentage;
-    var calorieDeficitPerDay = Math.round((lastWeekWeightLossKg * 7700) / 7);
-    var targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay);
-
-    // Cap targetCalories to grundUmsatzValue only if it falls below it
-    if (targetCalories < grundUmsatzValue) {
-        targetCalories = grundUmsatzValue;
-        // Recalculate calorieDeficitPerDay based on capped targetCalories
-        calorieDeficitPerDay = totalCaloriesValue - targetCalories;
-        // Recalculate lastWeekWeightLossKg based on new calorieDeficitPerDay
-        lastWeekWeightLossKg = (calorieDeficitPerDay * 7) / 7700;
-        lastWeekWeightLossKg = Number(lastWeekWeightLossKg.toFixed(2));
-        // Recalculate weeklyWeightLossPercentage
-        weeklyWeightLossPercentage = lastWeekWeightLossKg / currentWeight;
-    } else {
-        lastWeekWeightLossKg = Number(lastWeekWeightLossKg.toFixed(2));
-    }
-
-    // Calculate weeks to reach the goal using compound weight loss
-    var weeksToReachGoal = 0;
-    if (weeklyWeightLossPercentage > 0) {
-        weeksToReachGoal = calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPercentage);
-    }
-    var monthsToReachGoal = Math.round(weeksToReachGoal / 4.345);
-
-    if (weeksElement) weeksElement.textContent = weeksToReachGoal.toString();
-    if (monthsElement) monthsElement.textContent = monthsToReachGoal.toString();
-
-    if (targetWeightResultElement) targetWeightResultElement.textContent = targetWeight.toString();
-
-    if (zielKalorienElement) zielKalorienElement.textContent = targetCalories > 0 ? Math.round(targetCalories) : '0';
-    if (zielKcalElement) zielKcalElement.textContent = targetCalories > 0 ? Math.round(targetCalories) : '0';
-
-    if (warningMessageElement) {
-        if (targetCalories <= grundUmsatzValue) {
-            warningMessageElement.style.display = 'flex';
-            var warningMessage = warningMessageElement.querySelector('.warning-message');
-            if (warningMessage) {
-                warningMessage.textContent = 'Warnhinweis: Du solltest nicht weniger als ' + grundUmsatzValue + ' kcal essen, um deine Gesundheit nicht zu gefährden.';
+        function updateResults() {
+            var calculationMethod = getSelectedCalculationMethod();
+            
+            // Get the current weight based on the selected calculation method
+            var currentWeight = 0;
+            if (calculationMethod === 'miflin') {
+                currentWeight = parseFloat(weightInputElementMiflin && weightInputElementMiflin.value) || 0;
+            } else if (calculationMethod === 'kfa') {
+                currentWeight = parseFloat(weightInputElementKfa && weightInputElementKfa.value) || 0;
             }
-        } else {
-            warningMessageElement.style.display = 'none';
+        
+            var targetWeight = parseFloat(targetWeightElement && targetWeightElement.value) || 0;
+            var totalCalories = totalCaloriesElement ? totalCaloriesElement.textContent : '';
+            var totalCaloriesValue = parseInt(totalCalories.replace(/\D/g, '')) || 0;
+        
+            if (startWeightElement) startWeightElement.textContent = currentWeight.toString();
+        
+            // Calculate grundUmsatzValue based on the selected method
+            var grundUmsatzValue = 0;
+            if (calculationMethod === 'miflin') {
+                var heightInput = document.getElementById('height-2');
+                var height = parseFloat(heightInput && heightInput.value) || 0;
+        
+                var optimalWeight = height - 100;
+        
+                // Get age and gender
+                var ageInput = document.getElementById('age-2');
+                var age = parseFloat(ageInput && ageInput.value) || 0;
+        
+                var gender = document.querySelector('input[name="geschlecht"]:checked')?.value;
+                var genderFactor = (gender === 'man') ? 5 : -161;
+        
+                // Calculate Grundumsatz using Mifflin-St Jeor equation with optimal weight
+                grundUmsatzValue = 10 * optimalWeight + 6.25 * height - 5 * age + genderFactor;
+                grundUmsatzValue = Math.round(grundUmsatzValue);
+        
+            } else if (calculationMethod === 'kfa') {
+                var kfaInput = document.getElementById('kfa-2'); // User's body fat percentage input
+                var kfa = parseFloat(kfaInput && kfaInput.value) / 100 || 0; // Convert percentage input to decimal (e.g., 40% = 0.40)
+        
+                // Step 1: Calculate optimal weight assuming 15% body fat
+                var LBM = currentWeight * (1 - 0.15); // Lean body mass assuming 15% body fat
+                var optimalWeight = LBM / 0.85; // Adjusted weight for 15% body fat
+        
+                // Step 2: Use KFA formula with optimal weight and user's actual input KFA
+                grundUmsatzValue = 864 + 13.8 * (optimalWeight * (1 - kfa)); // KFA formula with optimal weight
+        
+                grundUmsatzValue = Math.round(grundUmsatzValue);
+            }
+        
+            var selectedValue = null;
+            for (var i = 0; i < radios.length; i++) {
+                if (radios[i].checked) {
+                    selectedValue = radios[i].value;
+                    break;
+                }
+            }
+        
+            // Check for invalid inputs
+            if (
+                isNaN(totalCaloriesValue) || totalCaloriesValue <= 0 ||
+                isNaN(currentWeight) || currentWeight <= 0 ||
+                isNaN(grundUmsatzValue) || grundUmsatzValue <= 0 ||
+                isNaN(targetWeight) || targetWeight <= 0 ||
+                !selectedValue
+            ) {
+                resetResults(); // Reset if inputs are invalid
+                return;
+            }
+        
+            // Set the weekly weight loss percentage based on selected value
+            var weeklyWeightLossPercentage = 0;
+            if (selectedValue === 'Langsames Abnehmen') {
+                weeklyWeightLossPercentage = 0.005;
+            } else if (selectedValue === 'Moderates Abnehmen') {
+                weeklyWeightLossPercentage = 0.0075;
+            } else if (selectedValue === 'Schnelles Abnehmen') {
+                weeklyWeightLossPercentage = 0.01;
+            }
+        
+            // Calculate the calorie deficit based on the last week's weight loss
+            var lastWeekWeightLossKg = currentWeight * weeklyWeightLossPercentage;
+            var calorieDeficitPerDay = Math.round((lastWeekWeightLossKg * 7700) / 7);
+            var targetCalories = Math.max(0, totalCaloriesValue - calorieDeficitPerDay);
+        
+            // Cap targetCalories to grundUmsatzValue only if it falls below it
+            if (targetCalories < grundUmsatzValue) {
+                targetCalories = grundUmsatzValue;
+                // Recalculate calorieDeficitPerDay based on capped targetCalories
+                calorieDeficitPerDay = totalCaloriesValue - targetCalories;
+                // Recalculate lastWeekWeightLossKg based on new calorieDeficitPerDay
+                lastWeekWeightLossKg = (calorieDeficitPerDay * 7) / 7700;
+                lastWeekWeightLossKg = Number(lastWeekWeightLossKg.toFixed(2));
+                // Recalculate weeklyWeightLossPercentage
+                weeklyWeightLossPercentage = lastWeekWeightLossKg / currentWeight;
+            } else {
+                lastWeekWeightLossKg = Number(lastWeekWeightLossKg.toFixed(2));
+            }
+        
+            // Calculate weeks to reach the goal using compound weight loss
+            var weeksToReachGoal = 0;
+            if (weeklyWeightLossPercentage > 0) {
+                weeksToReachGoal = calculateWeeksToGoal(currentWeight, targetWeight, weeklyWeightLossPercentage);
+            }
+            var monthsToReachGoal = Math.round(weeksToReachGoal / 4.345);
+        
+            if (weeksElement) weeksElement.textContent = weeksToReachGoal.toString();
+            if (monthsElement) monthsElement.textContent = monthsToReachGoal.toString();
+        
+            if (targetWeightResultElement) targetWeightResultElement.textContent = targetWeight.toString();
+        
+            if (zielKalorienElement) zielKalorienElement.textContent = targetCalories > 0 ? Math.round(targetCalories) : '0';
+            if (zielKcalElement) zielKcalElement.textContent = targetCalories > 0 ? Math.round(targetCalories) : '0';
+        
+            if (warningMessageElement) {
+                if (targetCalories <= grundUmsatzValue) {
+                    warningMessageElement.style.display = 'flex';
+                    var warningMessage = warningMessageElement.querySelector('.warning-message');
+                    if (warningMessage) {
+                        warningMessage.textContent = 'Warnhinweis: Du solltest nicht weniger als ' + grundUmsatzValue + ' kcal essen, um deine Gesundheit nicht zu gefährden.';
+                    }
+                } else {
+                    warningMessageElement.style.display = 'none';
+                }
+            }
+        
+            // Update defizit and fettAbnahme with rounded values
+            if (defizitElement) defizitElement.textContent = Math.round(calorieDeficitPerDay).toString();
+            if (fettAbnahmeElement) fettAbnahmeElement.textContent = lastWeekWeightLossKg.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        
+            // Generate weight data points based on calculated weeks and weight loss percentage
+            const { weightData, timeIntervals } = calculateWeightDataPoints(currentWeight, targetWeight, weeksToReachGoal, weeklyWeightLossPercentage);
+        
+            // Generate the chart with calculated weight data and time intervals
+            generateResultChart(weightData, timeIntervals);
         }
-    }
-
-    // Update defizit and fettAbnahme with rounded values
-    if (defizitElement) defizitElement.textContent = Math.round(calorieDeficitPerDay).toString();
-    if (fettAbnahmeElement) fettAbnahmeElement.textContent = lastWeekWeightLossKg.toLocaleString('de-DE', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-
-    // Generate weight data points based on calculated weeks and weight loss percentage
-    const { weightData, timeIntervals } = calculateWeightDataPoints(currentWeight, targetWeight, weeksToReachGoal, weeklyWeightLossPercentage);
-
-    // Generate the chart with calculated weight data and time intervals
-    generateResultChart(weightData, timeIntervals);
-}
+        
 
         
         
