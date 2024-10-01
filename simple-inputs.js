@@ -136,60 +136,52 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Function to update range slider position and value for weight, KFA, and steps
-    function updateRangeSliderPosition(rangeSliderWrapperClass, value, withTransition) {
-        console.log(`Updating range slider position for "${rangeSliderWrapperClass}" with value: ${value}, transition: ${withTransition}`);
-        const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
+    function updateRangeSliderPosition(wrapperClass, elementId, value, withTransition) {
+        console.log(`Updating range slider position for "${wrapperClass}" with value: ${value}, transition: ${withTransition}`);
+        
+        // Correctly select the wrapper using both the class and the attribute selector
+        const wrapper = document.querySelector(`.${wrapperClass}[fs-rangeslider-element="${elementId}"]`);
+        
         if (!wrapper) {
-            console.log(`Wrapper with class "${rangeSliderWrapperClass}" not found.`);
+            console.log(`Wrapper with class "${wrapperClass}" and fs-rangeslider-element="${elementId}" not found.`);
             return;
         }
-
+    
         const handle = wrapper.querySelector(".range-slider_handle");
         const fill = wrapper.querySelector(".range-slider_fill");
-
+    
         const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
         const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
-
+    
         console.log(`Range slider min: ${min}, max: ${max}`);
-
-        // Enforce 500 steps for the 'steps-4' slider
+    
         let stepSize = 1;
         if (wrapper.getAttribute("fs-rangeslider-element") === 'wrapper-4') {
             const totalSteps = 500;
             stepSize = (max - min) / totalSteps;
         }
-
-        // Remove commas and periods for numerical processing
+    
         const numericValue = parseFloat(value.replace(/,/g, '.'));
-        console.log(`Parsed numeric value: ${numericValue}`);
-
         if (isNaN(numericValue)) {
-            console.log(`Invalid numeric value for "${rangeSliderWrapperClass}": "${value}"`);
+            console.log(`Invalid numeric value for "${wrapperClass}": "${value}"`);
             return;
         }
-
-        // Ensure the value stays within the range and snap to the nearest step
+    
         const adjustedValue = Math.max(min, Math.min(numericValue, max));
-        const snappedValue = Math.round(adjustedValue / stepSize) * stepSize; // Snap to nearest step
-
-        console.log(`Adjusted value within range: ${adjustedValue}, Snapped value: ${snappedValue}`);
-
-        // Calculate percentage relative to the slider's range
+        const snappedValue = Math.round(adjustedValue / stepSize) * stepSize;
+    
         const percentage = ((snappedValue - min) / (max - min)) * 100;
-        console.log(`Calculated percentage: ${percentage}%`);
-
-        // Apply transition if needed
+    
         handle.style.transition = withTransition ? 'left 0.3s ease' : 'none';
         fill.style.transition = withTransition ? 'width 0.3s ease' : 'none';
-
-        // Set handle and fill to a max of 100% and a min of 0%
+    
         const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
         handle.style.left = `${clampedPercentage}%`;
         fill.style.width = `${clampedPercentage}%`;
-
+    
         console.log(`Set handle left to ${handle.style.left} and fill width to ${fill.style.width}`);
     }
-
+    
     // Sync input field value with slider handle text for weight, KFA, and steps
     function setInputValue(rangeSliderWrapperClass, inputId) {
         console.log(`Setting input value for "${inputId}" based on slider "${rangeSliderWrapperClass}"`);
