@@ -237,6 +237,15 @@ document.addEventListener('DOMContentLoaded', function() {
         handleInputChange();
     }
 
+     // Function to handle input changes for weight and KFA
+     function handleInputChange() {
+        console.log('Handling input changes for weight and KFA.');
+        const weight = document.getElementById("weight-3-kfa") ? document.getElementById("weight-3-kfa").value : 'N/A';
+        const kfa = document.getElementById("kfa-2") ? document.getElementById("kfa-2").value : 'N/A';
+        console.log(`Current weight-3-kfa: "${weight}", kfa-2: "${kfa}"`);
+        // Additional logic can be added here as needed
+    }
+
     // Update handle text based on input value for weight, KFA, and steps
     function setHandleText(rangeSliderWrapperClass, inputId) {
         console.log(`Setting handle text for slider "${rangeSliderWrapperClass}" based on input "${inputId}"`);
@@ -282,6 +291,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     console.log('Range sliders and input synchronization setup complete.');
+});
+
+
+slider.addEventListener('click', (event) => {
+    console.log(`Slider "${rangeSliderWrapperClass}" clicked at position: (${event.clientX}, ${event.clientY})`);
+    const rect = slider.getBoundingClientRect();
+    const offsetX = event.clientX - rect.left;
+    const percentage = (offsetX / slider.clientWidth) * 100;
+
+    const wrapper = document.querySelector(`.${rangeSliderWrapperClass}`);
+    const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
+    const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
+    const value = Math.round(min + (percentage / 100) * (max - min));
+
+    console.log(`Calculated value from click: ${value}`);
+    const inputElement = document.getElementById(inputId);
+    if (inputElement) {
+        inputElement.isProgrammaticChange = true;
+        inputElement.value = value;
+        inputElement.isProgrammaticChange = false;
+        console.log(`Updated input "${inputId}" value to "${value}" from slider click.`);
+        setHandleText(rangeSliderWrapperClass, inputId);
+    } else {
+        console.log(`Input element with ID "${inputId}" not found.`);
+    }
 });
 
 // Additional DOMContentLoaded listener for buttons
