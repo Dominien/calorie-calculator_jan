@@ -137,18 +137,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Function to update range slider position and value for weight, KFA, and steps
     function updateRangeSliderPosition(wrapperClass, elementId, value, withTransition) {
-        console.log(`Updating range slider position for "${wrapperClass}" with value: ${value}, transition: ${withTransition}`);
+        console.log(`Updating range slider position for "${wrapperClass}" with elementId "${elementId}", value: ${value}, transition: ${withTransition}`);
         
         // Correctly select the wrapper using both the class and the attribute selector
-        const wrapper = document.querySelector(`.${wrapperClass}[fs-rangeslider-element="${elementId}"]`);
+        const wrapperSelector = `.${wrapperClass}[fs-rangeslider-element="${elementId}"]`;
+        console.log(`Trying to select wrapper with selector: "${wrapperSelector}"`);
+        
+        const wrapper = document.querySelector(wrapperSelector);
         
         if (!wrapper) {
-            console.log(`Wrapper with class "${wrapperClass}" and fs-rangeslider-element="${elementId}" not found.`);
+            console.error(`Wrapper with class "${wrapperClass}" and fs-rangeslider-element="${elementId}" not found.`);
             return;
+        } else {
+            console.log(`Wrapper found: `, wrapper);
         }
     
         const handle = wrapper.querySelector(".range-slider_handle");
         const fill = wrapper.querySelector(".range-slider_fill");
+    
+        if (!handle || !fill) {
+            console.error('Handle or fill element not found within the wrapper.');
+            return;
+        }
+    
+        console.log(`Handle found: `, handle);
+        console.log(`Fill found: `, fill);
     
         const min = parseFloat(wrapper.getAttribute("fs-rangeslider-min"));
         const max = parseFloat(wrapper.getAttribute("fs-rangeslider-max"));
@@ -159,28 +172,47 @@ document.addEventListener('DOMContentLoaded', function() {
         if (wrapper.getAttribute("fs-rangeslider-element") === 'wrapper-4') {
             const totalSteps = 500;
             stepSize = (max - min) / totalSteps;
+            console.log(`Special case for "wrapper-4": Total steps = ${totalSteps}, step size = ${stepSize}`);
+        } else {
+            console.log(`Normal step size of 1 applied.`);
         }
     
         const numericValue = parseFloat(value.replace(/,/g, '.'));
+        console.log(`Parsed numeric value: ${numericValue}`);
+    
         if (isNaN(numericValue)) {
-            console.log(`Invalid numeric value for "${wrapperClass}": "${value}"`);
+            console.error(`Invalid numeric value provided: "${value}". Cannot update range slider.`);
             return;
         }
     
+        // Ensure the value stays within the range and snap to the nearest step
         const adjustedValue = Math.max(min, Math.min(numericValue, max));
         const snappedValue = Math.round(adjustedValue / stepSize) * stepSize;
+        
+        console.log(`Adjusted value (clamped between ${min} and ${max}): ${adjustedValue}`);
+        console.log(`Snapped value (to nearest step size ${stepSize}): ${snappedValue}`);
     
+        // Calculate percentage relative to the slider's range
         const percentage = ((snappedValue - min) / (max - min)) * 100;
+        console.log(`Calculated percentage: ${percentage}% of the slider's range`);
     
+        // Apply transition if needed
         handle.style.transition = withTransition ? 'left 0.3s ease' : 'none';
         fill.style.transition = withTransition ? 'width 0.3s ease' : 'none';
     
+        console.log(`Transition applied: ${withTransition ? 'with animation' : 'no animation'}`);
+    
+        // Set handle and fill to a max of 100% and a min of 0%
         const clampedPercentage = Math.min(Math.max(percentage, 0), 100);
+        console.log(`Clamped percentage: ${clampedPercentage}%`);
+    
         handle.style.left = `${clampedPercentage}%`;
         fill.style.width = `${clampedPercentage}%`;
     
-        console.log(`Set handle left to ${handle.style.left} and fill width to ${fill.style.width}`);
+        console.log(`Handle position set to: ${handle.style.left}`);
+        console.log(`Fill width set to: ${fill.style.width}`);
     }
+    
     
     // Sync input field value with slider handle text for weight, KFA, and steps
     function setInputValue(rangeSliderWrapperClass, inputId) {
