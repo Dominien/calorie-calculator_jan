@@ -590,3 +590,66 @@ document.addEventListener('DOMContentLoaded', function () {
 
     console.log('Pointer cursor added to woman buttons.');
 });
+
+
+// Function to format numbers with thousands separator
+function formatThousands(value) {
+    // Remove non-digit characters first, except commas and periods
+    value = value.replace(/[^0-9,.]/g, '');
+
+    // Handle commas and periods by removing any leading ones
+    value = value.replace(/^[,.]/, '');
+
+    // Split the value into integer and decimal parts if applicable
+    const parts = value.split(',');
+
+    // Add thousands separator to the integer part
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+    // Rejoin with the decimal part if it exists
+    return parts.join(',');
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    const numericInputs = document.querySelectorAll('.input-calculator');
+    const allowCommaFields = ['wunschgewicht', 'weight-2', 'weight-3-kfa'];
+
+    numericInputs.forEach(input => {
+        input.addEventListener('input', () => {
+            // Get the current value and format it
+            let value = input.value;
+
+            if (allowCommaFields.includes(input.id)) {
+                // Allow both commas and periods for these fields
+                value = formatThousands(value);
+            } else {
+                // Only numbers allowed for other fields
+                value = value.replace(/[^0-9]/g, '');
+            }
+
+            input.value = value;
+        });
+
+        // Ensure that only numbers, commas, and periods can be entered in allowed fields
+        input.addEventListener('keydown', (event) => {
+            const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'];
+
+            if (allowedKeys.includes(event.key) || (event.ctrlKey || event.metaKey)) {
+                return; // Allow control keys and meta keys
+            }
+
+            // Prevent multiple commas or periods
+            if ((event.key === ',' && input.value.includes(',')) || (event.key === '.' && input.value.includes('.'))) {
+                event.preventDefault();
+                return;
+            }
+
+            // Only allow number keys, commas, and periods
+            const isNumberKey = !event.shiftKey && ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105));
+
+            if (!isNumberKey && event.key !== ',' && event.key !== '.') {
+                event.preventDefault();
+            }
+        });
+    });
+});
