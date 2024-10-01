@@ -115,16 +115,19 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
         const grundumsatzWrapper = document.querySelector('.wrapper-result_grundumsatz');
     
         if ((calcType === 'miflin' && weight && height && age && gender) || (calcType === 'kfa' && weight && kfa && gender)) {
-            const roundedResult = Math.round(result).toLocaleString('de-DE'); // Format with comma for thousands
+            const roundedResult = Math.round(result); // Keep as a number for calculations
             
-            grundumsatzElement.textContent = `${roundedResult} kcal`;
+            // Display the result using toLocaleString
+            const formattedResult = roundedResult.toLocaleString('de-DE');
+            
+            grundumsatzElement.textContent = `${formattedResult} kcal`;
     
             const grundumsatzResultElement = document.querySelector('.wrapper-result_grundumsatz .steps_result-text');
             if (grundumsatzResultElement) {
-                grundumsatzResultElement.textContent = `${roundedResult} kcal`;
+                grundumsatzResultElement.textContent = `${formattedResult} kcal`;
             }
     
-            if (Math.round(result) > 0 && grundumsatzWrapper) {
+            if (roundedResult > 0 && grundumsatzWrapper) {
                 grundumsatzWrapper.style.display = 'flex';
             }
         } else {
@@ -140,6 +143,7 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
             }
         }
     }
+    
     
     
 
