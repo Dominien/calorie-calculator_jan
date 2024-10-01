@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Additional logic can be added here as needed
     }
 
-    // Function to handle input changes and slider sync for weight and KFA
+// Function to handle input changes and slider sync for weight and KFA
 function observeChanges(rangeSliderWrapperClass, inputId) {
     console.log(`Setting up MutationObserver for "${inputId}" with slider "${rangeSliderWrapperClass}"`);
     
@@ -260,8 +260,8 @@ function observeChanges(rangeSliderWrapperClass, inputId) {
     const observer = new MutationObserver(() => {
         console.log(`MutationObserver detected a change in "${rangeSliderWrapperClass}".`);
 
-        // Only update input if handle text is not empty
-        if (handleTextElement.textContent && inputElement.value !== handleTextElement.textContent) {
+        // Only update input if handle text is not empty and is not "0"
+        if (handleTextElement.textContent !== "" && handleTextElement.textContent !== "0" && inputElement.value !== handleTextElement.textContent) {
             console.log(`Updating input "${inputId}" value from "${inputElement.value}" to "${handleTextElement.textContent}"`);
             inputElement.isProgrammaticChange = true;
             inputElement.value = handleTextElement.textContent;
@@ -296,6 +296,7 @@ function observeChanges(rangeSliderWrapperClass, inputId) {
         }
     });
 }
+
 
 
     // Add listeners for slider handle movement for weight and KFA
