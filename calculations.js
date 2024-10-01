@@ -93,44 +93,53 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
 
     // Calculation function for BMR
     function calculateResult() {
+        // Fetch values from sliders' handle text if available
         age = getSliderValue('wrapper-step-range_slider', 'age-2');
         height = getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', 'height-2');
         weight = calcType === 'miflin' ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', 'weight-2') : getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
         kfa = calcType === 'kfa' ? getSliderValue('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2') : 0;
     
+    
         let result = 0;
     
         if (calcType === 'miflin') {
+            // Miflin St. Jeor formula (using height, weight, age)
             if (gender === 'Mann') {
                 result = 10 * weight + 6.25 * height - 5 * age + 5; // For males
             } else if (gender === 'frau') {
                 result = 10 * weight + 6.25 * height - 5 * age - 161; // For females
             }
         } else if (calcType === 'kfa') {
+            // Calculate BMR with KFA (only using weight and body fat percentage)
             if (weight > 0 && kfa > 0) {
                 result = 864 + 13.8 * (weight * (1 - kfa / 100)); // KFA formula
             }
         }
     
+    
+        // Select the wrapper for Grundumsatz result
         const grundumsatzWrapper = document.querySelector('.wrapper-result_grundumsatz');
     
+        // Update both elements with the calculated Grundumsatz
         if ((calcType === 'miflin' && weight && height && age && gender) || (calcType === 'kfa' && weight && kfa && gender)) {
-            const roundedResult = Math.round(result); // Keep as a number for calculations
-            
-            // Display the result using toLocaleString
-            const formattedResult = roundedResult.toLocaleString('de-DE');
-            
-            grundumsatzElement.textContent = `${formattedResult} kcal`;
+            const roundedResult = Math.round(result);
     
+            // Update the Grundumsatz element in the first section
+            grundumsatzElement.textContent = `${roundedResult} kcal`;
+    
+            // Update the other element with the Grundumsatz result
             const grundumsatzResultElement = document.querySelector('.wrapper-result_grundumsatz .steps_result-text');
             if (grundumsatzResultElement) {
-                grundumsatzResultElement.textContent = `${formattedResult} kcal`;
+                grundumsatzResultElement.textContent = `${roundedResult} kcal`;
             }
     
+            // Set wrapper display to flex if result is greater than 0
             if (roundedResult > 0 && grundumsatzWrapper) {
                 grundumsatzWrapper.style.display = 'flex';
             }
+    
         } else {
+            // Reset both elements to 0 kcal if inputs are incomplete
             grundumsatzElement.textContent = '0 kcal';
     
             const grundumsatzResultElement = document.querySelector('.wrapper-result_grundumsatz .steps_result-text');
@@ -138,29 +147,30 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
                 grundumsatzResultElement.textContent = '0 kcal';
             }
     
+            // Set wrapper display to none if result is 0
             if (grundumsatzWrapper) {
                 grundumsatzWrapper.style.display = 'none';
             }
+    
         }
     }
-    
     
     
 
     // New function to calculate calories burned from daily steps
     function calculateStepsCalories() {
-        const stepsCalories = dailySteps * 0.04; // On average, walking burns 0.04 kcal per step
-    
-        if (dailySteps > 0) {
-            stepsWrapperResult.style.display = 'flex';
-            stepsResultElement.textContent = `${Math.round(stepsCalories).toLocaleString('de-DE')} kcal`; // Format with comma for thousands
-            altagElement.textContent = `${Math.round(stepsCalories).toLocaleString('de-DE')} kcal`; // Update Alltagsbewegung
-        } else {
-            stepsWrapperResult.style.display = 'none'; // Hide if steps are 0
-            altagElement.textContent = '0 kcal'; // Reset Alltagsbewegung if steps are 0
-        }
+    const stepsCalories = dailySteps * 0.04; // On average, walking burns 0.04 kcal per step
+
+    if (dailySteps > 0) {
+        stepsWrapperResult.style.display = 'flex';
+        stepsResultElement.textContent = `${Math.round(stepsCalories).toLocaleString('de-DE')} kcal`; // Format with comma for thousands
+        altagElement.textContent = `${Math.round(stepsCalories).toLocaleString('de-DE')} kcal`; // Update Alltagsbewegung
+    } else {
+        stepsWrapperResult.style.display = 'none'; // Hide if steps are 0
+        altagElement.textContent = '0 kcal'; // Reset Alltagsbewegung if steps are 0
     }
-    
+}
+
 
     // Get the value from the slider handle or the input field
     function getSliderValue(wrapperClass, inputId) {
