@@ -246,6 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 // Function to handle input changes and slider sync for weight and KFA
+// Function to handle input changes and slider sync for weight and KFA
 function observeChanges(rangeSliderWrapperClass, inputId) {
     console.log(`Setting up MutationObserver for "${inputId}" with slider "${rangeSliderWrapperClass}"`);
     
@@ -260,8 +261,12 @@ function observeChanges(rangeSliderWrapperClass, inputId) {
     const observer = new MutationObserver(() => {
         console.log(`MutationObserver detected a change in "${rangeSliderWrapperClass}".`);
 
-        // Only update input if handle text is not empty and is not "0"
+        // Only update input if handle text is not empty, not "0", and if the user has interacted
         if (handleTextElement.textContent !== "" && handleTextElement.textContent !== "0" && inputElement.value !== handleTextElement.textContent) {
+            if (inputElement.value === "") {
+                console.log(`Skipping update because input "${inputId}" is still empty.`);
+                return;
+            }
             console.log(`Updating input "${inputId}" value from "${inputElement.value}" to "${handleTextElement.textContent}"`);
             inputElement.isProgrammaticChange = true;
             inputElement.value = handleTextElement.textContent;
@@ -296,6 +301,81 @@ function observeChanges(rangeSliderWrapperClass, inputId) {
         }
     });
 }
+
+// Initialization of range sliders and input synchronization
+document.addEventListener('DOMContentLoaded', function() {
+    const numericInputs = document.querySelectorAll('.input-calculator');
+
+    // List of input IDs that should allow commas
+    const allowCommaFields = ['wunschgewicht', 'weight-2', 'weight-3-kfa'];
+
+    console.log('Initializing input restrictions...');
+    console.log('Allow Comma Fields:', allowCommaFields);
+
+    // Restrict input based on whether commas are allowed
+    numericInputs.forEach(input => {
+        // Initialize the flag to prevent recursive input events
+        input.isProgrammaticChange = false;
+
+        console.log(`Setting up input restrictions for: ${input.id}`);
+        if (allowCommaFields.includes(input.id)) {
+            console.log(`${input.id} is allowed to have commas and periods.`);
+
+            // Allow numbers, commas, and periods for specific fields
+            input.addEventListener('input', () => {
+                if (input.isProgrammaticChange) {
+                    console.log(`Programmatic change detected on ${input.id}. Skipping input event.`);
+                    return;
+                }
+
+                console.log(`Input event triggered on ${input.id}. Current value: "${input.value}"`);
+                const originalValue = input.value;
+
+                // Replace any character that is not a digit, comma, or period
+                let sanitizedValue = input.value.replace(/[^0-9,\.]/g, '')
+                                               .replace(/,{2,}/g, ',') // Replace multiple commas with single comma
+                                               .replace(/\.{2,}/g, '.') // Replace multiple periods with single period
+                                               .replace(/,\./g, '.') // Replace comma followed by period with period
+                                               .replace(/\.,/g, ','); // Replace period followed by comma with comma
+
+                // Remove only leading commas or periods
+                sanitizedValue = sanitizedValue.replace(/^[,\.]+/g, '');
+
+                if (originalValue !== sanitizedValue) {
+                    console.log(`Sanitized value for ${input.id}: "${sanitizedValue}"`);
+                    // Update the flag to indicate a programmatic change
+                    input.isProgrammaticChange = true;
+                    input.value = sanitizedValue;
+                    input.isProgrammaticChange = false;
+                }
+
+                // Convert commas to periods for processing by the slider
+                const valueForSlider = sanitizedValue.replace(/,/g, '.');
+                updateRangeSliderPosition(`wrapper-step-range_slider[fs-rangeslider-element="${input.id}"]`, valueForSlider, true);
+            });
+        }
+    });
+
+    // Initialize values and add listeners for weight and KFA
+    console.log('Initializing range sliders and input synchronization.');
+
+    // Define the range slider wrappers and corresponding input IDs
+    const slidersAndInputs = [
+        { wrapper: 'wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', input: 'weight-3-kfa' },
+        { wrapper: 'wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', input: 'kfa-2' },
+        { wrapper: 'wrapper-step-range_slider', input: 'age-2' },
+        { wrapper: 'wrapper-step-range_slider[fs-rangeslider-element="wrapper-2"]', input: 'height-2' },
+        { wrapper: 'wrapper-step-range_slider[fs-rangeslider-element="wrapper-3"]', input: 'weight-2' },
+        { wrapper: 'wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', input: 'steps-4' },
+        { wrapper: 'wrapper-step-range_slider[fs-rangeslider-element="wrapper-7"]', input: 'wunschgewicht' }
+    ];
+
+    slidersAndInputs.forEach(({ wrapper, input }) => {
+        observeChanges(wrapper, input);
+    });
+
+    console.log('Range sliders and input synchronization setup complete.');
+});
 
 
 
