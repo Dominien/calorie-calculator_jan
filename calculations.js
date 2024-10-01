@@ -195,6 +195,7 @@ document.addEventListener('DOMContentLoaded', function () { //Stelle für Änder
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-5"]', 'weight-3-kfa');
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-6"]', 'kfa-2');
         observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-4"]', 'steps-4'); // Steps slider
+        observeSliderChange('wrapper-step-range_slider[fs-rangeslider-element="wrapper-7"]', 'wunschgewicht');
     }
 
     // Function to observe slider changes
