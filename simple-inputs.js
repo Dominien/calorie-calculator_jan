@@ -594,62 +594,88 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Function to format numbers with thousands separator
 function formatThousands(value) {
-    // Remove non-digit characters first, except commas and periods
-    value = value.replace(/[^0-9,.]/g, '');
-
-    // Handle commas and periods by removing any leading ones
-    value = value.replace(/^[,.]/, '');
-
-    // Split the value into integer and decimal parts if applicable
-    const parts = value.split(',');
+    // Remove non-digit characters first
+    value = value.replace(/[^0-9]/g, '');
 
     // Add thousands separator to the integer part
-    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-
-    // Rejoin with the decimal part if it exists
-    return parts.join(',');
+    return value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    const numericInputs = document.querySelectorAll('.input-calculator');
-    const allowCommaFields = ['wunschgewicht', 'weight-2', 'weight-3-kfa'];
+    const stepsInput = document.getElementById('steps-4');
+    const sliderHandleText = document.querySelector('.inside-handle-text');
+    const sliderHandle = document.querySelector('.range-slider_handle');
+    const sliderFill = document.querySelector('.range-slider_fill');
+    const sliderTrack = document.querySelector('.track-range-slider');
+    const maxSteps = 40000;
+    const minSteps = 0;
 
-    numericInputs.forEach(input => {
-        input.addEventListener('input', () => {
-            // Get the current value and format it
-            let value = input.value;
+    // Function to sync the slider and input value
+    function updateSliderFromInput() {
+        let inputValue = stepsInput.value.replace(/\./g, ''); // Remove the dots to parse the number
+        inputValue = parseInt(inputValue, 10) || 0; // Parse the number or default to 0
 
-            if (allowCommaFields.includes(input.id)) {
-                // Allow both commas and periods for these fields
-                value = formatThousands(value);
-            } else {
-                // Only numbers allowed for other fields
-                value = value.replace(/[^0-9]/g, '');
-            }
+        // Ensure the value is within the slider range
+        inputValue = Math.max(minSteps, Math.min(inputValue, maxSteps));
 
-            input.value = value;
-        });
+        // Update the slider handle position
+        const percentage = (inputValue / maxSteps) * 100;
+        sliderHandle.style.left = `${percentage}%`;
+        sliderFill.style.width = `${percentage}%`;
 
-        // Ensure that only numbers, commas, and periods can be entered in allowed fields
-        input.addEventListener('keydown', (event) => {
-            const allowedKeys = ['Backspace', 'Delete', 'Tab', 'Escape', 'Enter', 'Home', 'End', 'ArrowLeft', 'ArrowRight'];
+        // Update the slider handle text
+        sliderHandleText.textContent = formatThousands(inputValue.toString());
+    }
 
-            if (allowedKeys.includes(event.key) || (event.ctrlKey || event.metaKey)) {
-                return; // Allow control keys and meta keys
-            }
+    function updateInputFromSlider(value) {
+        // Update the input field with the formatted value
+        stepsInput.value = formatThousands(value.toString());
+    }
 
-            // Prevent multiple commas or periods
-            if ((event.key === ',' && input.value.includes(',')) || (event.key === '.' && input.value.includes('.'))) {
-                event.preventDefault();
-                return;
-            }
+    // Handle input changes
+    stepsInput.addEventListener('input', () => {
+        let inputValue = stepsInput.value;
 
-            // Only allow number keys, commas, and periods
-            const isNumberKey = !event.shiftKey && ((event.keyCode >= 48 && event.keyCode <= 57) || (event.keyCode >= 96 && event.keyCode <= 105));
+        // Format the input with thousands separator
+        inputValue = formatThousands(inputValue);
 
-            if (!isNumberKey && event.key !== ',' && event.key !== '.') {
-                event.preventDefault();
-            }
-        });
+        stepsInput.value = inputValue;
+
+        // Update the slider based on the input value
+        updateSliderFromInput();
     });
+
+    // Handle slider drag movement
+    sliderTrack.addEventListener('click', (event) => {
+        const rect = sliderTrack.getBoundingClientRect();
+        const offsetX = event.clientX - rect.left;
+        const percentage = (offsetX / sliderTrack.clientWidth) * 100;
+
+        const newValue = Math.round((percentage / 100) * maxSteps);
+        updateInputFromSlider(newValue);
+        updateSliderFromInput(); // Sync slider handle
+    });
+
+    sliderHandle.addEventListener('mousedown', () => {
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+    });
+
+    function onMouseMove(event) {
+        const rect = sliderTrack.getBoundingClientRect();
+        const offsetX = event.clientX - rect.left;
+        const percentage = Math.min(Math.max(0, (offsetX / sliderTrack.clientWidth) * 100), 100);
+
+        const newValue = Math.round((percentage / 100) * maxSteps);
+        updateInputFromSlider(newValue);
+        updateSliderFromInput(); // Sync slider handle
+    }
+
+    function onMouseUp() {
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    }
+
+    // Initial sync between slider and input
+    updateSliderFromInput();
 });
