@@ -246,46 +246,57 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Function to handle input changes and slider sync for weight and KFA
-    function observeChanges(rangeSliderWrapperClass, inputId) {
-        console.log(`Setting up MutationObserver for "${inputId}" with slider "${rangeSliderWrapperClass}"`);
-        const handleTextElement = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
-        const inputElement = document.getElementById(inputId);
+function observeChanges(rangeSliderWrapperClass, inputId) {
+    console.log(`Setting up MutationObserver for "${inputId}" with slider "${rangeSliderWrapperClass}"`);
+    
+    const handleTextElement = document.querySelector(`.${rangeSliderWrapperClass} .inside-handle-text`);
+    const inputElement = document.getElementById(inputId);
 
-        if (!handleTextElement || !inputElement) {
-            console.log(`Handle text element or input element not found for "${rangeSliderWrapperClass}" and "${inputId}".`);
+    if (!handleTextElement || !inputElement) {
+        console.log(`Handle text element or input element not found for "${rangeSliderWrapperClass}" and "${inputId}".`);
+        return;
+    }
+
+    const observer = new MutationObserver(() => {
+        console.log(`MutationObserver detected a change in "${rangeSliderWrapperClass}".`);
+
+        // Only update input if handle text is not empty
+        if (handleTextElement.textContent && inputElement.value !== handleTextElement.textContent) {
+            console.log(`Updating input "${inputId}" value from "${inputElement.value}" to "${handleTextElement.textContent}"`);
+            inputElement.isProgrammaticChange = true;
+            inputElement.value = handleTextElement.textContent;
+            inputElement.isProgrammaticChange = false;
+            handleInputChange();
+        }
+    });
+
+    observer.observe(handleTextElement, { childList: true });
+
+    inputElement.addEventListener('input', () => {
+        if (inputElement.isProgrammaticChange) {
+            console.log(`Programmatic change detected on "${inputId}". Skipping input event.`);
             return;
         }
 
-        const observer = new MutationObserver(() => {
-            console.log(`MutationObserver detected a change in "${rangeSliderWrapperClass}".`);
-            if (inputElement.value !== handleTextElement.textContent) {
-                console.log(`Updating input "${inputId}" value from "${inputElement.value}" to "${handleTextElement.textContent}"`);
-                inputElement.isProgrammaticChange = true;
-                inputElement.value = handleTextElement.textContent;
-                inputElement.isProgrammaticChange = false;
-                handleInputChange();
-            }
-        });
+        console.log(`Input event detected on "${inputId}". Value: "${inputElement.value}"`);
+        
+        // Do not update handle text if the input is empty
+        if (inputElement.value.trim() === "") {
+            console.log(`Input is empty for "${inputId}". No changes made.`);
+            return;
+        }
 
-        observer.observe(handleTextElement, { childList: true });
+        if (inputElement.value !== handleTextElement.textContent) {
+            console.log(`Updating handle text for "${rangeSliderWrapperClass}" to "${inputElement.value}"`);
+            // Use the flag to prevent recursive input event triggering
+            inputElement.isProgrammaticChange = true;
+            handleTextElement.textContent = inputElement.value;
+            inputElement.isProgrammaticChange = false;
+            updateRangeSliderPosition(rangeSliderWrapperClass, inputElement.value, true);
+        }
+    });
+}
 
-        inputElement.addEventListener('input', () => {
-            if (inputElement.isProgrammaticChange) {
-                console.log(`Programmatic change detected on "${inputId}". Skipping input event.`);
-                return;
-            }
-
-            console.log(`Input event detected on "${inputId}". Value: "${inputElement.value}"`);
-            if (inputElement.value !== handleTextElement.textContent) {
-                console.log(`Updating handle text for "${rangeSliderWrapperClass}" to "${inputElement.value}"`);
-                // Use the flag to prevent recursive input event triggering
-                inputElement.isProgrammaticChange = true;
-                handleTextElement.textContent = inputElement.value;
-                inputElement.isProgrammaticChange = false;
-                updateRangeSliderPosition(rangeSliderWrapperClass, inputElement.value, true);
-            }
-        });
-    }
 
     // Add listeners for slider handle movement for weight and KFA
     function addHandleMovementListener(rangeSliderWrapperClass, inputId) {
